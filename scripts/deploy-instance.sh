@@ -129,8 +129,8 @@ create_docker_compose() {
     export DB_PASSWORD="${DB_PASSWORD:-root}"
     export NODE_ENV="${NODE_ENV:-production}"
 
-    # Create docker compose.yml from template
-    envsubst < "$PROJECT_ROOT/docker compose.template.yml" > "$instance_dir/docker compose.yml"
+    # Create docker-compose.yml from template
+    envsubst < "$PROJECT_ROOT/docker-compose.template.yml" > "$instance_dir/docker-compose.yml"
 
     print_success "Docker Compose file created"
 }
