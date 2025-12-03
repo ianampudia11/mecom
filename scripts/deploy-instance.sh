@@ -163,7 +163,7 @@ create_env_file() {
     sed -i "s/SESSION_SECRET=.*/SESSION_SECRET=$session_secret/" "$env_file"
 
     if [ -n "$company_name" ]; then
-        sed -i "s/COMPANY_NAME=.*/COMPANY_NAME=$company_name/" "$env_file"
+        sed -i "s/COMPANY_NAME=.*/COMPANY_NAME=\"$company_name\"/" "$env_file"
         # Create slug from company name
         local company_slug=$(echo "$company_name" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-\|-$//g')
         sed -i "s/COMPANY_SLUG=.*/COMPANY_SLUG=$company_slug/" "$env_file"
