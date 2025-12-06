@@ -84,7 +84,7 @@ chmod +x deploy.sh
 
 # Deploy using the instance script
 # We'll call the instance "main" and use port 5000
-./scripts/deploy-instance.sh "main" --app-port 5000 --db-port 5432 --company-name "Iawarrior tech" --admin-email "$EMAIL"
+./scripts/deploy-instance.sh "main" --app-port 5000 --db-port 5432 --company-name "Iawarrior tech" --admin-email "$EMAIL" --admin-password "$ADMIN_PASSWORD"
 
 # 6. Configure Nginx
 echo -e "${GREEN}Configuring Nginx...${NC}"
