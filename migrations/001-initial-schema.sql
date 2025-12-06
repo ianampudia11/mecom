@@ -933,10 +933,10 @@ ON CONFLICT (slug) DO NOTHING;
 -- Password: Admin@123456 (CHANGE THIS AFTER FIRST LOGIN!)
 INSERT INTO users (username, password, full_name, email, role, is_super_admin, company_id)
 SELECT
-  'admin',
-  '29afa0d245666f74f88337abf5f76577d07a99132f5d5d6cc7902ce2ef2df5d13b545b36c5e7efd5830eeb243bc4dbb3b68fe560a9c1ed2e3de9af548bc2f66d.aa1da567baf11c4a100b592c24bcb9a8',
+  '${ADMIN_USERNAME}',
+  '${ADMIN_PASSWORD}',
   'Admin User',
-  'admin@app.com',
+  '${ADMIN_EMAIL}',
   'super_admin',
   TRUE,
   id

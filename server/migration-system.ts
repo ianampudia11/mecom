@@ -70,7 +70,6 @@ export class MigrationSystem {
       throw error;
     }
   }
-
   private async calculateChecksum(content: string): Promise<string> {
     const crypto = await import('crypto');
     return crypto.createHash('sha256').update(content).digest('hex');
@@ -79,8 +78,10 @@ export class MigrationSystem {
   /**
    * Substitute environment variables in SQL content
    * Supports placeholders like ${ADMIN_EMAIL}, ${ADMIN_USERNAME}, etc.
+   * Special handling for ${ADMIN_PASSWORD}: Hashes it using scrypt before substitution.
    */
   private substituteEnvironmentVariables(content: string): string {
+    const crypto = require('crypto');
     try {
       const defaults = {
         ADMIN_EMAIL: 'admin@app.com',
@@ -90,7 +91,22 @@ export class MigrationSystem {
 
       let processedContent = content;
 
+      // Handle ADMIN_PASSWORD separately to ensure hashing
+      if (processedContent.includes('${ADMIN_PASSWORD}')) {
+        const plainPassword = process.env.ADMIN_PASSWORD || 'Admin@123456';
+
+        // Generate valid scrypt hash
+        const salt = crypto.randomBytes(16).toString("hex");
+        const hashedBuf = crypto.scryptSync(plainPassword, salt, 64);
+        const hashedPassword = `${hashedBuf.toString("hex")}.${salt}`;
+
+        processedContent = processedContent.replace(/\$\{ADMIN_PASSWORD\}/g, hashedPassword);
+      }
+
       processedContent = processedContent.replace(/\$\{([A-Z_]+)\}/g, (match, varName) => {
+        // Skip ADMIN_PASSWORD as it's already handled
+        if (varName === 'ADMIN_PASSWORD') return match;
+
         const value = process.env[varName] || defaults[varName as keyof typeof defaults];
         if (value === undefined) {
           console.warn(`⚠️  Environment variable ${varName} not found, keeping placeholder`);
@@ -257,7 +273,7 @@ export class MigrationSystem {
 
   async createMigration(name: string, content: string): Promise<string> {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').split('T')[0] +
-                     '-' + Date.now();
+      '-' + Date.now();
     const filename = `${timestamp}-${name.replace(/[^a-zA-Z0-9]/g, '-')}.sql`;
     const filePath = path.join(this.migrationsDir, filename);
 

@@ -18,8 +18,15 @@ else
     EMAIL=$2
 fi
 
-if [ -z "$DOMAIN" ] || [ -z "$EMAIL" ]; then
-    echo "Error: Domain and Email are required."
+if [ -z "$3" ]; then
+    read -s -p "Enter admin password: " ADMIN_PASSWORD
+    echo ""
+else
+    ADMIN_PASSWORD=$3
+fi
+
+if [ -z "$DOMAIN" ] || [ -z "$EMAIL" ] || [ -z "$ADMIN_PASSWORD" ]; then
+    echo "Error: Domain, Email, and Password are required."
     exit 1
 fi
 
