@@ -1070,7 +1070,7 @@ export function ConversationProvider({ children }: ConversationProviderProps) {
           queryKey: ['/api/conversations', message.conversationId, 'messages']
         });
 
-        const audio = new Audio('/assets/notification.mp3');
+        const audio = new Audio('/notification.mp3');
         audio.play().catch(() => {
         });
 

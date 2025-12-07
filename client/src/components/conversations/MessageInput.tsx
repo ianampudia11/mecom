@@ -788,7 +788,7 @@ export default function MessageInput({ conversationId, conversation, contact }: 
       )}
 
       {selectedFile && (
-        <div className="mb-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-100 dark:border-gray-700 flex items-center justify-between animate-in fade-in slide-in-from-bottom-2 duration-200">
+        <div className="mb-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-100 dark:border-gray-700 flex items-center justify-between duration-200">
           <div className="flex items-center gap-3 overflow-hidden">
             <div className="relative h-14 w-14 rounded-md overflow-hidden bg-gray-200 dark:bg-gray-600 flex-shrink-0 border border-gray-200 dark:border-gray-600">
               {selectedFile.type.startsWith('image/') ? (
