@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode, useMemo, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useMemo, useCallback, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import useSocket from '@/hooks/useSocket';
 import { useToast } from '@/hooks/use-toast';
@@ -481,8 +481,17 @@ export function ConversationProvider({ children }: ConversationProviderProps) {
     await fetchGroupConversations(groupConversationsPagination.page + 1, true);
   };
 
+  const isRefetchingRef = useRef(false);
+
   const refetchConversations = async () => {
-    await fetchConversations(1, false);
+    if (isRefetchingRef.current) return;
+
+    try {
+      isRefetchingRef.current = true;
+      await fetchConversations(1, false, true);
+    } finally {
+      isRefetchingRef.current = false;
+    }
   };
 
   const refetchGroupConversations = async () => {
@@ -1062,12 +1071,31 @@ export function ConversationProvider({ children }: ConversationProviderProps) {
           };
         });
 
-        queryClient.invalidateQueries({
-          queryKey: ['/api/conversations']
+        // Optimistically update conversation list to eliminate 7s delay
+        setAllConversations(prev => {
+          const conversationIndex = prev.findIndex(c => c.id === message.conversationId);
+          if (conversationIndex === -1) {
+            // New conversation? Fallback to refetch logic cautiously
+            refetchConversations();
+            return prev;
+          }
+
+          const updatedConversation = {
+            ...prev[conversationIndex],
+            lastMessage: message.content || `${message.type} message`,
+            lastMessageAt: message.createdAt,
+            unreadCount: (prev[conversationIndex].unreadCount || 0) + 1
+          };
+
+          const newConversations = [...prev];
+          newConversations.splice(conversationIndex, 1);
+          newConversations.unshift(updatedConversation);
+          return newConversations;
         });
 
+        // Still invalidate queries for consistency, but user sees instant update first
         queryClient.invalidateQueries({
-          queryKey: ['/api/conversations', message.conversationId, 'messages']
+          queryKey: ['/api/conversations']
         });
 
         // Audio handled in handleNewMessage
