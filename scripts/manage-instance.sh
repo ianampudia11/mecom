@@ -103,7 +103,7 @@ run_docker_compose() {
 
     cd "$instance_dir"
     load_instance_env "$instance_name"
-    docker-compose "$@"
+    docker compose "$@"
 }
 
 # Command: Start instance
@@ -331,7 +331,7 @@ cmd_list() {
             cd "$instance_dir"
             load_instance_env "$instance_name"
             local status="stopped"
-            if docker-compose ps -q | xargs docker inspect -f '{{.State.Running}}' 2>/dev/null | grep -q true; then
+            if docker compose ps -q | xargs docker inspect -f '{{.State.Running}}' 2>/dev/null | grep -q true; then
                 status="running"
             fi
 
