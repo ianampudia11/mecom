@@ -2,7 +2,7 @@ node_modules
 dist
 .DS_Store
 uploads
-public
+
 whatsapp-sessions
 vite.config.ts.*
 *.tar.gz

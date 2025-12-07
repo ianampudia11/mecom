@@ -366,21 +366,21 @@ export function ConversationProvider({ children }: ConversationProviderProps) {
       }
       return canView;
     }
-
-    console.warn(`[Security] User ${user.id} has no permission to view conversation ${conversation.id}`);
     return false;
   }, [user, canViewAllConversations, canOnlyViewAssignedConversations]);
 
-  const fetchConversations = async (page: number = 1, append: boolean = false) => {
+  const fetchConversations = async (page: number = 1, append: boolean = false, background: boolean = false) => {
     if (!user || authLoading) {
       return;
     }
 
     try {
-      setConversationsPagination(prev => ({
-        ...prev,
-        loading: true
-      }));
+      if (!background) {
+        setConversationsPagination(prev => ({
+          ...prev,
+          loading: true
+        }));
+      }
 
       const res = await apiRequest('GET', `/api/conversations?page=${page}&limit=20`);
 
@@ -500,9 +500,9 @@ export function ConversationProvider({ children }: ConversationProviderProps) {
   // Handle new message socket events
   useEffect(() => {
     const handleNewMessage = (data: any) => {
-      if (!data || !data.message) return;
+      if (!data || !data.data) return;
 
-      const message = data.message;
+      const message = data.data;
       const conversationId = message.conversationId;
 
       const isIncoming = message.direction === 'inbound';
@@ -1070,9 +1070,9 @@ export function ConversationProvider({ children }: ConversationProviderProps) {
           queryKey: ['/api/conversations', message.conversationId, 'messages']
         });
 
-        const audio = new Audio('/notification.mp3');
-        audio.play().catch(() => {
-        });
+        // Audio handled in handleNewMessage
+        // const audio = new Audio('/notification.mp3');
+        // audio.play().catch(() => {});
 
         if (browserNotifications && (message.direction === 'incoming' || message.direction === 'inbound')) {
           const conversation = [...allConversations, ...allGroupConversations].find(conv => conv.id === message.conversationId);

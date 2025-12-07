@@ -165,7 +165,9 @@ restart_container_services() {
     print_status "Restarting application services in container..."
     
     # Send SIGUSR2 to restart the Node.js application gracefully
-    docker exec "$container_name" pkill -SIGUSR2 node 2>/dev/null || true
+    # Restart the container to ensure changes take effect
+    echo "[INFO] Restarting container '$container_name'..."
+    docker restart "$container_name"
     
     # Wait a moment for the restart
     sleep 2
