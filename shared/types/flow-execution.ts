@@ -73,13 +73,25 @@ export interface NodeExecutionConfig {
 }
 
 export interface FlowTriggerEvent {
-  type: 'message_received' | 'webhook' | 'schedule' | 'manual';
+  type: 'message_received' | 'webhook' | 'schedule' | 'manual' | 'tag_assigned' | 'agent_assigned' | 'task_completed' | 'pipeline_stage_changed';
   data: {
     messageId?: number;
     conversationId: number;
     contactId: number;
-    channelConnectionId: number;
-    triggerData?: any;
+    channelConnectionId?: number;
+    triggerData?: {
+      tagId?: number;
+      tagName?: string;
+      agentId?: number;
+      agentName?: string;
+      taskId?: number;
+      taskTitle?: string;
+      pipelineId?: number;
+      stageId?: number;
+      stageName?: string;
+      // Allow for other custom data
+      [key: string]: any;
+    };
   };
 }
 
@@ -218,22 +230,4 @@ export interface FlowExecutionAnalytics {
   };
 }
 
-export default {
-  FlowExecutionState,
-  FlowExecutionContext,
-  NodeExecutionResult,
-  FlowExecutionEvent,
-  FlowExecutionStats,
-  FlowExecutionConfig,
-  NodeExecutionConfig,
-  FlowTriggerEvent,
-  FlowExecutionMetrics,
-  FlowExecutionLog,
-  FlowExecutionSummary,
-  WebSocketMessage,
-  FlowExecutionWebSocketMessage,
-  NodeExecutionStatus,
-  NodeExecutionInfo,
-  FlowExecutionQuery,
-  FlowExecutionAnalytics
-};
+

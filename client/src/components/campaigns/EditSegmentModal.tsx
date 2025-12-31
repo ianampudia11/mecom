@@ -11,7 +11,22 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { ColoredTag } from '@/components/ui/colored-tag';
 import { Separator } from '@/components/ui/separator';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+} from '@/components/ui/command';
 import {
   Table,
   TableBody,
@@ -47,6 +62,8 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from '@/hooks/use-translation';
 import { ToastAction } from '@/components/ui/toast';
+import { useQuery } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
 import type { SegmentFilterCriteria } from '../../../../shared/schema';
 
 interface EditSegmentModalProps {
@@ -89,9 +106,23 @@ export function EditSegmentModal({ isOpen, onClose, segmentId, onSegmentUpdated 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [originalSegment, setOriginalSegment] = useState<ContactSegment | null>(null);
   const [retryCount, setRetryCount] = useState(0);
+  const [showTagDropdown, setShowTagDropdown] = useState(false);
   const { toast } = useToast();
   const { t } = useTranslation();
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Fetch available tags
+  const { data: availableTags = [] } = useQuery({
+    queryKey: ['/api/contacts/tags'],
+    queryFn: async () => {
+      const res = await fetch('/api/contacts/tags');
+      if (!res.ok) return [];
+      const data = await res.json();
+      return Array.isArray(data) ? data : [];
+    },
+    staleTime: 60000,
+    enabled: isOpen
+  });
 
 
   useEffect(() => {
@@ -167,7 +198,7 @@ export function EditSegmentModal({ isOpen, onClose, segmentId, onSegmentUpdated 
     setRetryCount(prev => prev + 1);
 
     const syntheticEvent = {
-      preventDefault: () => {}
+      preventDefault: () => { }
     } as React.FormEvent;
     handleSubmit(syntheticEvent);
   };
@@ -480,18 +511,57 @@ export function EditSegmentModal({ isOpen, onClose, segmentId, onSegmentUpdated 
               {/* Tags */}
               <div className="space-y-2">
                 <Label>{t('segments.edit.contact_tags_label', 'Contact Tags')}</Label>
-                <div className="flex gap-2">
-                  <Input
-                    value={newTag}
-                    onChange={(e) => setNewTag(e.target.value)}
-                    placeholder={t('segments.edit.tag_placeholder', 'Add a tag...')}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        addTag();
-                      }
-                    }}
-                  />
+                <div className="flex gap-2 relative">
+                  <div className="flex-1 relative">
+                    <Input
+                      value={newTag}
+                      onChange={(e) => setNewTag(e.target.value)}
+                      onFocus={() => setShowTagDropdown(true)}
+                      onBlur={() => setTimeout(() => setShowTagDropdown(false), 200)}
+                      placeholder={t('segments.edit.tag_placeholder', 'Select or enter tag name')}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          addTag();
+                        }
+                      }}
+                    />
+                    {showTagDropdown && availableTags.length > 0 && (
+                      <div className="absolute z-50 w-full mt-1 bg-popover text-popover-foreground border rounded-md shadow-md">
+                        <div className="p-2">
+                          <div className="text-sm text-muted-foreground mb-2">Search tags...</div>
+                          <div className="max-h-[200px] overflow-auto space-y-1">
+                            {availableTags
+                              .filter((tag: any) => !(criteria.tags ?? []).includes(tag.name))
+                              .filter((tag: any) => tag.name.toLowerCase().includes(newTag.toLowerCase()))
+                              .map((tag: any) => (
+                                <div
+                                  key={tag.id}
+                                  className="cursor-pointer hover:bg-accent p-2 rounded-sm"
+                                  onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    const newTags = [...(criteria.tags ?? []), tag.name];
+                                    setCriteria(prev => ({ ...prev, tags: newTags }));
+                                    setNewTag('');
+                                    setShowTagDropdown(false);
+                                  }}
+                                >
+                                  <ColoredTag name={tag.name} color={tag.color} size="sm" />
+                                </div>
+                              ))}
+                            {availableTags
+                              .filter((tag: any) => !(criteria.tags ?? []).includes(tag.name))
+                              .filter((tag: any) => tag.name.toLowerCase().includes(newTag.toLowerCase()))
+                              .length === 0 && (
+                                <div className="text-sm text-muted-foreground p-2">
+                                  No tags found. Press + to create new.
+                                </div>
+                              )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                   <Button type="button" onClick={addTag} size="sm">
                     <Plus className="w-4 h-4" />
                   </Button>
@@ -500,21 +570,12 @@ export function EditSegmentModal({ isOpen, onClose, segmentId, onSegmentUpdated 
                 {(criteria.tags?.length ?? 0) > 0 && (
                   <div className="flex flex-wrap gap-2 mt-2">
                     {(criteria.tags ?? []).map((tag) => (
-                      <Badge key={tag} variant="secondary" className="flex items-center gap-1">
-                        <Tag className="w-3 h-3" />
-                        {tag}
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            removeTag(tag);
-                          }}
-                          className="ml-1 hover:text-destructive"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </Badge>
+                      <ColoredTag
+                        key={tag}
+                        name={tag}
+                        onRemove={() => removeTag(tag)}
+                        size="md"
+                      />
                     ))}
                   </div>
                 )}
@@ -622,9 +683,7 @@ export function EditSegmentModal({ isOpen, onClose, segmentId, onSegmentUpdated 
                             {contact.tags && contact.tags.length > 0 ? (
                               <div className="flex flex-wrap gap-1">
                                 {contact.tags.slice(0, 2).map((tag: string, index: number) => (
-                                  <Badge key={index} variant="outline" className="text-xs">
-                                    {tag}
-                                  </Badge>
+                                  <ColoredTag key={index} name={tag} size="sm" />
                                 ))}
                                 {contact.tags.length > 2 && (
                                   <Badge variant="outline" className="text-xs">

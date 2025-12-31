@@ -21,7 +21,7 @@ export default function Sidebar() {
   const { t } = useTranslation();
   const { data: subscriptionStatus } = useSubscriptionStatus();
   const { requestManualRenewal } = useManualRenewal();
-  
+
 
   const { data: renewalStatus } = useQuery({
     queryKey: ['/api/plan-renewal/status'],
@@ -216,10 +216,10 @@ export default function Sidebar() {
     }
 
     const { daysUntilExpiry, nextBillingDate, gracePeriodActive, gracePeriodDaysRemaining, isActive } = subscriptionStatus;
-    
+
 
     const isLifetime = company?.plan && isLifetimePlan(company.plan);
-    
+
 
     if (isLifetime) {
       return {
@@ -309,10 +309,10 @@ export default function Sidebar() {
 
   const isSubscriptionExpired = () => {
     return subscriptionStatus &&
-           !subscriptionStatus.isActive &&
-           (subscriptionStatus.status === 'expired' ||
-            subscriptionStatus.status === 'cancelled' ||
-            subscriptionStatus.status === 'past_due');
+      !subscriptionStatus.isActive &&
+      (subscriptionStatus.status === 'expired' ||
+        subscriptionStatus.status === 'cancelled' ||
+        subscriptionStatus.status === 'past_due');
   };
 
   return (
@@ -372,7 +372,18 @@ export default function Sidebar() {
               style={location === '/pipeline' ? companyStyle.activeItem : {}}
             >
               <i className="ri-stack-line text-xl"></i>
-              <span className={`ml-3 ${isCollapsed ? 'hidden' : 'block'}`}>{t('nav.pipeline', 'Pipeline')}</span>
+              <span className={`ml-3 ${isCollapsed ? 'hidden' : 'block'}`}>Ruta Lead</span>
+            </Link>
+          </PermissionGate>
+
+          <PermissionGate permissions={[PERMISSIONS.VIEW_PIPELINE, PERMISSIONS.MANAGE_PIPELINE]}>
+            <Link
+              href="/properties"
+              className={`flex items-center px-2 py-2 rounded-lg ${location === '/properties' ? 'text-white' : 'text-gray-400 hover:text-white'}`}
+              style={location === '/properties' ? companyStyle.activeItem : {}}
+            >
+              <i className="ri-building-line text-xl"></i>
+              <span className={`ml-3 ${isCollapsed ? 'hidden' : 'block'}`}>{t('nav.properties', 'Propiedades')}</span>
             </Link>
           </PermissionGate>
 
@@ -447,58 +458,58 @@ export default function Sidebar() {
             <h3 className={`text-xs uppercase tracking-wide text-gray-500 mb-2 ${isCollapsed ? 'hidden' : 'block'}`}>{t('nav.channels', 'Channels')}</h3>
             <div className="flex flex-col space-y-1">
               {channelConnections.map((connection: any) => {
-              let icon;
-              let color;
+                let icon;
+                let color;
 
-              switch(connection.channelType) {
-                case 'whatsapp_official':
-                  icon = "ri-whatsapp-line";
-                  color = "#25D366";
-                  break;
-                case 'whatsapp_unofficial':
-                  icon = "ri-whatsapp-line";
-                  color = "#25D366";
-                  break;
-                case 'messenger':
-                  icon = "ri-messenger-line";
-                  color = "#1877F2";
-                  break;
-                case 'instagram':
-                  icon = "ri-instagram-line";
-                  color = "#E4405F";
-                  break;
-                case 'email':
-                  icon = "ri-mail-line";
-                  color = "#0078D4";
-                  break;
-                case 'twilio_sms':
-                  icon = "ri-message-3-line";
-                  color = "#E4405F";
-                  break;
-                case 'webchat':
-                  icon = "ri-message-3-line";
-                  color = "#6366f1";
-                  break;
-                
-                default:
-                  icon = "ri-message-3-line";
-                  color = "#a1f15bff";
-              }
+                switch (connection.channelType) {
+                  case 'whatsapp_official':
+                    icon = "ri-whatsapp-line";
+                    color = "#25D366";
+                    break;
+                  case 'whatsapp_unofficial':
+                    icon = "ri-whatsapp-line";
+                    color = "#25D366";
+                    break;
+                  case 'messenger':
+                    icon = "ri-messenger-line";
+                    color = "#1877F2";
+                    break;
+                  case 'instagram':
+                    icon = "ri-instagram-line";
+                    color = "#E4405F";
+                    break;
+                  case 'email':
+                    icon = "ri-mail-line";
+                    color = "#0078D4";
+                    break;
+                  case 'twilio_sms':
+                    icon = "ri-message-3-line";
+                    color = "#E4405F";
+                    break;
+                  case 'webchat':
+                    icon = "ri-message-3-line";
+                    color = "#6366f1";
+                    break;
 
-              const isActive = activeChannelId === connection.id;
+                  default:
+                    icon = "ri-message-3-line";
+                    color = "#a1f15bff";
+                }
 
-              return (
-                <button
-                  key={connection.id}
-                  className={`flex items-center px-2 py-2 rounded-lg w-full text-left ${isActive ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}
-                  onClick={() => handleChannelClick(connection.id)}
-                >
-                  <i className={icon + " text-xl"} style={{ color: isActive ? 'white' : color }}></i>
-                  <span className={`ml-3 ${isCollapsed ? 'hidden' : 'block'} truncate`}>
-                    {connection.accountName}
-                  </span>
-                </button>
-              );
+                const isActive = activeChannelId === connection.id;
+
+                return (
+                  <button
+                    key={connection.id}
+                    className={`flex items-center px-2 py-2 rounded-lg w-full text-left ${isActive ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}
+                    onClick={() => handleChannelClick(connection.id)}
+                  >
+                    <i className={icon + " text-xl"} style={{ color: isActive ? 'white' : color }}></i>
+                    <span className={`ml-3 ${isCollapsed ? 'hidden' : 'block'} truncate`}>
+                      {connection.accountName}
+                    </span>
+                  </button>
+                );
               })}
             </div>
           </div>
@@ -528,23 +539,23 @@ export default function Sidebar() {
               <span className={`ml-3 ${isCollapsed ? 'hidden' : 'block'}`}>{t('nav.settings', 'Settings')}</span>
             </Link>
           </PermissionGate>
-            <a
+          <a
             href={getHelpSupportUrl()}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center px-2 py-2 rounded-lg w-full text-left text-gray-400 hover:text-white"
-            >
+          >
             <i className="ri-question-line text-xl"></i>
             <span className={`ml-3 ${isCollapsed ? 'hidden' : 'block'}`}>{t('nav.help_support', 'Help & Support')}</span>
-            </a>
+          </a>
 
-            <Link
-              href="/settings?tab=billing"
-              className="flex items-center px-2 py-2 rounded-lg w-full text-left text-gray-400 hover:text-white"
-            >
-              <i className="ri-bank-card-line text-xl"></i>
-              <span className={`ml-3 ${isCollapsed ? 'hidden' : 'block'}`}>{t('nav.billing', 'Billing & Subscription')}</span>
-            </Link>
+          <Link
+            href="/settings?tab=billing"
+            className="flex items-center px-2 py-2 rounded-lg w-full text-left text-gray-400 hover:text-white"
+          >
+            <i className="ri-bank-card-line text-xl"></i>
+            <span className={`ml-3 ${isCollapsed ? 'hidden' : 'block'}`}>{t('nav.billing', 'Billing & Subscription')}</span>
+          </Link>
 
           {company && (
             <div className={`mt-4 pt-4 border-t border-gray-700 text-xs text-gray-500 ${isCollapsed ? 'hidden' : 'block'}`}>

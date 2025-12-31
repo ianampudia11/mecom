@@ -2,7 +2,7 @@ import { Bot, CheckCircle, ChevronDown, ChevronUp, Copy, Eye, EyeOff, Loader2, M
 import { useCallback, useEffect, useState } from 'react';
 import { Handle, Position, useReactFlow } from 'reactflow';
 import BotIcon from '@/components/ui/bot-icon';
-import { useFlowContext } from '../../pages/flow-builder';
+import { useFlowContext } from './FlowContext';
 import { useTranslation } from '@/hooks/use-translation';
 
 import { Button } from "@/components/ui/button";

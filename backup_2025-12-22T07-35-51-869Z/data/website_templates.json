@@ -1,0 +1,76 @@
+[
+  {
+    "id": 1,
+    "name": "Blank Template",
+    "description": "A blank template to start from scratch",
+    "category": "general",
+    "preview_image": null,
+    "preview_url": null,
+    "grapes_data": {
+      "pages": [
+        {
+          "frames": [
+            {
+              "component": {
+                "type": "wrapper",
+                "components": [
+                  {
+                    "type": "text",
+                    "content": "Welcome to your new website!"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "grapes_html": "<div>Welcome to your new website!</div>",
+    "grapes_css": "body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }",
+    "grapes_js": null,
+    "is_active": true,
+    "is_premium": false,
+    "tags": null,
+    "usage_count": 0,
+    "created_by_id": 1,
+    "created_at": "2025-12-08 15:35:01.917426",
+    "updated_at": "2025-12-08 15:35:01.917426"
+  },
+  {
+    "id": 2,
+    "name": "Landing Page Template",
+    "description": "A simple landing page template with hero section",
+    "category": "landing",
+    "preview_image": null,
+    "preview_url": null,
+    "grapes_data": {
+      "pages": [
+        {
+          "frames": [
+            {
+              "component": {
+                "type": "wrapper",
+                "components": [
+                  {
+                    "type": "text",
+                    "content": "<h1>Your Amazing Product</h1><p>Transform your business with our innovative solution.</p><button>Get Started</button>"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "grapes_html": "<div style=\"text-align: center; padding: 50px;\"><h1>Your Amazing Product</h1><p>Transform your business with our innovative solution.</p><button style=\"background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;\">Get Started</button></div>",
+    "grapes_css": "body { font-family: Arial, sans-serif; margin: 0; } h1 { color: #333; } button:hover { background: #0056b3; }",
+    "grapes_js": null,
+    "is_active": true,
+    "is_premium": false,
+    "tags": null,
+    "usage_count": 0,
+    "created_by_id": 1,
+    "created_at": "2025-12-08 15:35:01.919545",
+    "updated_at": "2025-12-08 15:35:01.919545"
+  }
+]

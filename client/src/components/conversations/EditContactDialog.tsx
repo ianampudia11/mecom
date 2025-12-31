@@ -29,6 +29,10 @@ interface Contact {
   createdAt: Date | null;
   updatedAt: Date | null;
   companyId: number | null;
+  assignedToUserId: number | null;
+  isArchived: boolean | null;
+  isHistorySync: boolean | null;
+  historySyncBatchId: string | null;
 }
 
 interface EditContactDialogProps {
@@ -102,7 +106,7 @@ export default function EditContactDialog({
       };
 
       const hasChanges = JSON.stringify(formData) !== JSON.stringify(currentData) ||
-                        profilePictureFile !== null;
+        profilePictureFile !== null;
       setHasUnsavedChanges(hasChanges);
     }
   }, [formData, contact, profilePictureFile]);
@@ -128,6 +132,7 @@ export default function EditContactDialog({
 
       queryClient.invalidateQueries({ queryKey: ['/api/contacts'] });
       queryClient.invalidateQueries({ queryKey: ['/api/conversations'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/deals'] });
       queryClient.invalidateQueries({ queryKey: [`/api/contacts/${contact?.id}`] });
 
       if (onContactUpdated) {
@@ -488,21 +493,21 @@ export default function EditContactDialog({
 
                 {(conversation?.channelType === 'whatsapp' ||
                   conversation?.channelType === 'whatsapp_unofficial') && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleWhatsAppProfilePictureUpdate}
-                    disabled={isUpdatingProfilePicture}
-                  >
-                    {isUpdatingProfilePicture ? (
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    ) : (
-                      <i className="ri-whatsapp-line w-4 h-4 mr-2"></i>
-                    )}
-                    {t('contacts.edit_dialog.sync_from_whatsapp', 'Sync from WhatsApp')}
-                  </Button>
-                )}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleWhatsAppProfilePictureUpdate}
+                      disabled={isUpdatingProfilePicture}
+                    >
+                      {isUpdatingProfilePicture ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <i className="ri-whatsapp-line w-4 h-4 mr-2"></i>
+                      )}
+                      {t('contacts.edit_dialog.sync_from_whatsapp', 'Sync from WhatsApp')}
+                    </Button>
+                  )}
               </div>
             </div>
 

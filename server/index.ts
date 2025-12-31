@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { migrationSystem } from "./migration-system";
@@ -43,7 +44,7 @@ app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
 app.use((req, res, next) => {
   const start = Date.now();
-  const path = req.path;
+  const reqPath = req.path;
   let capturedJsonResponse: Record<string, any> | undefined = undefined;
 
   const originalResJson = res.json;
@@ -54,10 +55,10 @@ app.use((req, res, next) => {
 
   res.on("finish", () => {
     const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
+    if (reqPath.startsWith("/api")) {
       logger.info(
         "api",
-        `${req.method} ${path} ${res.statusCode} in ${duration}ms`,
+        `${req.method} ${reqPath} ${res.statusCode} in ${duration}ms`,
         capturedJsonResponse,
       );
     }
@@ -111,13 +112,14 @@ app.use((req, res, next) => {
 
 
 
-        logger.info('migration', 'Running database migrations...');
-        try {
-          await migrationSystem.runPendingMigrations();
-          logger.info('migration', 'Database migrations completed successfully');
-        } catch (error) {
-
-        }
+        // Temporarily disabled auto-migrations for debugging
+        logger.info('migration', 'Skipping automatic migrations (run manually with npm run db:migrate)');
+        // try {
+        //   await migrationSystem.runPendingMigrations();
+        //   logger.info('migration', 'Database migrations completed successfully');
+        // } catch (error) {
+        //   logger.error('migration', 'Migration failed:', error);
+        // }
 
 
         logger.info('whatsapp', 'Starting WhatsApp auto-reconnection...');

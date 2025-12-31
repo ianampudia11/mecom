@@ -19,7 +19,7 @@ import {
   TooltipTrigger
 } from '@/components/ui/tooltip';
 import { useTranslation } from '@/hooks/use-translation';
-import { useFlowContext } from '../../pages/flow-builder';
+import { useFlowContext } from './FlowContext';
 import { standardHandleStyle } from '@/components/flow-builder/StyledHandle';
 import { cn } from '@/lib/utils';
 

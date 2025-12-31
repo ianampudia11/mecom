@@ -1,0 +1,19 @@
+[
+  {
+    "id": 1,
+    "campaign_id": 1,
+    "recorded_at": "2025-12-08 19:47:31.67",
+    "total_recipients": 3,
+    "messages_sent": 3,
+    "messages_delivered": 0,
+    "messages_read": 0,
+    "messages_failed": 0,
+    "delivery_rate": "0.00",
+    "read_rate": "0.00",
+    "failure_rate": "0.00",
+    "avg_delivery_time": null,
+    "avg_read_time": null,
+    "estimated_cost": "0.0000",
+    "metrics_data": {}
+  }
+]

@@ -7,8 +7,8 @@ export const userRoleEnum = pgEnum('user_role', ['super_admin', 'admin', 'agent'
 export const companies = pgTable("companies", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  slug: text("slug").notNull().unique(),
-  subdomain: text("subdomain").unique(),
+  slug: text("slug").notNull(),
+  subdomain: text("subdomain"),
   logo: text("logo"),
   primaryColor: text("primary_color").default("#333235"),
   active: boolean("active").default(true),
@@ -87,9 +87,11 @@ export const insertCompanySchema = createInsertSchema(companies).pick({
   lastUsageUpdate: true
 });
 
+// Session table for connect-pg-simple - managed via drizzle.config.ts filter
+
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
+  username: text("username").notNull(),
   password: text("password").notNull(),
   fullName: text("full_name").notNull(),
   email: text("email").notNull(),
@@ -100,6 +102,8 @@ export const users = pgTable("users", {
   active: boolean("active").default(true),
   languagePreference: text("language_preference").default("en"),
   permissions: jsonb("permissions").default('{}'),
+  mobilePhone: text("mobile_phone"),
+  notificationPreferences: jsonb("notification_preferences").default('{"whatsapp": false, "email": true}'),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()
 });
@@ -146,7 +150,9 @@ export const insertUserSchema = createInsertSchema(users).pick({
   isSuperAdmin: true,
   active: true,
   languagePreference: true,
-  permissions: true
+  permissions: true,
+  mobilePhone: true,
+  notificationPreferences: true
 });
 
 export const insertRolePermissionSchema = createInsertSchema(rolePermissions).pick({
@@ -775,9 +781,106 @@ export const insertApiRateLimitSchema = createInsertSchema(apiRateLimits).pick({
   requestCount: true
 });
 
+export const properties = pgTable("properties", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  status: text("status").default('available'),
+
+  price: integer("price"),
+  currency: text("currency").default('USD'),
+  negotiable: boolean("negotiable").default(true),
+
+  address: text("address"),
+  city: text("city"),
+  state: text("state"),
+  country: text("country"),
+
+  bedrooms: integer("bedrooms"),
+  bathrooms: integer("bathrooms"),
+  floors: integer("floors").default(1),
+
+  files: jsonb("files").default([]).notNull(),
+
+  companyId: integer("company_id").references(() => companies.id),
+
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const insertPropertySchema = createInsertSchema(properties).pick({
+  name: true,
+  description: true,
+  status: true,
+  price: true,
+  currency: true,
+  negotiable: true,
+  address: true,
+  city: true,
+  state: true,
+  country: true,
+  bedrooms: true,
+  bathrooms: true,
+  floors: true,
+  files: true,
+  companyId: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export const propertyMedia = pgTable("property_media", {
+  id: serial("id").primaryKey(),
+  propertyId: integer("property_id").references(() => properties.id).notNull(),
+  mediaType: text("media_type").notNull(),
+  fileUrl: text("file_url").notNull(),
+  fileName: text("file_name").notNull(),
+  fileSize: integer("file_size").notNull(),
+  mimeType: text("mime_type"),
+  orderNum: integer("order_num").default(0),
+  isFlyer: boolean("is_flyer").default(false),
+  isPrimary: boolean("is_primary").default(false),
+  uploadedBy: integer("uploaded_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertPropertyMediaSchema = createInsertSchema(propertyMedia).pick({
+  propertyId: true,
+  mediaType: true,
+  fileUrl: true,
+  fileName: true,
+  fileSize: true,
+  mimeType: true,
+  orderNum: true,
+  isFlyer: true,
+  isPrimary: true,
+  uploadedBy: true,
+});
+
+export type Property = typeof properties.$inferSelect;
+export type InsertProperty = z.infer<typeof insertPropertySchema>;
+
+export const dealProperties = pgTable("deal_properties", {
+  id: serial("id").primaryKey(),
+  dealId: integer("deal_id").notNull().references(() => deals.id, { onDelete: 'cascade' }),
+  propertyId: integer("property_id").notNull().references(() => properties.id, { onDelete: 'cascade' }),
+  createdAt: timestamp("created_at").defaultNow()
+}, (table) => ({
+  uniqueDealProperty: unique("unique_deal_property").on(table.dealId, table.propertyId)
+}));
+
+export const insertDealPropertySchema = createInsertSchema(dealProperties).pick({
+  dealId: true,
+  propertyId: true
+});
+
+export type DealProperty = typeof dealProperties.$inferSelect;
+export type InsertDealProperty = z.infer<typeof insertDealPropertySchema>;
+
+
 export const contacts = pgTable("contacts", {
   id: serial("id").primaryKey(),
   companyId: integer("company_id").references(() => companies.id),
+  assignedToUserId: integer("assigned_to_user_id").references(() => users.id),
   name: text("name").notNull(),
   avatarUrl: text("avatar_url"),
   email: text("email"),
@@ -799,6 +902,7 @@ export const contacts = pgTable("contacts", {
 });
 
 export const insertContactSchema = createInsertSchema(contacts).pick({
+  assignedToUserId: true,
   companyId: true,
   name: true,
   avatarUrl: true,
@@ -1111,7 +1215,7 @@ export type InsertContactAppointment = typeof contactAppointments.$inferInsert;
 
 export const contactTasks = pgTable("contact_tasks", {
   id: serial("id").primaryKey(),
-  contactId: integer("contact_id").notNull().references(() => contacts.id, { onDelete: 'cascade' }),
+  contactId: integer("contact_id").references(() => contacts.id, { onDelete: 'cascade' }),
   companyId: integer("company_id").notNull().references(() => companies.id, { onDelete: 'cascade' }),
 
 
@@ -1123,6 +1227,7 @@ export const contactTasks = pgTable("contact_tasks", {
   status: text("status", {
     enum: ['not_started', 'in_progress', 'completed', 'cancelled']
   }).notNull().default('not_started'),
+  checklist: jsonb("checklist").default([]),
 
 
   dueDate: timestamp("due_date"),
@@ -1528,9 +1633,7 @@ export const followUpTemplates = pgTable("follow_up_templates", {
   createdBy: integer("created_by").references(() => users.id),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow()
-}, (table) => ({
-  uniqueCompanyName: unique().on(table.companyId, table.name)
-}));
+});
 
 export const followUpExecutionLog = pgTable("follow_up_execution_log", {
   id: serial("id").primaryKey(),
@@ -1747,8 +1850,19 @@ export const dealPriorityTypes = z.enum([
   'high'
 ]);
 
+export const pipelines = pgTable("pipelines", {
+  id: serial("id").primaryKey(),
+  companyId: integer("company_id").references(() => companies.id),
+  name: text("name").notNull(),
+  description: text("description"),
+  isDefault: boolean("is_default").default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow()
+});
+
 export const pipelineStages = pgTable("pipeline_stages", {
   id: serial("id").primaryKey(),
+  pipelineId: integer("pipeline_id").references(() => pipelines.id),
   companyId: integer("company_id").references(() => companies.id),
   name: text("name").notNull(),
   color: text("color").notNull(),
@@ -1933,7 +2047,7 @@ export const insertPlanSchema = createInsertSchema(plans).pick({
 
 export const appSettings = pgTable("app_settings", {
   id: serial("id").primaryKey(),
-  key: text("key").notNull().unique(),
+  key: text("key").notNull(),
   value: jsonb("value").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow()
@@ -1980,7 +2094,7 @@ export type InsertWhatsappProxyServer = z.infer<typeof insertWhatsappProxyServer
 
 export const languages = pgTable("languages", {
   id: serial("id").primaryKey(),
-  code: text("code").notNull().unique(),
+  code: text("code").notNull(),
   name: text("name").notNull(),
   nativeName: text("native_name").notNull(),
   flagIcon: text("flag_icon"),
@@ -2003,7 +2117,7 @@ export const insertLanguageSchema = createInsertSchema(languages).pick({
 
 export const translationNamespaces = pgTable("translation_namespaces", {
   id: serial("id").primaryKey(),
-  name: text("name").notNull().unique(),
+  name: text("name").notNull(),
   description: text("description"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()
@@ -2550,7 +2664,7 @@ export const couponCodes = pgTable("coupon_codes", {
   companyId: integer("company_id").references(() => companies.id, { onDelete: "cascade" }), // NULL for global coupons
 
 
-  code: text("code").notNull().unique(),
+  code: text("code").notNull(),
   name: text("name").notNull(),
   description: text("description"),
 
@@ -3093,9 +3207,7 @@ export const campaignRecipients = pgTable("campaign_recipients", {
 
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow()
-}, (table) => ({
-  uniqueCampaignContact: unique().on(table.campaignId, table.contactId)
-}));
+});
 
 export const campaignMessages = pgTable("campaign_messages", {
   id: serial("id").primaryKey(),
@@ -3205,7 +3317,7 @@ export const whatsappAccountLogs = pgTable("whatsapp_account_logs", {
 
 export const scheduledMessageStatusEnum = pgEnum('scheduled_message_status', [
   'pending',
-  'scheduled', 
+  'scheduled',
   'processing',
   'sent',
   'failed',
@@ -3219,7 +3331,7 @@ export const scheduledMessages = pgTable("scheduled_messages", {
   conversationId: integer("conversation_id").notNull(),
   channelId: integer("channel_id").notNull(),
   channelType: text("channel_type").notNull(), // 'whatsapp', 'instagram', 'messenger', 'email', etc.
-  
+
 
   content: text("content").notNull(),
   messageType: text("message_type").notNull().default('text'), // 'text', 'media', 'template', etc.
@@ -3227,11 +3339,11 @@ export const scheduledMessages = pgTable("scheduled_messages", {
   mediaFilePath: text("media_file_path"), // Local file path for scheduled media
   mediaType: text("media_type"), // 'image', 'video', 'audio', 'document'
   caption: text("caption"),
-  
+
 
   scheduledFor: timestamp("scheduled_for").notNull(),
   timezone: text("timezone").default('UTC'),
-  
+
 
   status: scheduledMessageStatusEnum("status").default('pending'),
   attempts: integer("attempts").default(0),
@@ -3240,7 +3352,7 @@ export const scheduledMessages = pgTable("scheduled_messages", {
   sentAt: timestamp("sent_at"),
   failedAt: timestamp("failed_at"),
   errorMessage: text("error_message"),
-  
+
 
   metadata: jsonb("metadata").default('{}'), // Additional data like quick replies, templates, etc.
   createdBy: integer("created_by").notNull(), // User who scheduled the message
@@ -3539,9 +3651,7 @@ export const subscriptionUsageTracking = pgTable("subscription_usage_tracking", 
   lastReset: timestamp("last_reset").defaultNow(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow()
-}, (table) => ({
-  uniqueCompanyMetric: unique().on(table.companyId, table.metricName)
-}));
+});
 
 export const insertSubscriptionUsageTrackingSchema = createInsertSchema(subscriptionUsageTracking).pick({
   companyId: true,
@@ -3741,7 +3851,7 @@ export const aiCredentialUsage = pgTable("ai_credential_usage", {
 
 export const companyAiPreferences = pgTable("company_ai_preferences", {
   id: serial("id").primaryKey(),
-  companyId: integer("company_id").notNull().references(() => companies.id, { onDelete: 'cascade' }).unique(),
+  companyId: integer("company_id").notNull().references(() => companies.id, { onDelete: 'cascade' }),
   defaultProvider: text("default_provider").default("openai"),
   credentialPreference: text("credential_preference").default("auto"),
   fallbackEnabled: boolean("fallback_enabled").default(true),

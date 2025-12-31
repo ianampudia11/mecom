@@ -30,7 +30,7 @@ import {
 } from 'lucide-react';
 import { useCallback, useState, useEffect } from 'react';
 import { Handle, Position, useReactFlow } from 'reactflow';
-import { useFlowContext } from '../../pages/flow-builder';
+import { useFlowContext } from './FlowContext';
 import { useTranslation } from '@/hooks/use-translation';
 
 

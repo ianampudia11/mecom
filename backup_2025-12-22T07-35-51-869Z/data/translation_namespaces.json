@@ -1,0 +1,317 @@
+[
+  {
+    "id": 1,
+    "name": "common",
+    "description": "Common UI elements and messages",
+    "created_at": "2025-12-08 15:34:59.489539",
+    "updated_at": "2025-12-08 15:34:59.489539"
+  },
+  {
+    "id": 2,
+    "name": "auth",
+    "description": "Authentication and authorization",
+    "created_at": "2025-12-08 15:34:59.489539",
+    "updated_at": "2025-12-08 15:34:59.489539"
+  },
+  {
+    "id": 3,
+    "name": "dashboard",
+    "description": "Dashboard and main interface",
+    "created_at": "2025-12-08 15:34:59.489539",
+    "updated_at": "2025-12-08 15:34:59.489539"
+  },
+  {
+    "id": 4,
+    "name": "conversations",
+    "description": "Conversation management",
+    "created_at": "2025-12-08 15:34:59.489539",
+    "updated_at": "2025-12-08 15:34:59.489539"
+  },
+  {
+    "id": 5,
+    "name": "contacts",
+    "description": "Contact management",
+    "created_at": "2025-12-08 15:34:59.489539",
+    "updated_at": "2025-12-08 15:34:59.489539"
+  },
+  {
+    "id": 6,
+    "name": "flows",
+    "description": "Flow builder and automation",
+    "created_at": "2025-12-08 15:34:59.489539",
+    "updated_at": "2025-12-08 15:34:59.489539"
+  },
+  {
+    "id": 7,
+    "name": "settings",
+    "description": "Application settings",
+    "created_at": "2025-12-08 15:34:59.489539",
+    "updated_at": "2025-12-08 15:34:59.489539"
+  },
+  {
+    "id": 8,
+    "name": "admin",
+    "description": "Admin panel",
+    "created_at": "2025-12-08 15:34:59.489539",
+    "updated_at": "2025-12-08 15:34:59.489539"
+  },
+  {
+    "id": 9,
+    "name": "errors",
+    "description": "Error messages",
+    "created_at": "2025-12-08 15:34:59.489539",
+    "updated_at": "2025-12-08 15:34:59.489539"
+  },
+  {
+    "id": 10,
+    "name": "notifications",
+    "description": "Notification messages",
+    "created_at": "2025-12-08 15:34:59.489539",
+    "updated_at": "2025-12-08 15:34:59.489539"
+  },
+  {
+    "id": 11,
+    "name": "trial",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:42:47.165",
+    "updated_at": "2025-12-08 16:42:47.165"
+  },
+  {
+    "id": 12,
+    "name": "plans",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:42:47.209",
+    "updated_at": "2025-12-08 16:42:47.209"
+  },
+  {
+    "id": 13,
+    "name": "registration",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:42:47.269",
+    "updated_at": "2025-12-08 16:42:47.269"
+  },
+  {
+    "id": 14,
+    "name": "search",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:42:48.021",
+    "updated_at": "2025-12-08 16:42:48.021"
+  },
+  {
+    "id": 15,
+    "name": "emoji",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:42:48.053",
+    "updated_at": "2025-12-08 16:42:48.053"
+  },
+  {
+    "id": 16,
+    "name": "messages",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:42:48.079",
+    "updated_at": "2025-12-08 16:42:48.079"
+  },
+  {
+    "id": 17,
+    "name": "quoted_message",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:42:48.348",
+    "updated_at": "2025-12-08 16:42:48.348"
+  },
+  {
+    "id": 18,
+    "name": "message_bubble",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:42:48.434",
+    "updated_at": "2025-12-08 16:42:48.434"
+  },
+  {
+    "id": 19,
+    "name": "welcome",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:42:48.701",
+    "updated_at": "2025-12-08 16:42:48.701"
+  },
+  {
+    "id": 20,
+    "name": "flow_builder",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:42:48.713",
+    "updated_at": "2025-12-08 16:42:48.713"
+  },
+  {
+    "id": 21,
+    "name": "nav",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:42:56.84",
+    "updated_at": "2025-12-08 16:42:56.84"
+  },
+  {
+    "id": 22,
+    "name": "inbox",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:42:56.964",
+    "updated_at": "2025-12-08 16:42:56.964"
+  },
+  {
+    "id": 23,
+    "name": "pipeline",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:42:58.786",
+    "updated_at": "2025-12-08 16:42:58.786"
+  },
+  {
+    "id": 24,
+    "name": "calendar",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:42:58.99",
+    "updated_at": "2025-12-08 16:42:58.99"
+  },
+  {
+    "id": 25,
+    "name": "campaigns",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:42:59.366",
+    "updated_at": "2025-12-08 16:42:59.366"
+  },
+  {
+    "id": 26,
+    "name": "segments",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:43:01.258",
+    "updated_at": "2025-12-08 16:43:01.258"
+  },
+  {
+    "id": 27,
+    "name": "templates",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:43:02.188",
+    "updated_at": "2025-12-08 16:43:02.188"
+  },
+  {
+    "id": 28,
+    "name": "variables",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:43:02.622",
+    "updated_at": "2025-12-08 16:43:02.622"
+  },
+  {
+    "id": 29,
+    "name": "agents",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:43:02.807",
+    "updated_at": "2025-12-08 16:43:02.807"
+  },
+  {
+    "id": 30,
+    "name": "media_upload",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:43:03.235",
+    "updated_at": "2025-12-08 16:43:03.235"
+  },
+  {
+    "id": 31,
+    "name": "message_input",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:43:03.328",
+    "updated_at": "2025-12-08 16:43:03.328"
+  },
+  {
+    "id": 32,
+    "name": "channel",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:43:03.369",
+    "updated_at": "2025-12-08 16:43:03.369"
+  },
+  {
+    "id": 33,
+    "name": "clear_history",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:43:03.403",
+    "updated_at": "2025-12-08 16:43:03.403"
+  },
+  {
+    "id": 34,
+    "name": "new_conversation",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:43:03.455",
+    "updated_at": "2025-12-08 16:43:03.455"
+  },
+  {
+    "id": 35,
+    "name": "header",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:43:03.689",
+    "updated_at": "2025-12-08 16:43:03.689"
+  },
+  {
+    "id": 36,
+    "name": "sidebar",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:43:03.724",
+    "updated_at": "2025-12-08 16:43:03.724"
+  },
+  {
+    "id": 37,
+    "name": "payment",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:43:03.743",
+    "updated_at": "2025-12-08 16:43:03.743"
+  },
+  {
+    "id": 38,
+    "name": "subdomain",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:43:03.896",
+    "updated_at": "2025-12-08 16:43:03.896"
+  },
+  {
+    "id": 39,
+    "name": "whatsapp_360dialog",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:43:04.064",
+    "updated_at": "2025-12-08 16:43:04.064"
+  },
+  {
+    "id": 40,
+    "name": "groups",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:43:04.321",
+    "updated_at": "2025-12-08 16:43:04.321"
+  },
+  {
+    "id": 41,
+    "name": "analytics",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:43:04.63",
+    "updated_at": "2025-12-08 16:43:04.63"
+  },
+  {
+    "id": 42,
+    "name": "meta",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:43:05.05",
+    "updated_at": "2025-12-08 16:43:05.05"
+  },
+  {
+    "id": 43,
+    "name": "channels",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:43:05.501",
+    "updated_at": "2025-12-08 16:43:05.501"
+  },
+  {
+    "id": 44,
+    "name": "partner",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:43:05.551",
+    "updated_at": "2025-12-08 16:43:05.551"
+  },
+  {
+    "id": 45,
+    "name": "api",
+    "description": "Auto-created during import for language es",
+    "created_at": "2025-12-08 16:43:05.595",
+    "updated_at": "2025-12-08 16:43:05.595"
+  }
+]

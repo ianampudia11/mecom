@@ -14,10 +14,10 @@ import { CalendlyCalendarOAuthStatus } from '@/components/flow-builder/CalendlyC
 import { useGoogleCalendarAuth } from '@/hooks/useGoogleCalendarAuth';
 import { useZohoCalendarAuth } from '@/hooks/useZohoCalendarAuth';
 import { useCalendlyCalendarAuth } from '@/hooks/useCalendlyCalendarAuth';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
   DialogTitle,
   DialogFooter,
   DialogDescription
@@ -27,12 +27,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from "@/components/ui/select";
 import {
   AlertDialog,
@@ -44,10 +44,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { 
+import {
   Loader2, Calendar as CalendarIcon, X, UserPlus, Clock, MapPin,
   ChevronLeft, ChevronRight, Search, Settings, PlusCircle, Check,
-  ChevronDown, Pencil, Trash
+  ChevronDown, Pencil, Trash, Star
 } from 'lucide-react';
 import { queryClient, apiRequest } from '@/lib/queryClient';
 import { format, addDays, subDays, parse, parseISO, formatISO, addHours, getDay, isSameMonth, startOfWeek, eachDayOfInterval, addWeeks, subWeeks, getDaysInMonth, isToday, endOfWeek, isSameDay, addMonths, subMonths } from 'date-fns';
@@ -103,6 +103,14 @@ interface Schedule {
   name: string;
   selected: boolean;
   color?: string;
+}
+
+interface GoogleCalendar {
+  id: string;
+  summary: string;
+  primary?: boolean;
+  backgroundColor?: string;
+  foregroundColor?: string;
 }
 
 const EVENT_COLORS: Record<string, string> = {
@@ -176,8 +184,21 @@ export default function Calendar() {
   ]);
   const [categories, setCategories] = useState<EventCategory[]>([]);
 
+  // Google Calendars State
+  const [googleCalendars, setGoogleCalendars] = useState<GoogleCalendar[]>([]);
+  const [selectedGoogleCalendarIds, setSelectedGoogleCalendarIds] = useState<string[]>(['primary']);
+  const [defaultGoogleCalendarId, setDefaultGoogleCalendarId] = useState<string>(() => {
+    return localStorage.getItem('defaultGoogleCalendarId') || 'primary';
+  });
 
-  
+  useEffect(() => {
+    if (defaultGoogleCalendarId) {
+      localStorage.setItem('defaultGoogleCalendarId', defaultGoogleCalendarId);
+    }
+  }, [defaultGoogleCalendarId]);
+
+
+
   const [eventForm, setEventForm] = useState<EventFormData>({
     summary: '',
     description: '',
@@ -188,14 +209,48 @@ export default function Calendar() {
     attendeeInput: '',
     colorId: '1'
   });
-  
+
+  // Check for edit params in URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const editEventId = params.get('editEventId');
+    const provider = params.get('provider');
+
+    if (editEventId && provider) {
+      // Fetch specific event details
+      apiRequest("GET", `/api/${provider}/calendar/events/${editEventId}`)
+        .then(async (res) => {
+          if (res.ok) {
+            const event = await res.json();
+            setSelectedEvent(event);
+            setEventForm({
+              summary: event.summary,
+              description: event.description || '',
+              location: event.location || '',
+              startDateTime: event.start.dateTime || event.start.date,
+              endDateTime: event.end.dateTime || event.end.date,
+              attendees: event.attendees?.map((a: any) => a.email) || [],
+              attendeeInput: '',
+              colorId: event.colorId || '1'
+            });
+            setIsEditModalOpen(true);
+
+            // Clear params
+            const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.history.replaceState({ path: newUrl }, '', newUrl);
+          }
+        })
+        .catch(err => console.error("Failed to load event for edit", err));
+    }
+  }, []);
+
   const dateRange = useMemo(() => {
     let startDate, endDate;
-    
+
     if (viewMode === 'month') {
       const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
       const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-      
+
       startDate = startOfWeek(firstDayOfMonth);
       endDate = endOfWeek(lastDayOfMonth);
     } else if (viewMode === 'week') {
@@ -205,29 +260,99 @@ export default function Calendar() {
       startDate = currentDate;
       endDate = currentDate;
     }
-    
+
     return {
       start: format(startDate, 'yyyy-MM-dd'),
       end: format(endDate, 'yyyy-MM-dd')
     };
   }, [currentDate, viewMode]);
-  
+
   const formattedSelectedDate = format(selectedDate, 'yyyy-MM-dd');
 
+  // Fetch Available Google Calendars
+  const { data: googleCalendarsData } = useQuery({
+    queryKey: ['/api/google/calendars'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/google/calendars');
+      const data = await response.json();
+      return data;
+    },
+    enabled: isGoogleCalendarConnected
+  });
+
+  useEffect(() => {
+    console.log('Google Calendars Data:', googleCalendarsData);
+    if (googleCalendarsData?.success && googleCalendarsData.items) {
+      console.log('Setting Google Calendars:', googleCalendarsData.items);
+      setGoogleCalendars(googleCalendarsData.items);
+      // By default select primary 
+      const primary = googleCalendarsData.items.find((c: any) => c.primary);
+      if (primary && selectedGoogleCalendarIds.length === 1 && selectedGoogleCalendarIds[0] === 'primary') {
+        // Keep primary default or replace with actual ID if needed, but 'primary' alias works well
+        // Actually, the list returns IDs. Let's make sure we track by IDs.
+        if (!selectedGoogleCalendarIds.includes(primary.id)) {
+          setSelectedGoogleCalendarIds(prev => prev.filter(id => id !== 'primary').concat(primary.id));
+        }
+        // Set default calendar if not set
+        if (defaultGoogleCalendarId === 'primary') {
+          setDefaultGoogleCalendarId(primary.id);
+        }
+      }
+    } else {
+      console.log('No calendars found or success false');
+    }
+  }, [googleCalendarsData]);
+
+  const toggleGoogleCalendar = (calendarId: string) => {
+    setSelectedGoogleCalendarIds(prev =>
+      prev.includes(calendarId)
+        ? prev.filter(id => id !== calendarId)
+        : [...prev, calendarId]
+    );
+  };
 
   const {
     data: googleCalendarEvents,
     isLoading: isLoadingGoogleEvents,
     refetch: refetchGoogleEvents
-  } = useQuery<{success: boolean, items: Appointment[]}>({
-    queryKey: ['/api/google/calendar/events', dateRange.start, dateRange.end],
+  } = useQuery<{ success: boolean, items: Appointment[] }>({
+    queryKey: ['/api/google/calendar/events', dateRange.start, dateRange.end, selectedGoogleCalendarIds],
     queryFn: async () => {
       const timeMin = `${dateRange.start}T00:00:00Z`;
       const timeMax = `${dateRange.end}T23:59:59Z`;
-      const response = await apiRequest('GET',
-        `/api/google/calendar/events?timeMin=${encodeURIComponent(timeMin)}&timeMax=${encodeURIComponent(timeMax)}&maxResults=100`
+
+      // If no calendars selected, return empty
+      if (selectedGoogleCalendarIds.length === 0) return { success: true, items: [] };
+
+      // Fetch for all selected calendars
+      const promises = selectedGoogleCalendarIds.map(calendarId =>
+        apiRequest('GET',
+          `/api/google/calendar/events?timeMin=${encodeURIComponent(timeMin)}&timeMax=${encodeURIComponent(timeMax)}&maxResults=100&calendarId=${encodeURIComponent(calendarId)}`
+        ).then(res => res.json().then(data => ({ ...data, calendarId })))
       );
-      return response.json();
+
+      const results = await Promise.all(promises);
+
+      // Merge results
+      const allEvents: Appointment[] = [];
+      results.forEach((res, index) => {
+        if (res.success && res.items) {
+          // Optionally tag events with calendarId if needed for color coding
+          const calendarId = selectedGoogleCalendarIds[index];
+          const calendar = googleCalendars.find(c => c.id === calendarId);
+
+          const eventsWithMetadata = res.items.map((e: any) => ({
+            ...e,
+            // Use calendar background color if event doesn't have one, or some other logic
+            // event.colorId usually comes from Google 
+            calendarId: res.calendarId // Propagated from promise above
+          }));
+
+          allEvents.push(...eventsWithMetadata);
+        }
+      });
+
+      return { success: true, items: allEvents };
     },
     enabled: isGoogleCalendarConnected && (calendarFilter === 'all' || calendarFilter === 'google')
   });
@@ -237,7 +362,7 @@ export default function Calendar() {
     data: zohoCalendarEvents,
     isLoading: isLoadingZohoEvents,
     refetch: refetchZohoEvents
-  } = useQuery<{success: boolean, items: Appointment[]}>({
+  } = useQuery<{ success: boolean, items: Appointment[] }>({
     queryKey: ['/api/zoho/calendar/events', dateRange.start, dateRange.end],
     queryFn: async () => {
       const timeMin = `${dateRange.start}T00:00:00Z`;
@@ -255,7 +380,7 @@ export default function Calendar() {
     data: calendlyCalendarEvents,
     isLoading: isLoadingCalendlyEvents,
     refetch: refetchCalendlyEvents
-  } = useQuery<{success: boolean, events: Appointment[]}>({
+  } = useQuery<{ success: boolean, events: Appointment[] }>({
     queryKey: ['/api/calendly/events', dateRange.start, dateRange.end],
     queryFn: async () => {
       const timeMin = `${dateRange.start}T00:00:00Z`;
@@ -355,17 +480,17 @@ export default function Calendar() {
 
     return 'google';
   };
-  
+
   useEffect(() => {
     if (calendarEvents && calendarEvents.length > 0) {
-      const colorGroups: Record<string, {count: number, name: string, color: string}> = {};
+      const colorGroups: Record<string, { count: number, name: string, color: string }> = {};
 
       calendarEvents.forEach(event => {
         const colorId = event.colorId || 'default';
         const category = COLOR_CATEGORY_MAP[colorId] || COLOR_CATEGORY_MAP['default'];
         const categoryName = category.name;
         const colorClass = category.color;
-        
+
         if (!colorGroups[colorId]) {
           colorGroups[colorId] = {
             count: 0,
@@ -373,10 +498,10 @@ export default function Calendar() {
             color: colorClass
           };
         }
-        
+
         colorGroups[colorId].count++;
       });
-      
+
       const newCategories = Object.entries(colorGroups).map(([id, data]) => ({
         id,
         name: data.name,
@@ -384,24 +509,24 @@ export default function Calendar() {
         count: data.count,
         selected: true
       }));
-      
+
       setCategories(newCategories);
     }
   }, [calendarEvents]);
-  
-  const { data: calendarStatus } = useQuery<{connected: boolean, message: string}>({
+
+  const { data: calendarStatus } = useQuery<{ connected: boolean, message: string }>({
     queryKey: [`/api/${selectedProvider}/calendar/status`, selectedProvider],
     queryFn: async () => {
       const response = await apiRequest('GET', `/api/${selectedProvider}/calendar/status`);
       return response.json();
     }
   });
-  
+
   const {
     data: availabilityData,
     isLoading: isLoadingAvailability,
     refetch: refetchAvailability
-  } = useQuery<{success: boolean, timeSlots: TimeSlot[]}>({
+  } = useQuery<{ success: boolean, timeSlots: TimeSlot[] }>({
     queryKey: [`/api/${selectedProvider}/calendar/availability`, formattedSelectedDate, selectedAppointmentDuration, selectedProvider],
     queryFn: async () => {
       const response = await apiRequest('GET',
@@ -411,9 +536,10 @@ export default function Calendar() {
     },
     enabled: false
   });
-  
+
   const createEventMutation = useMutation({
     mutationFn: async (data: any) => {
+      // data should now include calendarId if provider is google
       const response = await apiRequest('POST', `/api/${selectedProvider}/calendar/events`, data);
       return response.json();
     },
@@ -438,9 +564,9 @@ export default function Calendar() {
       });
     }
   });
-  
+
   const updateEventMutation = useMutation({
-    mutationFn: async (data: {eventId: string, eventData: any, provider: 'google' | 'zoho' | 'calendly'}) => {
+    mutationFn: async (data: { eventId: string, eventData: any, provider: 'google' | 'zoho' | 'calendly' }) => {
 
 
 
@@ -470,9 +596,9 @@ export default function Calendar() {
       });
     }
   });
-  
+
   const deleteEventMutation = useMutation({
-    mutationFn: async (data: {eventId: string, provider: 'google' | 'zoho' | 'calendly'}) => {
+    mutationFn: async (data: { eventId: string, provider: 'google' | 'zoho' | 'calendly', calendarId?: string }) => {
 
 
 
@@ -484,7 +610,8 @@ export default function Calendar() {
         throw new Error('Failed to cancel Calendly event');
       }
 
-      const response = await apiRequest('DELETE', `/api/${data.provider}/calendar/events/${data.eventId}`);
+      const queryParams = data.calendarId ? `?calendarId=${data.calendarId}` : '';
+      const response = await apiRequest('DELETE', `/api/${data.provider}/calendar/events/${data.eventId}${queryParams}`);
       if (response.ok) {
         return { success: true };
       }
@@ -509,7 +636,7 @@ export default function Calendar() {
       });
     }
   });
-  
+
   const resetEventForm = () => {
     setEventForm({
       summary: '',
@@ -523,7 +650,7 @@ export default function Calendar() {
     });
     setSelectedTimeSlot(null);
   };
-  
+
   useEffect(() => {
     if (selectedEvent && isEditModalOpen) {
       setEventForm({
@@ -538,18 +665,18 @@ export default function Calendar() {
       });
     }
   }, [selectedEvent, isEditModalOpen]);
-  
+
   useEffect(() => {
     if (availabilityData?.success && availabilityData.timeSlots) {
       setTimeSlots(availabilityData.timeSlots);
     }
   }, [availabilityData]);
-  
+
   const handleScheduleAppointment = () => {
     const isConnected = selectedProvider === 'google' ? isGoogleCalendarConnected :
-                       selectedProvider === 'zoho' ? isZohoCalendarConnected : isCalendlyCalendarConnected;
+      selectedProvider === 'zoho' ? isZohoCalendarConnected : isCalendlyCalendarConnected;
     const providerName = selectedProvider === 'google' ? t('calendar.google_calendar', 'Google Calendar') :
-                        selectedProvider === 'zoho' ? t('calendar.zoho_calendar', 'Zoho Calendar') : t('calendar.calendly_calendar', 'Calendly');
+      selectedProvider === 'zoho' ? t('calendar.zoho_calendar', 'Zoho Calendar') : t('calendar.calendly_calendar', 'Calendly');
 
     if (!isConnected) {
       toast({
@@ -572,12 +699,12 @@ export default function Calendar() {
     resetEventForm();
     setIsCreateModalOpen(true);
   };
-  
+
   const handleCheckAvailability = () => {
     const isConnected = selectedProvider === 'google' ? isGoogleCalendarConnected :
-                       selectedProvider === 'zoho' ? isZohoCalendarConnected : isCalendlyCalendarConnected;
+      selectedProvider === 'zoho' ? isZohoCalendarConnected : isCalendlyCalendarConnected;
     const providerName = selectedProvider === 'google' ? t('calendar.google_calendar', 'Google Calendar') :
-                        selectedProvider === 'zoho' ? t('calendar.zoho_calendar', 'Zoho Calendar') : t('calendar.calendly_calendar', 'Calendly');
+      selectedProvider === 'zoho' ? t('calendar.zoho_calendar', 'Zoho Calendar') : t('calendar.calendly_calendar', 'Calendly');
 
     if (!isConnected) {
       toast({
@@ -590,7 +717,7 @@ export default function Calendar() {
     setIsAvailabilityModalOpen(true);
     refetchAvailability();
   };
-  
+
   const handleAddAttendee = () => {
     if (eventForm.attendeeInput.trim() && !eventForm.attendees.includes(eventForm.attendeeInput.trim())) {
       setEventForm({
@@ -600,14 +727,14 @@ export default function Calendar() {
       });
     }
   };
-  
+
   const handleRemoveAttendee = (email: string) => {
     setEventForm({
       ...eventForm,
       attendees: eventForm.attendees.filter(a => a !== email)
     });
   };
-  
+
   const formatTimeDisplay = (dateTimeString: string) => {
     try {
       const date = parseISO(dateTimeString);
@@ -616,30 +743,30 @@ export default function Calendar() {
       return dateTimeString;
     }
   };
-  
+
   const handleCreateFromTimeSlot = (timeSlot: string) => {
     setSelectedTimeSlot(timeSlot);
-    
+
     const [hours, minutes] = timeSlot.match(/(\d+):(\d+)/)?.slice(1, 3).map(Number) || [0, 0];
     const isPM = timeSlot.toLowerCase().includes('pm');
     const hour24 = isPM && hours !== 12 ? hours + 12 : (!isPM && hours === 12 ? 0 : hours);
-    
+
     const startDate = new Date(selectedDate || new Date());
     startDate.setHours(hour24, minutes, 0, 0);
-    
+
     const endDate = new Date(startDate);
     endDate.setMinutes(endDate.getMinutes() + Number(selectedAppointmentDuration));
-    
+
     setEventForm({
       ...eventForm,
       startDateTime: formatISO(startDate),
       endDateTime: formatISO(endDate)
     });
-    
+
     setIsAvailabilityModalOpen(false);
     setIsCreateModalOpen(true);
   };
-  
+
   const handleCreateEvent = () => {
     if (!eventForm.summary || !eventForm.startDateTime || !eventForm.endDateTime) {
       toast({
@@ -649,7 +776,7 @@ export default function Calendar() {
       });
       return;
     }
-    
+
     const eventData = {
       summary: eventForm.summary,
       description: eventForm.description,
@@ -657,12 +784,23 @@ export default function Calendar() {
       startDateTime: eventForm.startDateTime,
       endDateTime: eventForm.endDateTime,
       attendees: eventForm.attendees,
-      colorId: eventForm.colorId
+      colorId: eventForm.colorId,
+      calendarId: selectedProvider === 'google' ? defaultGoogleCalendarId : undefined
     };
-    
+    const targetCalendar = googleCalendars.find(c => c.id === (selectedProvider === 'google' ? defaultGoogleCalendarId : ''));
+
+    // TEMPORARY DEBUG ALERT
+    alert(`Debug: Attempting to create event in calendar: ${targetCalendar?.summary || 'Unknown'} (ID: ${selectedProvider === 'google' ? defaultGoogleCalendarId : 'N/A'})`);
+    console.log('Creating event with data:', eventData);
+
+    toast({
+      title: "Creating Event",
+      description: `Saving to ${targetCalendar?.summary || 'Primary Calendar'}...`,
+    });
+
     createEventMutation.mutate(eventData);
   };
-  
+
   const handleUpdateEvent = () => {
     if (!selectedEvent || !eventForm.summary || !eventForm.startDateTime || !eventForm.endDateTime) {
       toast({
@@ -693,7 +831,7 @@ export default function Calendar() {
       provider: eventProvider
     });
   };
-  
+
   const handleDeleteEvent = () => {
     if (selectedEvent?.id) {
 
@@ -706,7 +844,7 @@ export default function Calendar() {
       });
     }
   };
-  
+
   const handleAddSchedule = () => {
     if (!newScheduleName.trim()) {
       toast({
@@ -716,29 +854,29 @@ export default function Calendar() {
       });
       return;
     }
-    
+
     const newId = (Math.max(...schedules.map(s => parseInt(s.id)), 0) + 1).toString();
-    
+
     setSchedules(prev => [
       ...prev,
       { id: newId, name: newScheduleName.trim(), selected: true, color: newScheduleColor }
     ]);
-    
+
     setNewScheduleName("");
     setNewScheduleColor("blue");
     setIsAddScheduleModalOpen(false);
-    
+
     toast({
       title: t('calendar.schedule_added', 'Schedule Added'),
       description: t('calendar.schedule_added_success', 'New schedule "{{name}}" has been added', { name: newScheduleName.trim() }),
     });
   };
-  
+
   const goToToday = () => {
     setCurrentDate(new Date());
     setSelectedDate(new Date());
   };
-  
+
   const goToPrevious = () => {
     if (viewMode === 'month') {
       setCurrentDate(subMonths(currentDate, 1));
@@ -748,7 +886,7 @@ export default function Calendar() {
       setCurrentDate(subDays(currentDate, 1));
     }
   };
-  
+
   const goToNext = () => {
     if (viewMode === 'month') {
       setCurrentDate(addMonths(currentDate, 1));
@@ -758,19 +896,19 @@ export default function Calendar() {
       setCurrentDate(addDays(currentDate, 1));
     }
   };
-  
+
   const toggleSchedule = (id: string) => {
-    setSchedules(schedules.map(schedule => 
+    setSchedules(schedules.map(schedule =>
       schedule.id === id ? { ...schedule, selected: !schedule.selected } : schedule
     ));
   };
-  
+
   const toggleCategory = (id: string) => {
-    setCategories(categories.map(category => 
+    setCategories(categories.map(category =>
       category.id === id ? { ...category, selected: !category.selected } : category
     ));
   };
-  
+
   const handleEditSchedule = () => {
     if (!selectedSchedule || !newScheduleName.trim()) {
       toast({
@@ -780,38 +918,38 @@ export default function Calendar() {
       });
       return;
     }
-    
-    setSchedules(prev => prev.map(schedule => 
-      schedule.id === selectedSchedule.id 
+
+    setSchedules(prev => prev.map(schedule =>
+      schedule.id === selectedSchedule.id
         ? { ...schedule, name: newScheduleName.trim(), color: newScheduleColor }
         : schedule
     ));
-    
+
     setNewScheduleName("");
     setNewScheduleColor("blue");
     setIsEditScheduleModalOpen(false);
     setSelectedSchedule(null);
-    
+
     toast({
       title: t('calendar.schedule_updated', 'Schedule Updated'),
       description: t('calendar.schedule_updated_success', 'Schedule "{{name}}" has been updated', { name: newScheduleName.trim() }),
     });
   };
-  
+
   const handleDeleteSchedule = () => {
     if (!selectedSchedule) return;
-    
+
     setSchedules(prev => prev.filter(schedule => schedule.id !== selectedSchedule.id));
-    
+
     setIsDeleteScheduleAlertOpen(false);
     setSelectedSchedule(null);
-    
+
     toast({
       title: t('calendar.schedule_deleted', 'Schedule Deleted'),
       description: t('calendar.schedule_deleted_success', 'Schedule "{{name}}" has been deleted', { name: selectedSchedule.name }),
     });
   };
-  
+
   const calendarData = useMemo(() => {
     if (viewMode === 'month') {
       const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
@@ -821,12 +959,12 @@ export default function Calendar() {
         start,
         end: addDays(start, 41)
       });
-      
+
       const weeks = [];
       for (let i = 0; i < 6; i++) {
         weeks.push(days.slice(i * 7, (i + 1) * 7));
       }
-      
+
       return weeks;
     } else if (viewMode === 'week') {
       const startOfCurrentWeek = startOfWeek(currentDate);
@@ -838,51 +976,51 @@ export default function Calendar() {
       return [currentDate];
     }
   }, [currentDate, viewMode]);
-  
+
   const filteredEvents = useMemo(() => {
     if (!calendarEvents || calendarEvents.length === 0) return [];
-    
+
     const selectedCategoryIds = categories
       .filter(category => category.selected)
       .map(category => category.id);
-    
+
     const selectedScheduleIds = schedules
       .filter(schedule => schedule.selected)
       .map(schedule => schedule.id);
-    
+
     let filteredByCategories = calendarEvents;
-    
+
     if (selectedCategoryIds.length !== categories.length) {
       filteredByCategories = calendarEvents.filter((event: any) => {
         if (!event.colorId) return true;
-        
+
         return selectedCategoryIds.includes(event.colorId);
       });
     }
-    
+
     if (selectedScheduleIds.length > 0 && selectedScheduleIds.length !== schedules.length) {
-      
+
       return filteredByCategories.filter((event: any) => {
         for (const scheduleId of selectedScheduleIds) {
           const schedule = schedules.find(s => s.id === scheduleId);
           if (!schedule) continue;
-          
+
           const summary = (event.summary || '').toLowerCase();
           const description = (event.description || '').toLowerCase();
           const scheduleName = schedule.name.toLowerCase();
-          
+
           if (summary.includes(scheduleName) || description.includes(scheduleName)) {
             return true;
           }
         }
-        
+
         return false;
       });
     }
-    
+
     return filteredByCategories;
   }, [calendarEvents, categories, schedules]);
-  
+
 
   const eventsByDate = useMemo(() => {
     if (!filteredEvents.length) return new Map();
@@ -915,26 +1053,25 @@ export default function Calendar() {
 
     return eventMap;
   }, [filteredEvents]);
-  
+
   const getEventsForDay = (day: Date) => {
     const dateKey = format(day, 'yyyy-MM-dd');
     return eventsByDate.get(dateKey) || [];
   };
-  
+
   const renderMonthCell = (day: Date) => {
     const dayEvents = getEventsForDay(day);
     const isCurrentMonth = isSameMonth(day, currentDate);
     const isSelectedDay = isSameDay(day, selectedDate);
     const displayDay = format(day, 'd');
-    
+
     return (
-      <div 
-        key={day.toString()} 
-        className={`border border-gray-200 min-h-[100px] p-1 transition-colors ${
-          isToday(day) ? 'bg-blue-50' : 
-          !isCurrentMonth ? 'bg-gray-50 text-gray-400' : 
-          isSelectedDay ? 'bg-blue-100' : ''
-        }`}
+      <div
+        key={day.toString()}
+        className={`border border-gray-200 min-h-[100px] p-1 transition-colors ${isToday(day) ? 'bg-blue-50' :
+          !isCurrentMonth ? 'bg-gray-50 text-gray-400' :
+            isSelectedDay ? 'bg-blue-100' : ''
+          }`}
         onClick={() => setSelectedDate(day)}
       >
         <div className="flex justify-between items-start">
@@ -955,14 +1092,13 @@ export default function Calendar() {
             >
               {/* Provider indicator */}
               <div
-                className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
-                  event.provider === 'google' ? 'bg-blue-200' :
+                className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${event.provider === 'google' ? 'bg-blue-200' :
                   event.provider === 'zoho' ? 'bg-orange-200' :
-                  event.provider === 'calendly' ? 'bg-purple-200' : 'bg-gray-200'
-                }`}
+                    event.provider === 'calendly' ? 'bg-purple-200' : 'bg-gray-200'
+                  }`}
                 title={event.provider === 'google' ? t('calendar.google_calendar', 'Google Calendar') :
-                       event.provider === 'zoho' ? t('calendar.zoho_calendar', 'Zoho Calendar') :
-                       event.provider === 'calendly' ? t('calendar.calendly_calendar', 'Calendly') : t('nav.calendar', 'Calendar')}
+                  event.provider === 'zoho' ? t('calendar.zoho_calendar', 'Zoho Calendar') :
+                    event.provider === 'calendly' ? t('calendar.calendly_calendar', 'Calendly') : t('nav.calendar', 'Calendar')}
               />
               <span className="truncate">
                 {format(parseISO(event.start.dateTime), 'h:mm a')} {event.summary}
@@ -978,10 +1114,10 @@ export default function Calendar() {
       </div>
     );
   };
-  
+
   const renderWeekDayCell = (day: Date, hourSlots: string[]) => {
     const dayEvents = getEventsForDay(day);
-    
+
     return (
       <div className="flex-1 flex flex-col min-h-[800px]">
         <div className={`text-center py-2 font-medium ${isToday(day) ? 'bg-blue-100' : 'bg-gray-50'}`}>
@@ -1008,14 +1144,13 @@ export default function Calendar() {
                   >
                     {/* Provider indicator */}
                     <div
-                      className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
-                        event.provider === 'google' ? 'bg-blue-200' :
+                      className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${event.provider === 'google' ? 'bg-blue-200' :
                         event.provider === 'zoho' ? 'bg-orange-200' :
-                        event.provider === 'calendly' ? 'bg-purple-200' : 'bg-gray-200'
-                      }`}
+                          event.provider === 'calendly' ? 'bg-purple-200' : 'bg-gray-200'
+                        }`}
                       title={event.provider === 'google' ? t('calendar.google_calendar', 'Google Calendar') :
-                             event.provider === 'zoho' ? t('calendar.zoho_calendar', 'Zoho Calendar') :
-                             event.provider === 'calendly' ? t('calendar.calendly_calendar', 'Calendly') : t('nav.calendar', 'Calendar')}
+                        event.provider === 'zoho' ? t('calendar.zoho_calendar', 'Zoho Calendar') :
+                          event.provider === 'calendly' ? t('calendar.calendly_calendar', 'Calendly') : t('nav.calendar', 'Calendar')}
                     />
                     <span className="truncate">
                       {format(parseISO(event.start.dateTime), 'h:mm a')} - {event.summary}
@@ -1028,19 +1163,19 @@ export default function Calendar() {
       </div>
     );
   };
-  
+
   const hourSlots = [
-    '8 am', '9 am', '10 am', '11 am', '12 pm', 
+    '8 am', '9 am', '10 am', '11 am', '12 pm',
     '1 pm', '2 pm', '3 pm', '4 pm', '5 pm', '6 pm'
   ];
-  
+
   return (
     <div className="h-screen flex flex-col overflow-hidden font-poppins text-gray-800 bg-gray-50">
       <Header />
-      
+
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        
+
         <div className="flex-1 overflow-y-auto">
           <div className="max-w-7xl mx-auto p-6">
             {/* Calendar Provider Selection and Filtering */}
@@ -1054,11 +1189,11 @@ export default function Calendar() {
                       variant={selectedProvider === 'google' ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => setSelectedProvider('google')}
-                      className="flex items-center space-x-2"
+                      className={`flex items-center space-x-2 ${selectedProvider === 'google' ? 'bg-blue-600 text-white hover:bg-blue-700' : ''}`}
                     >
                       <span>{t('calendar.google_calendar', 'Google Calendar')}</span>
                       {isGoogleCalendarConnected && (
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <div className="w-2 h-2 bg-green-500 rounded-full border border-white"></div>
                       )}
                     </Button>
                     <Button
@@ -1094,7 +1229,7 @@ export default function Calendar() {
                       variant={calendarFilter === 'all' ? 'default' : 'ghost'}
                       size="sm"
                       onClick={() => setCalendarFilter('all')}
-                      className="text-xs px-3 py-1 h-7"
+                      className={`text-xs px-3 py-1 h-7 ${calendarFilter === 'all' ? 'bg-blue-600 text-white hover:bg-blue-700' : ''}`}
                     >
                       {t('calendar.all_calendars', 'All Calendars')}
                     </Button>
@@ -1102,10 +1237,10 @@ export default function Calendar() {
                       variant={calendarFilter === 'google' ? 'default' : 'ghost'}
                       size="sm"
                       onClick={() => setCalendarFilter('google')}
-                      className="text-xs px-3 py-1 h-7 flex items-center space-x-1"
+                      className={`text-xs px-3 py-1 h-7 flex items-center space-x-1 ${calendarFilter === 'google' ? 'bg-blue-600 text-white hover:bg-blue-700' : ''}`}
                       disabled={!isGoogleCalendarConnected}
                     >
-                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <div className={`w-2 h-2 rounded-full ${calendarFilter === 'google' ? 'bg-white' : 'bg-blue-500'}`}></div>
                       <span>{t('calendar.google', 'Google')}</span>
                     </Button>
                     <Button
@@ -1165,24 +1300,24 @@ export default function Calendar() {
                   <div className="text-sm text-gray-500">{t('calendar.personal_teams', 'Personal, Teams')}</div>
                 </div>
                 <div className="flex items-center space-x-4">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={goToToday}
                   >
                     {t('calendar.today', 'Today')}
                   </Button>
                   <div className="flex">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       onClick={goToPrevious}
                     >
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       onClick={goToNext}
                     >
                       <ChevronRight className="h-4 w-4" />
@@ -1210,7 +1345,7 @@ export default function Calendar() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex flex-1 h-full">
                 <div className="w-[260px] border-r p-4">
                   <div className="mb-6">
@@ -1219,17 +1354,17 @@ export default function Calendar() {
                         {format(currentDate, 'MMMM yyyy')}
                       </span>
                       <div className="flex">
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           className="h-6 w-6"
                           onClick={() => setCurrentDate(subMonths(currentDate, 1))}
                         >
                           <ChevronLeft className="h-3 w-3" />
                         </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           className="h-6 w-6"
                           onClick={() => setCurrentDate(addMonths(currentDate, 1))}
                         >
@@ -1237,13 +1372,13 @@ export default function Calendar() {
                         </Button>
                       </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-7 text-center text-xs mb-1">
                       {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
                         <div key={i} className="py-1">{day}</div>
                       ))}
                     </div>
-                    
+
                     <div className="grid grid-cols-7 gap-1 text-center text-sm">
                       {eachDayOfInterval({
                         start: startOfWeek(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)),
@@ -1251,15 +1386,14 @@ export default function Calendar() {
                       }).map(day => {
                         const isCurrentMonth = isSameMonth(day, currentDate);
                         const isCurrent = isSameDay(day, selectedDate);
-                        
+
                         return (
                           <button
                             key={day.toString()}
-                            className={`h-7 w-7 flex items-center justify-center rounded-full ${
-                              isCurrent ? 'bg-blue-600 text-white' : 
-                              isToday(day) ? 'bg-blue-100 text-blue-700' : 
-                              !isCurrentMonth ? 'text-gray-400' : ''
-                            }`}
+                            className={`h-7 w-7 flex items-center justify-center rounded-full ${isCurrent ? 'bg-blue-600 text-white' :
+                              isToday(day) ? 'bg-blue-100 text-blue-700' :
+                                !isCurrentMonth ? 'text-gray-400' : ''
+                              }`}
                             onClick={() => setSelectedDate(day)}
                           >
                             {format(day, 'd')}
@@ -1268,36 +1402,96 @@ export default function Calendar() {
                       })}
                     </div>
                   </div>
-                  
+
+
+
+                  {isGoogleCalendarConnected && googleCalendars.length > 0 && (
+                    <div className="mb-6">
+                      <div className="flex justify-between items-center mb-4">
+                        <span className="text-base ">{t('calendar.google_calendars', 'Google Calendars')}</span>
+                        <div className="flex">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                          >
+                            <ChevronDown className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        {googleCalendars.map(calendar => (
+                          <div
+                            key={calendar.id}
+                            className="flex items-center justify-between group cursor-pointer"
+                            onClick={() => toggleGoogleCalendar(calendar.id)}
+                          >
+                            <div className="flex items-center">
+                              <div className={`w-5 h-5 rounded flex items-center justify-center ${selectedGoogleCalendarIds.includes(calendar.id) ? 'bg-blue-500' : 'border-2 border-gray-300'}`}>
+                                {selectedGoogleCalendarIds.includes(calendar.id) && <Check className="h-3 w-3 text-white" />}
+                              </div>
+                              <span className="ml-2 text-sm font-medium truncate max-w-[140px]" title={calendar.summary}>{calendar.summary}</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              {calendar.primary && (
+                                <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 mr-1 text-gray-500">Main</Badge>
+                              )}
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setDefaultGoogleCalendarId(calendar.id);
+                                  toast({
+                                    title: t('calendar.default_set', 'Default Calendar Updated'),
+                                    description: t('calendar.default_set_desc', `New events will be created in ${calendar.summary}`),
+                                  });
+                                }}
+                                title={t('calendar.set_default', 'Set as default for new events')}
+                              >
+                                <Star
+                                  className={`h-4 w-4 ${defaultGoogleCalendarId === calendar.id ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300 hover:text-yellow-400'}`}
+                                />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   <div className="mb-6">
                     <div className="flex justify-between items-center mb-4">
                       <span className="text-base ">{t('calendar.my_schedules', 'My Schedules')}</span>
+
                       <div className="flex">
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           className="h-6 w-6"
                           onClick={() => setIsAddScheduleModalOpen(true)}
                         >
                           <PlusCircle className="h-4 w-4" />
                         </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           className="h-6 w-6"
                         >
                           <ChevronDown className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
-                    
+
                     <div className="space-y-3">
                       {schedules.map(schedule => (
-                        <div 
-                          key={schedule.id} 
+                        <div
+                          key={schedule.id}
                           className="flex items-center justify-between group"
                         >
-                          <div 
+                          <div
                             className="flex items-center cursor-pointer"
                             onClick={() => toggleSchedule(schedule.id)}
                           >
@@ -1336,23 +1530,23 @@ export default function Calendar() {
                       ))}
                     </div>
                   </div>
-                  
+
                   <div>
                     <div className="flex justify-between items-center mb-4">
                       <span className="text-base ">{t('calendar.categories', 'Categories')}</span>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         className="h-6 w-6"
                       >
                         <ChevronDown className="h-4 w-4" />
                       </Button>
                     </div>
-                    
+
                     <div className="space-y-3">
                       {categories.map(category => (
-                        <div 
-                          key={category.id} 
+                        <div
+                          key={category.id}
                           className="flex items-center justify-between cursor-pointer"
                           onClick={() => toggleCategory(category.id)}
                         >
@@ -1371,7 +1565,7 @@ export default function Calendar() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="flex-1 overflow-auto">
                   {viewMode === 'month' && (
                     <div>
@@ -1388,13 +1582,13 @@ export default function Calendar() {
                           <div key={day} className="text-sm font-medium text-gray-600">{day}</div>
                         ))}
                       </div>
-                      
+
                       <div className="grid grid-cols-7">
                         {calendarData.flat().map(day => renderMonthCell(day))}
                       </div>
                     </div>
                   )}
-                  
+
                   {viewMode === 'week' && (
                     <div className="flex h-full">
                       <div className="w-16 pt-10 bg-gray-50 border-r">
@@ -1404,13 +1598,13 @@ export default function Calendar() {
                           </div>
                         ))}
                       </div>
-                      
+
                       <div className="flex-1 flex">
                         {(calendarData as Date[]).map((day) => renderWeekDayCell(day, hourSlots))}
                       </div>
                     </div>
                   )}
-                  
+
                   {viewMode === 'day' && (
                     <div className="flex h-full">
                       <div className="w-16 pt-10 bg-gray-50 border-r">
@@ -1420,7 +1614,7 @@ export default function Calendar() {
                           </div>
                         ))}
                       </div>
-                      
+
                       <div className="flex-1">
                         {renderWeekDayCell(currentDate, hourSlots)}
                       </div>
@@ -1429,16 +1623,16 @@ export default function Calendar() {
                 </div>
               </div>
             </div>
-            
+
             <div className="fixed bottom-8 right-8 flex space-x-2">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={handleCheckAvailability}
                 className="rounded-full shadow-sm"
               >
                 <Clock className="h-4 w-4 mr-2" /> {t('calendar.check_availability', 'Check Availability')}
               </Button>
-              <Button 
+              <Button
                 onClick={handleScheduleAppointment}
                 className="rounded-full shadow-sm text-green-600 btn-brand-primary"
               >
@@ -1448,7 +1642,7 @@ export default function Calendar() {
           </div>
         </div>
       </div>
-      
+
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
@@ -1458,14 +1652,13 @@ export default function Calendar() {
                 <span className="text-gray-500">via</span>
                 <div className="flex items-center space-x-1 px-2 py-1 bg-gray-100 rounded-md">
                   <div
-                    className={`w-2 h-2 rounded-full ${
-                      selectedProvider === 'google' ? 'bg-blue-500' :
+                    className={`w-2 h-2 rounded-full ${selectedProvider === 'google' ? 'bg-blue-500' :
                       selectedProvider === 'zoho' ? 'bg-orange-500' : 'bg-purple-500'
-                    }`}
+                      }`}
                   />
                   <span className="text-xs font-medium">
                     {selectedProvider === 'google' ? t('calendar.google_calendar', 'Google Calendar') :
-                     selectedProvider === 'zoho' ? t('calendar.zoho_calendar', 'Zoho Calendar') : t('calendar.calendly_calendar', 'Calendly')}
+                      selectedProvider === 'zoho' ? t('calendar.zoho_calendar', 'Zoho Calendar') : t('calendar.calendly_calendar', 'Calendly')}
                   </span>
                 </div>
               </div>
@@ -1482,7 +1675,7 @@ export default function Calendar() {
               <Input
                 id="summary"
                 value={eventForm.summary}
-                onChange={(e) => setEventForm({...eventForm, summary: e.target.value})}
+                onChange={(e) => setEventForm({ ...eventForm, summary: e.target.value })}
                 className="col-span-3"
               />
             </div>
@@ -1493,7 +1686,7 @@ export default function Calendar() {
               <Textarea
                 id="description"
                 value={eventForm.description}
-                onChange={(e) => setEventForm({...eventForm, description: e.target.value})}
+                onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })}
                 className="col-span-3"
               />
             </div>
@@ -1504,7 +1697,7 @@ export default function Calendar() {
               <Input
                 id="location"
                 value={eventForm.location}
-                onChange={(e) => setEventForm({...eventForm, location: e.target.value})}
+                onChange={(e) => setEventForm({ ...eventForm, location: e.target.value })}
                 className="col-span-3"
               />
             </div>
@@ -1512,9 +1705,9 @@ export default function Calendar() {
               <Label htmlFor="colorId" className="text-right">
                 {t('calendar.category', 'Category')}
               </Label>
-              <Select 
-                value={eventForm.colorId} 
-                onValueChange={(value) => setEventForm({...eventForm, colorId: value})}
+              <Select
+                value={eventForm.colorId}
+                onValueChange={(value) => setEventForm({ ...eventForm, colorId: value })}
               >
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder={t('calendar.select_category', 'Select category')} />
@@ -1579,7 +1772,7 @@ export default function Calendar() {
                 id="startDateTime"
                 type="datetime-local"
                 value={eventForm.startDateTime.slice(0, 16)}
-                onChange={(e) => setEventForm({...eventForm, startDateTime: e.target.value})}
+                onChange={(e) => setEventForm({ ...eventForm, startDateTime: e.target.value })}
                 className="col-span-3"
               />
             </div>
@@ -1591,7 +1784,7 @@ export default function Calendar() {
                 id="endDateTime"
                 type="datetime-local"
                 value={eventForm.endDateTime.slice(0, 16)}
-                onChange={(e) => setEventForm({...eventForm, endDateTime: e.target.value})}
+                onChange={(e) => setEventForm({ ...eventForm, endDateTime: e.target.value })}
                 className="col-span-3"
               />
             </div>
@@ -1605,7 +1798,7 @@ export default function Calendar() {
                     id="attendees"
                     placeholder={t('calendar.enter_email_address', 'Enter email address')}
                     value={eventForm.attendeeInput}
-                    onChange={(e) => setEventForm({...eventForm, attendeeInput: e.target.value})}
+                    onChange={(e) => setEventForm({ ...eventForm, attendeeInput: e.target.value })}
                     className="flex-1"
                   />
                   <Button type="button" className="btn-brand-primary" onClick={handleAddAttendee}>{t('common.add', 'Add')}</Button>
@@ -1614,8 +1807,8 @@ export default function Calendar() {
                   {eventForm.attendees.map(email => (
                     <Badge key={email} variant="secondary" className="gap-1">
                       {email}
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         onClick={() => handleRemoveAttendee(email)}
                         className="ml-1 text-blue-600 hover:text-blue-800"
                       >
@@ -1631,8 +1824,8 @@ export default function Calendar() {
             <Button type="button" variant="outline" className="btn-brand-primary" onClick={() => setIsCreateModalOpen(false)}>
               {t('common.cancel', 'Cancel')}
             </Button>
-            <Button 
-              type="button" 
+            <Button
+              type="button"
               onClick={handleCreateEvent}
               disabled={createEventMutation.isPending}
             >
@@ -1646,7 +1839,7 @@ export default function Calendar() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
@@ -1657,14 +1850,13 @@ export default function Calendar() {
                   <span className="text-gray-500">{t('calendar.from', 'from')}</span>
                   <div className="flex items-center space-x-1 px-2 py-1 bg-gray-100 rounded-md">
                     <div
-                      className={`w-2 h-2 rounded-full ${
-                        detectEventProvider(selectedEvent) === 'google' ? 'bg-blue-500' :
+                      className={`w-2 h-2 rounded-full ${detectEventProvider(selectedEvent) === 'google' ? 'bg-blue-500' :
                         detectEventProvider(selectedEvent) === 'zoho' ? 'bg-orange-500' : 'bg-purple-500'
-                      }`}
+                        }`}
                     />
                     <span className="text-xs font-medium">
                       {detectEventProvider(selectedEvent) === 'google' ? t('calendar.google_calendar', 'Google Calendar') :
-                       detectEventProvider(selectedEvent) === 'zoho' ? t('calendar.zoho_calendar', 'Zoho Calendar') : t('calendar.calendly_calendar', 'Calendly')}
+                        detectEventProvider(selectedEvent) === 'zoho' ? t('calendar.zoho_calendar', 'Zoho Calendar') : t('calendar.calendly_calendar', 'Calendly')}
                     </span>
                   </div>
                 </div>
@@ -1682,7 +1874,7 @@ export default function Calendar() {
               <Input
                 id="edit-summary"
                 value={eventForm.summary}
-                onChange={(e) => setEventForm({...eventForm, summary: e.target.value})}
+                onChange={(e) => setEventForm({ ...eventForm, summary: e.target.value })}
                 className="col-span-3"
               />
             </div>
@@ -1693,7 +1885,7 @@ export default function Calendar() {
               <Textarea
                 id="edit-description"
                 value={eventForm.description}
-                onChange={(e) => setEventForm({...eventForm, description: e.target.value})}
+                onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })}
                 className="col-span-3"
               />
             </div>
@@ -1704,7 +1896,7 @@ export default function Calendar() {
               <Input
                 id="edit-location"
                 value={eventForm.location}
-                onChange={(e) => setEventForm({...eventForm, location: e.target.value})}
+                onChange={(e) => setEventForm({ ...eventForm, location: e.target.value })}
                 className="col-span-3"
               />
             </div>
@@ -1712,9 +1904,9 @@ export default function Calendar() {
               <Label htmlFor="edit-colorId" className="text-right">
                 {t('calendar.category', 'Category')}
               </Label>
-              <Select 
-                value={eventForm.colorId} 
-                onValueChange={(value) => setEventForm({...eventForm, colorId: value})}
+              <Select
+                value={eventForm.colorId}
+                onValueChange={(value) => setEventForm({ ...eventForm, colorId: value })}
               >
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder={t('calendar.select_category', 'Select category')} />
@@ -1779,7 +1971,7 @@ export default function Calendar() {
                 id="edit-startDateTime"
                 type="datetime-local"
                 value={eventForm.startDateTime.slice(0, 16)}
-                onChange={(e) => setEventForm({...eventForm, startDateTime: e.target.value})}
+                onChange={(e) => setEventForm({ ...eventForm, startDateTime: e.target.value })}
                 className="col-span-3"
               />
             </div>
@@ -1791,7 +1983,7 @@ export default function Calendar() {
                 id="edit-endDateTime"
                 type="datetime-local"
                 value={eventForm.endDateTime.slice(0, 16)}
-                onChange={(e) => setEventForm({...eventForm, endDateTime: e.target.value})}
+                onChange={(e) => setEventForm({ ...eventForm, endDateTime: e.target.value })}
                 className="col-span-3"
               />
             </div>
@@ -1805,7 +1997,7 @@ export default function Calendar() {
                     id="edit-attendees"
                     placeholder={t('calendar.enter_email_address', 'Enter email address')}
                     value={eventForm.attendeeInput}
-                    onChange={(e) => setEventForm({...eventForm, attendeeInput: e.target.value})}
+                    onChange={(e) => setEventForm({ ...eventForm, attendeeInput: e.target.value })}
                     className="flex-1"
                   />
                   <Button type="button" className="btn-brand-primary" onClick={handleAddAttendee}>{t('common.add', 'Add')}</Button>
@@ -1814,8 +2006,8 @@ export default function Calendar() {
                   {eventForm.attendees.map(email => (
                     <Badge key={email} variant="secondary" className="gap-1">
                       {email}
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         onClick={() => handleRemoveAttendee(email)}
                         className="ml-1 text-blue-600 hover:text-blue-800"
                       >
@@ -1828,9 +2020,9 @@ export default function Calendar() {
             </div>
           </div>
           <DialogFooter className="flex justify-between">
-            <Button 
-              type="button" 
-              variant="destructive" 
+            <Button
+              type="button"
+              variant="destructive"
               onClick={() => {
                 setIsEditModalOpen(false);
                 setIsDeleteAlertOpen(true);
@@ -1842,8 +2034,8 @@ export default function Calendar() {
               <Button type="button" variant="outline" className="btn-brand-primary" onClick={() => setIsEditModalOpen(false)}>
                 {t('common.cancel', 'Cancel')}
               </Button>
-              <Button 
-                type="button" 
+              <Button
+                type="button"
                 onClick={handleUpdateEvent}
                 disabled={updateEventMutation.isPending}
               >
@@ -1858,7 +2050,7 @@ export default function Calendar() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       <AlertDialog open={isDeleteAlertOpen} onOpenChange={setIsDeleteAlertOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -1874,14 +2066,13 @@ export default function Calendar() {
                     <span className="text-gray-500">from</span>
                     <div className="flex items-center space-x-1 px-2 py-1 bg-gray-100 rounded-md">
                       <div
-                        className={`w-2 h-2 rounded-full ${
-                          detectEventProvider(selectedEvent) === 'google' ? 'bg-blue-500' :
+                        className={`w-2 h-2 rounded-full ${detectEventProvider(selectedEvent) === 'google' ? 'bg-blue-500' :
                           detectEventProvider(selectedEvent) === 'zoho' ? 'bg-orange-500' : 'bg-purple-500'
-                        }`}
+                          }`}
                       />
                       <span className="text-xs font-medium">
                         {detectEventProvider(selectedEvent) === 'google' ? t('calendar.google_calendar', 'Google Calendar') :
-                         detectEventProvider(selectedEvent) === 'zoho' ? t('calendar.zoho_calendar', 'Zoho Calendar') : t('calendar.calendly_calendar', 'Calendly')}
+                          detectEventProvider(selectedEvent) === 'zoho' ? t('calendar.zoho_calendar', 'Zoho Calendar') : t('calendar.calendly_calendar', 'Calendly')}
                       </span>
                     </div>
                   </div>
@@ -1892,7 +2083,15 @@ export default function Calendar() {
           <AlertDialogFooter>
             <AlertDialogCancel>No, Keep It</AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleDeleteEvent}
+              onClick={() => {
+                if (selectedEvent) {
+                  deleteEventMutation.mutate({
+                    eventId: selectedEvent.id,
+                    provider: detectEventProvider(selectedEvent),
+                    calendarId: (selectedEvent as any).calendarId
+                  });
+                }
+              }}
               className="bg-red-600 focus:ring-red-600"
             >
               {deleteEventMutation.isPending ? (
@@ -1905,7 +2104,7 @@ export default function Calendar() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      
+
       <Dialog open={isAddScheduleModalOpen} onOpenChange={setIsAddScheduleModalOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -1931,8 +2130,8 @@ export default function Calendar() {
               <Label htmlFor="scheduleColor" className="text-right">
                 {t('calendar.color', 'Color')}
               </Label>
-              <Select 
-                value={newScheduleColor} 
+              <Select
+                value={newScheduleColor}
                 onValueChange={setNewScheduleColor}
               >
                 <SelectTrigger className="col-span-3">
@@ -1962,8 +2161,8 @@ export default function Calendar() {
             <Button type="button" variant="outline" className="btn-brand-primary" onClick={() => setIsAddScheduleModalOpen(false)}>
               Cancel
             </Button>
-            <Button 
-              type="button" 
+            <Button
+              type="button"
               onClick={handleAddSchedule}
             >
               Add Schedule
@@ -1971,7 +2170,7 @@ export default function Calendar() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       <Dialog open={isEditScheduleModalOpen} onOpenChange={setIsEditScheduleModalOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -1997,8 +2196,8 @@ export default function Calendar() {
               <Label htmlFor="editScheduleColor" className="text-right">
                 Color
               </Label>
-              <Select 
-                value={newScheduleColor} 
+              <Select
+                value={newScheduleColor}
                 onValueChange={setNewScheduleColor}
               >
                 <SelectTrigger className="col-span-3">
@@ -2028,18 +2227,18 @@ export default function Calendar() {
             <Button type="button" variant="outline" className="btn-brand-primary" onClick={() => setIsEditScheduleModalOpen(false)}>
               Cancel
             </Button>
-            <Button 
-            variant="brand"
-            className="btn-brand-primary"
-            type="button" 
-            onClick={handleEditSchedule}
+            <Button
+              variant="brand"
+              className="btn-brand-primary"
+              type="button"
+              onClick={handleEditSchedule}
             >
               Save Changes
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       <AlertDialog open={isDeleteScheduleAlertOpen} onOpenChange={setIsDeleteScheduleAlertOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -2056,7 +2255,7 @@ export default function Calendar() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               className="bg-red-600 hover:bg-red-700"
               onClick={handleDeleteSchedule}
             >
@@ -2065,7 +2264,7 @@ export default function Calendar() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      
+
       <Dialog open={isAvailabilityModalOpen} onOpenChange={setIsAvailabilityModalOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
@@ -2079,8 +2278,8 @@ export default function Calendar() {
               <div className="text-sm text-gray-500">
                 {selectedDate ? format(selectedDate, 'MMMM d, yyyy') : ''}
               </div>
-              <Select 
-                value={selectedAppointmentDuration} 
+              <Select
+                value={selectedAppointmentDuration}
                 onValueChange={setSelectedAppointmentDuration}
               >
                 <SelectTrigger className="w-[180px]">
@@ -2094,7 +2293,7 @@ export default function Calendar() {
                 </SelectContent>
               </Select>
             </div>
-            
+
             {isLoadingAvailability ? (
               <div className="flex justify-center p-6">
                 <Loader2 className="h-6 w-6 animate-spin" />
@@ -2128,14 +2327,14 @@ export default function Calendar() {
             )}
           </div>
           <DialogFooter>
-            <Button 
-              type="button" 
-              variant="outline" 
+            <Button
+              type="button"
+              variant="outline"
               onClick={() => setIsAvailabilityModalOpen(false)}
             >
               Cancel
             </Button>
-            <Button 
+            <Button
               type="button"
               onClick={() => refetchAvailability()}
               disabled={isLoadingAvailability}

@@ -1,3 +1,4 @@
+import { broadcastToAll } from './utils/websocket';
 import {
   users, type User, type InsertUser,
   contacts, type Contact, type InsertContact,
@@ -29,6 +30,7 @@ import {
   teamInvitations, type TeamInvitation, type InsertTeamInvitation,
   deals, type Deal, type InsertDeal,
   dealActivities, type DealActivity, type InsertDealActivity,
+  properties, type Property, type InsertProperty,
   pipelineStages, type PipelineStage, type InsertPipelineStage,
   companies, type Company, type InsertCompany,
   rolePermissions,
@@ -74,10 +76,12 @@ import {
   databaseBackupLogs, type DatabaseBackupLog, type InsertDatabaseBackupLog,
 
   type DealStatus, type DealPriority,
-  type CompanySetting} from "@shared/schema";
+  type CompanySetting
+} from "@shared/schema";
 
 import session from "express-session";
 import { eq, and, desc, asc, or, sql, count, isNull, isNotNull, gt, gte, lt, lte, inArray, ne, not } from "drizzle-orm";
+import { getDb } from "./db";
 import { filterGroupChatsFromConversations, isWhatsAppGroupChatId } from "./utils/whatsapp-group-filter";
 import { validatePhoneNumber as validatePhoneNumberUtil } from "./utils/phone-validation";
 
@@ -330,10 +334,10 @@ export interface IStorage {
   updateTranslation(id: number, updates: Partial<InsertTranslation>): Promise<Translation>;
   deleteTranslation(id: number): Promise<boolean>;
 
-  getTranslationsForLanguage(languageCode: string): Promise<Array<{id: number, key: string, value: string}>>;
+  getTranslationsForLanguage(languageCode: string): Promise<Array<{ id: number, key: string, value: string }>>;
   getTranslationsForLanguageByNamespace(languageCode: string): Promise<Record<string, Record<string, string>>>;
-  getTranslationsForLanguageAsArray(languageCode: string): Promise<Array<{key: string, value: string}>>;
-  convertArrayToNestedFormat(arrayData: Array<{key: string, value: string}>): Promise<Record<string, Record<string, string>>>;
+  getTranslationsForLanguageAsArray(languageCode: string): Promise<Array<{ key: string, value: string }>>;
+  convertArrayToNestedFormat(arrayData: Array<{ key: string, value: string }>): Promise<Record<string, Record<string, string>>>;
   importTranslations(languageId: number, translations: Record<string, Record<string, string>>): Promise<boolean>;
 
   getRolePermissions(companyId?: number): Promise<RolePermission[]>;
@@ -567,6 +571,7 @@ export interface IStorage {
   createNote(note: InsertNote): Promise<Note>;
 
   getFlows(userId: number): Promise<Flow[]>;
+  getFlowsByCompany(companyId: number): Promise<Flow[]>;
   getFlow(id: number): Promise<Flow | undefined>;
   createFlow(flow: InsertFlow): Promise<Flow>;
   updateFlow(id: number, updates: Partial<InsertFlow>): Promise<Flow>;
@@ -600,7 +605,7 @@ export interface IStorage {
   getDeals(filter?: {
     companyId?: number;
     generalSearch?: string;
-  }): Promise<Deal[]>;
+  }): Promise<(Deal & { unreadCount: number; lastMessageAt: Date | null; lastMessageContent: string | null; properties: { id: number; title: string; }[] })[]>;
   getDealsByStage(stage: DealStatus): Promise<Deal[]>;
   getDealsByStageId(stageId: number): Promise<Deal[]>;
   getDeal(id: number): Promise<Deal | undefined>;
@@ -683,6 +688,12 @@ export interface IStorage {
   updateDealStage(id: number, stage: DealStatus): Promise<Deal>;
   updateDealStageId(id: number, stageId: number): Promise<Deal>;
   deleteDeal(id: number, companyId?: number): Promise<{ success: boolean; reason?: string }>;
+
+  getProperties(companyId: number): Promise<Property[]>;
+  getProperty(id: number, companyId: number): Promise<Property | undefined>;
+  createProperty(property: InsertProperty): Promise<Property>;
+  updateProperty(id: number, updates: Partial<InsertProperty>): Promise<Property>;
+  deleteProperty(id: number, companyId: number): Promise<boolean>;
 
   getDealActivities(dealId: number): Promise<DealActivity[]>;
   createDealActivity(activity: InsertDealActivity): Promise<DealActivity>;
@@ -784,7 +795,7 @@ export interface IStorage {
   sessionStore: session.Store;
 }
 
-import { getDb } from "./db";
+
 
 
 
@@ -1553,7 +1564,7 @@ export class DatabaseStorage implements IStorage {
         .set(updateData)
         .where(eq(whatsappProxyServers.id, id))
         .returning();
-      
+
       if (!server) {
         throw new Error('Proxy server not found');
       }
@@ -1831,26 +1842,26 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateUser(id: number, updates: Partial<InsertUser>): Promise<User> {
-  try {
-    const [updatedUser] = await db
-      .update(users)
-      .set({
-        ...updates,
-        updatedAt: new Date()
-      })
-      .where(eq(users.id, id))
-      .returning();
+    try {
+      const [updatedUser] = await db
+        .update(users)
+        .set({
+          ...updates,
+          updatedAt: new Date()
+        })
+        .where(eq(users.id, id))
+        .returning();
 
-    if (!updatedUser) {
-      throw new Error(`User with ID ${id} not found`);
+      if (!updatedUser) {
+        throw new Error(`User with ID ${id} not found`);
+      }
+
+      return updatedUser;
+    } catch (error) {
+      console.error("Error updating user:", error);
+      throw error;
     }
-
-    return updatedUser;
-  } catch (error) {
-    console.error("Error updating user:", error);
-    throw error;
   }
-}
 
   async updateUserPassword(id: number, newPassword: string, isAlreadyHashed: boolean = false): Promise<boolean> {
     try {
@@ -2318,7 +2329,7 @@ export class DatabaseStorage implements IStorage {
           .offset(offset);
       }
 
-    
+
 
       return {
         contacts: contactsList,
@@ -2570,7 +2581,7 @@ export class DatabaseStorage implements IStorage {
       ) : contact.phone
     };
 
-    
+
     try {
       return await this.createContact(contactToCreate);
     } catch (error: any) {
@@ -2615,10 +2626,123 @@ export class DatabaseStorage implements IStorage {
       .set({ ...updates, updatedAt: new Date() })
       .where(eq(contacts.id, id))
       .returning();
+
+    // Bidirectional Sync: Contact -> Active Deals
+    // If assignedToUserId or tags changed, sync to all ACTIVE deals
+    if (updates.assignedToUserId !== undefined || (updates.tags && updates.tags.length > 0)) {
+      try {
+        // Fetch all deals for this contact
+        // We consider "Active" as all deals for now, simplified. 
+        // Or strictly check 'status'? Schema says deal has stageId, but maybe not 'status' field directly on Deal table in snippet I saw?
+        // Let's check shared/schema.ts snippet I have? 
+        // Deal table definition wasn't fully visible.
+        // Assumption: Sync to ALL deals for this contact is safer/expected for "Assigned User".
+
+        const contactDeals = await db.select().from(deals).where(eq(deals.contactId, id));
+
+        for (const deal of contactDeals) {
+          const dealUpdates: any = {};
+
+          // Sync Assigned User
+          if (updates.assignedToUserId !== undefined && deal.assignedToUserId !== updates.assignedToUserId) {
+            dealUpdates.assignedToUserId = updates.assignedToUserId;
+          }
+
+          // Sync Tags
+          // Sync Tags
+          // We overwrite Deal tags with Contact tags to ensure full sync (including removals)
+          // assuming Deals and Contacts share the same "Tags" concept in this context.
+          if (updates.tags && Array.isArray(updates.tags)) {
+            const newContactTags = updates.tags;
+            const currentDealTags = deal.tags || [];
+
+            const sortedCurrent = [...currentDealTags].sort();
+            const sortedNew = [...newContactTags].sort();
+
+            if (JSON.stringify(sortedCurrent) !== JSON.stringify(sortedNew)) {
+              dealUpdates.tags = newContactTags;
+            }
+          }
+
+          if (Object.keys(dealUpdates).length > 0) {
+            // Update deal without recursively calling sync back?
+            // updateDeal calls updateContact...
+            // BUT updateDeal checks: "if (updates.assignedToUserId !== undefined)"...
+            // We ARE passing it.
+            // It updates Contact.
+            // Contact updates Deals.
+            // LOOP RISK!
+
+            // We need a way to update Deal WITHOUT triggering the logic in updateDeal.
+            // OR: verify in updateDeal that Contact ALREADY has this value.
+
+            // In updateDeal logic I added:
+            // contactUpdates.assignedToUserId = updates.assignedToUserId;
+            // ... await this.updateContact(...)
+
+            // If I call updateDeal here, it will trigger updateContact.
+            // updateContact will see value is same, and execute query?
+            // Wait, updateContact query: "UPDATE contacts SET ...".
+            // If value is same, DB updates it anyway (or no-op).
+            // But my code: "if (updates.assignedToUserId !== undefined)" -> YES.
+            // It proceeds to find deals...
+
+            // It's a LOOP.
+            // Fix: Direct DB update here instead of `this.updateDeal`?
+            // YES. Use direct DB update to avoid recursion.
+
+            const [syncedDeal] = await db.update(deals)
+              .set({ ...dealUpdates, updatedAt: new Date() })
+              .where(eq(deals.id, deal.id))
+              .returning();
+
+            // Broadcast deal update
+            broadcastToAll({
+              type: 'dealUpdated',
+              data: syncedDeal
+            });
+          }
+        }
+
+      } catch (error) {
+        console.error("Error syncing contact updates to deals:", error);
+      }
+    }
+
+    // Bidirectional Sync: Contact -> Conversations
+    // If assignedToUserId changed, sync to relevant conversations so Inbox reflects it immediately
+    if (updates.assignedToUserId !== undefined) {
+      try {
+        const contactConversations = await db.select().from(conversations).where(eq(conversations.contactId, id));
+
+        for (const conversation of contactConversations) {
+          if (conversation.assignedToUserId !== updates.assignedToUserId) {
+            const [updatedConv] = await db
+              .update(conversations)
+              .set({
+                assignedToUserId: updates.assignedToUserId,
+                updatedAt: new Date()
+              })
+              .where(eq(conversations.id, conversation.id))
+              .returning();
+
+            if (updatedConv) {
+              broadcastToAll({
+                type: 'conversationUpdated',
+                data: updatedConv
+              });
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error syncing contact assignment to conversations:", error);
+      }
+    }
+
     return updatedContact;
   }
 
-  async getConversations(options?: { companyId?: number; page?: number; limit?: number; search?: string; assignedToUserId?: number }): Promise<{ conversations: Conversation[]; total: number }> {
+  async getConversations(options?: { companyId?: number; page?: number; limit?: number; search?: string; assignedToUserId?: number; contactId?: number }): Promise<{ conversations: Conversation[]; total: number }> {
     try {
       const page = options?.page || 1;
       const limit = options?.limit || 50;
@@ -2628,6 +2752,10 @@ export class DatabaseStorage implements IStorage {
 
       if (options?.companyId) {
         whereConditions.push(eq(conversations.companyId, options.companyId));
+      }
+
+      if (options?.contactId) {
+        whereConditions.push(eq(conversations.contactId, options.contactId));
       }
 
       if (options?.assignedToUserId) {
@@ -2894,6 +3022,18 @@ export class DatabaseStorage implements IStorage {
       .set({ ...updates, updatedAt: new Date() })
       .where(eq(conversations.id, id))
       .returning();
+
+    // Sync to Contact (and thus Deals) if assigned user changes
+    if (updatedConversation && updatedConversation.contactId && updates.assignedToUserId !== undefined) {
+      try {
+        await this.updateContact(updatedConversation.contactId, {
+          assignedToUserId: updates.assignedToUserId
+        });
+      } catch (error) {
+        console.error('Error syncing conversation assignment to contact:', error);
+      }
+    }
+
     return updatedConversation;
   }
 
@@ -4769,7 +4909,7 @@ export class DatabaseStorage implements IStorage {
         lastActivityAt: new Date()
       }).returning({ id: flowExecutions.id });
 
-      
+
       return result.id;
     } catch (error) {
       console.error('Error creating flow execution:', error);
@@ -4806,7 +4946,7 @@ export class DatabaseStorage implements IStorage {
         .set(updateData)
         .where(eq(flowExecutions.executionId, executionId));
 
-      
+
     } catch (error) {
       console.error('Error updating flow execution:', error);
       throw error;
@@ -4831,7 +4971,7 @@ export class DatabaseStorage implements IStorage {
         startedAt: new Date()
       }).returning({ id: flowStepExecutions.id });
 
-      
+
       return result.id;
     } catch (error) {
       console.error('Error creating flow step execution:', error);
@@ -4859,7 +4999,7 @@ export class DatabaseStorage implements IStorage {
         .set(updateData)
         .where(eq(flowStepExecutions.id, stepId));
 
-      
+
     } catch (error) {
       console.error('Error updating flow step execution:', error);
       throw error;
@@ -5557,7 +5697,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async getTranslationsForLanguage(languageCode: string): Promise<Array<{id: number, key: string, value: string}>> {
+  async getTranslationsForLanguage(languageCode: string): Promise<Array<{ id: number, key: string, value: string }>> {
     try {
       const language = await this.getLanguageByCode(languageCode);
       if (!language) {
@@ -5616,7 +5756,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async getTranslationsForLanguageAsArray(languageCode: string): Promise<Array<{key: string, value: string}>> {
+  async getTranslationsForLanguageAsArray(languageCode: string): Promise<Array<{ key: string, value: string }>> {
     try {
       const language = await this.getLanguageByCode(languageCode);
       if (!language) {
@@ -5645,13 +5785,13 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async convertArrayToNestedFormat(arrayData: Array<{key: string, value: string}>): Promise<Record<string, Record<string, string>>> {
+  async convertArrayToNestedFormat(arrayData: Array<{ key: string, value: string }>): Promise<Record<string, Record<string, string>>> {
     const nested: Record<string, Record<string, string>> = {};
 
     for (const item of arrayData) {
       const keyParts = item.key.split('.');
       if (keyParts.length < 2) {
-        
+
         continue;
       }
 
@@ -5684,13 +5824,13 @@ export class DatabaseStorage implements IStorage {
 
       for (const namespaceName in translations) {
         if (!namespaceName || typeof namespaceName !== 'string') {
-          
+
           continue;
         }
 
         const namespaceTranslations = translations[namespaceName];
         if (!namespaceTranslations || typeof namespaceTranslations !== 'object') {
-          
+
           continue;
         }
 
@@ -5704,14 +5844,14 @@ export class DatabaseStorage implements IStorage {
 
         for (const keyName in namespaceTranslations) {
           if (!keyName || typeof keyName !== 'string') {
-            
+
             skippedCount++;
             continue;
           }
 
           const value = namespaceTranslations[keyName];
           if (typeof value !== 'string') {
-            
+
             skippedCount++;
             continue;
           }
@@ -5735,7 +5875,7 @@ export class DatabaseStorage implements IStorage {
         }
       }
 
-      
+
       return true;
     } catch (error) {
       console.error(`Error importing translations for language ${languageId}:`, error);
@@ -5879,911 +6019,593 @@ export class DatabaseStorage implements IStorage {
 
 
 
-async getDealsByStage(stage: DealStatus): Promise<Deal[]> {
-  try {
-    return db
-      .select()
-      .from(deals)
-      .where(eq(deals.stage, stage))
-      .orderBy(desc(deals.lastActivityAt));
-  } catch (error) {
-    console.error(`Error getting deals by stage ${stage}:`, error);
-    return [];
-  }
-}
-
-async getDeal(id: number): Promise<Deal | undefined> {
-  try {
-    const [deal] = await db
-      .select()
-      .from(deals)
-      .where(eq(deals.id, id));
-    return deal;
-  } catch (error) {
-    console.error(`Error getting deal with ID ${id}:`, error);
-    return undefined;
-  }
-}
-
-async getDealsByContact(contactId: number): Promise<Deal[]> {
-  try {
-    return db
-      .select()
-      .from(deals)
-      .where(
-        and(
-          eq(deals.contactId, contactId),
-          sql`${deals.status} != 'archived'`
-        )
-      )
-      .orderBy(desc(deals.lastActivityAt));
-  } catch (error) {
-    console.error(`Error getting deals for contact ${contactId}:`, error);
-    return [];
-  }
-}
-
-async getActiveDealByContact(contactId: number, companyId?: number): Promise<Deal | null> {
-  try {
-    const conditions = [
-      eq(deals.contactId, contactId),
-      eq(deals.status, 'active')
-    ];
-
-    if (companyId) {
-      conditions.push(eq(deals.companyId, companyId));
+  async getDealsByStage(stage: DealStatus): Promise<Deal[]> {
+    try {
+      return db
+        .select()
+        .from(deals)
+        .where(eq(deals.stage, stage))
+        .orderBy(desc(deals.lastActivityAt));
+    } catch (error) {
+      console.error(`Error getting deals by stage ${stage}:`, error);
+      return [];
     }
-
-    const result = await db
-      .select()
-      .from(deals)
-      .where(and(...conditions))
-      .orderBy(desc(deals.lastActivityAt))
-      .limit(1);
-
-    return result.length > 0 ? result[0] : null;
-  } catch (error) {
-    console.error(`Error getting active deal for contact ${contactId}:`, error);
-    return null;
   }
-}
 
-async getDealsByAssignedUser(userId: number): Promise<Deal[]> {
-  try {
-    return db
-      .select()
-      .from(deals)
-      .where(eq(deals.assignedToUserId, userId))
-      .orderBy(desc(deals.lastActivityAt));
-  } catch (error) {
-    console.error(`Error getting deals for user ${userId}:`, error);
-    return [];
-  }
-}
-
-async getDealTags(companyId: number): Promise<string[]> {
-  try {
-    const result = await db
-      .select({ tags: deals.tags })
-      .from(deals)
-      .where(
-        and(
-          eq(deals.companyId, companyId),
-          sql`${deals.status} != 'archived'`,
-          sql`${deals.tags} IS NOT NULL`,
-          sql`array_length(${deals.tags}, 1) > 0`
-        )
-      );
-
-
-    const allTags = new Set<string>();
-    result.forEach((row: { tags: string[] | null }) => {
-      if (row.tags && Array.isArray(row.tags)) {
-        row.tags.forEach((tag: string) => {
-          if (tag && tag.trim()) {
-            allTags.add(tag.trim());
-          }
-        });
-      }
-    });
-
-    return Array.from(allTags).sort();
-  } catch (error) {
-    console.error(`Error getting deal tags for company ${companyId}:`, error);
-    return [];
-  }
-}
-
-async getContactTags(companyId: number): Promise<string[]> {
-  try {
-    const result = await db
-      .select({ tags: contacts.tags })
-      .from(contacts)
-      .where(
-        and(
-          eq(contacts.companyId, companyId),
-          eq(contacts.isActive, true),
-          sql`${contacts.tags} IS NOT NULL`,
-          sql`array_length(${contacts.tags}, 1) > 0`
-        )
-      );
-
-    const allTags = new Set<string>();
-    result.forEach((row: { tags: string[] | null }) => {
-      if (row.tags && Array.isArray(row.tags)) {
-        row.tags.forEach((tag: string) => {
-          if (tag && tag.trim()) {
-            allTags.add(tag.trim());
-          }
-        });
-      }
-    });
-
-    return Array.from(allTags).sort();
-  } catch (error) {
-    console.error(`Error getting contact tags for company ${companyId}:`, error);
-    return [];
-  }
-}
-
-async getContactsForExport(options: {
-  companyId: number;
-  exportScope?: 'all' | 'filtered';
-  tags?: string[];
-  createdAfter?: string;
-  createdBefore?: string;
-  search?: string;
-  channel?: string;
-}): Promise<Contact[]> {
-  try {
-    let whereConditions = [
-      eq(contacts.companyId, options.companyId),
-      eq(contacts.isActive, true)
-    ];
-
-
-
-    const phoneNumberFilter = or(
-      isNull(contacts.phone),
-      and(
-        sql`${contacts.phone} NOT LIKE 'LID-%'`,
-        sql`NOT (LENGTH(REGEXP_REPLACE(${contacts.phone}, '[^0-9]', '', 'g')) >= 15 AND REGEXP_REPLACE(${contacts.phone}, '[^0-9]', '', 'g') ~ '^120[0-9]+$')`
-      )
-    );
-
-    if (phoneNumberFilter) {
-      whereConditions.push(phoneNumberFilter);
+  async getDeal(id: number): Promise<Deal | undefined> {
+    try {
+      const [deal] = await db
+        .select()
+        .from(deals)
+        .where(eq(deals.id, id));
+      return deal;
+    } catch (error) {
+      console.error(`Error getting deal with ID ${id}:`, error);
+      return undefined;
     }
+  }
 
+  async getDealsByContact(contactId: number): Promise<Deal[]> {
+    try {
+      return db
+        .select()
+        .from(deals)
+        .where(
+          and(
+            eq(deals.contactId, contactId),
+            sql`${deals.status} != 'archived'`
+          )
+        )
+        .orderBy(desc(deals.lastActivityAt));
+    } catch (error) {
+      console.error(`Error getting deals for contact ${contactId}:`, error);
+      return [];
+    }
+  }
 
-    const shouldApplyFilters = options.exportScope === 'filtered';
+  async getActiveDealByContact(contactId: number, companyId?: number): Promise<Deal | null> {
+    try {
+      const conditions = [
+        eq(deals.contactId, contactId),
+        eq(deals.status, 'active')
+      ];
 
-    if (shouldApplyFilters) {
-      if (options.tags && options.tags.length > 0) {
-        const tagConditions = options.tags.map(tag =>
-          sql`${contacts.tags} @> ARRAY[${tag}]::text[]`
+      if (companyId) {
+        conditions.push(eq(deals.companyId, companyId));
+      }
+
+      const result = await db
+        .select()
+        .from(deals)
+        .where(and(...conditions))
+        .orderBy(desc(deals.lastActivityAt))
+        .limit(1);
+
+      return result.length > 0 ? result[0] : null;
+    } catch (error) {
+      console.error(`Error getting active deal for contact ${contactId}:`, error);
+      return null;
+    }
+  }
+
+  async getDealsByAssignedUser(userId: number): Promise<Deal[]> {
+    try {
+      return db
+        .select()
+        .from(deals)
+        .where(eq(deals.assignedToUserId, userId))
+        .orderBy(desc(deals.lastActivityAt));
+    } catch (error) {
+      console.error(`Error getting deals for user ${userId}:`, error);
+      return [];
+    }
+  }
+
+  async getDealTags(companyId: number): Promise<string[]> {
+    try {
+      const result = await db
+        .select({ tags: deals.tags })
+        .from(deals)
+        .where(
+          and(
+            eq(deals.companyId, companyId),
+            sql`${deals.status} != 'archived'`,
+            sql`${deals.tags} IS NOT NULL`,
+            sql`array_length(${deals.tags}, 1) > 0`
+          )
         );
-        const tagCondition = or(...tagConditions);
-        if (tagCondition) {
-          whereConditions.push(tagCondition);
+
+
+      const allTags = new Set<string>();
+      result.forEach((row: { tags: string[] | null }) => {
+        if (row.tags && Array.isArray(row.tags)) {
+          row.tags.forEach((tag: string) => {
+            if (tag && tag.trim()) {
+              allTags.add(tag.trim());
+            }
+          });
         }
-      }
+      });
 
-      if (options.createdAfter) {
-        whereConditions.push(gte(contacts.createdAt, new Date(options.createdAfter)));
-      }
-
-      if (options.createdBefore) {
-        whereConditions.push(lte(contacts.createdAt, new Date(options.createdBefore)));
-      }
-
-      if (options.search) {
-        const searchTerm = `%${options.search}%`;
-        const searchCondition = or(
-          sql`${contacts.name} ILIKE ${searchTerm}`,
-          sql`${contacts.email} ILIKE ${searchTerm}`,
-          sql`${contacts.phone} ILIKE ${searchTerm}`
-        );
-        if (searchCondition) {
-          whereConditions.push(searchCondition);
-        }
-      }
-
-      if (options.channel && options.channel !== 'all' && options.channel !== '') {
-        whereConditions.push(eq(contacts.identifierType, options.channel));
-      }
+      return Array.from(allTags).sort();
+    } catch (error) {
+      console.error(`Error getting deal tags for company ${companyId}:`, error);
+      return [];
     }
-
-    const contactsList = await db
-      .select()
-      .from(contacts)
-      .where(and(...whereConditions))
-      .orderBy(desc(contacts.createdAt));
-
-    return contactsList;
-  } catch (error) {
-    console.error('Error getting contacts for export:', error);
-    return [];
   }
-}
 
-/**
- * Get contacts without conversations for a company
- * These are contacts that can potentially have conversations created for them
- */
-async getContactsWithoutConversations(companyId: number, options?: {
-  search?: string;
-  limit?: number;
-  offset?: number;
-}): Promise<{ contacts: Contact[]; total: number }> {
-  let searchTerm = options?.search?.trim();
+  async getContactTags(companyId: number): Promise<string[]> {
+    try {
+      const result = await db
+        .select({ tags: contacts.tags })
+        .from(contacts)
+        .where(
+          and(
+            eq(contacts.companyId, companyId),
+            eq(contacts.isActive, true),
+            sql`${contacts.tags} IS NOT NULL`,
+            sql`array_length(${contacts.tags}, 1) > 0`
+          )
+        );
+
+      const allTags = new Set<string>();
+      result.forEach((row: { tags: string[] | null }) => {
+        if (row.tags && Array.isArray(row.tags)) {
+          row.tags.forEach((tag: string) => {
+            if (tag && tag.trim()) {
+              allTags.add(tag.trim());
+            }
+          });
+        }
+      });
+
+      return Array.from(allTags).sort();
+    } catch (error) {
+      console.error(`Error getting contact tags for company ${companyId}:`, error);
+      return [];
+    }
+  }
+
+  async getContactsForExport(options: {
+    companyId: number;
+    exportScope?: 'all' | 'filtered';
+    tags?: string[];
+    createdAfter?: string;
+    createdBefore?: string;
+    search?: string;
+    channel?: string;
+  }): Promise<Contact[]> {
+    try {
+      let whereConditions = [
+        eq(contacts.companyId, options.companyId),
+        eq(contacts.isActive, true)
+      ];
 
 
-  const queryTimeout = 30000; // 30 seconds timeout
-  const timeoutPromise = new Promise((_, reject) => {
-    setTimeout(() => reject(new Error('Query timeout')), queryTimeout);
-  });
 
-  try {
-    const limit = Math.min(options?.limit || 50, 100); // Cap limit to prevent large queries
-    const offset = Math.max(options?.offset || 0, 0); // Ensure non-negative offset
-
-    let whereConditions = [
-      eq(contacts.companyId, companyId),
-      eq(contacts.isActive, true),
-      isNotNull(contacts.identifierType),
-      ne(contacts.identifierType, 'email')
-    ];
-
-
-    const phoneNumberFilter = and(
-      or(
+      const phoneNumberFilter = or(
         isNull(contacts.phone),
         and(
           sql`${contacts.phone} NOT LIKE 'LID-%'`,
-          sql`LENGTH(REGEXP_REPLACE(${contacts.phone}, '[^0-9]', '', 'g')) >= 7`,
-          sql`LENGTH(REGEXP_REPLACE(${contacts.phone}, '[^0-9]', '', 'g')) <= 14`,
           sql`NOT (LENGTH(REGEXP_REPLACE(${contacts.phone}, '[^0-9]', '', 'g')) >= 15 AND REGEXP_REPLACE(${contacts.phone}, '[^0-9]', '', 'g') ~ '^120[0-9]+$')`
         )
-      )
-    );
+      );
 
-    if (phoneNumberFilter) {
-      whereConditions.push(phoneNumberFilter);
-    }
-
-
-
-    if (searchTerm && searchTerm.length > 0) {
-
-      if (searchTerm.length > 100) {
-        searchTerm = searchTerm.substring(0, 100);
+      if (phoneNumberFilter) {
+        whereConditions.push(phoneNumberFilter);
       }
 
 
-      const escapedSearchTerm = searchTerm.replace(/[%_\\]/g, '\\$&');
-      const searchPattern = `%${escapedSearchTerm}%`;
+      const shouldApplyFilters = options.exportScope === 'filtered';
 
-      try {
-
-        const searchCondition = or(
-
-          sql`${contacts.name} ILIKE ${searchPattern}`,
-
-          sql`${contacts.email} ILIKE ${searchPattern}`,
-          sql`${contacts.phone} LIKE ${searchPattern}`,
-          sql`${contacts.company} ILIKE ${searchPattern}`,
-
-          sql`${contacts.identifier} LIKE ${searchPattern}`
-        );
-
-        if (searchCondition) {
-          whereConditions.push(searchCondition);
+      if (shouldApplyFilters) {
+        if (options.tags && options.tags.length > 0) {
+          const tagConditions = options.tags.map(tag =>
+            sql`${contacts.tags} @> ARRAY[${tag}]::text[]`
+          );
+          const tagCondition = or(...tagConditions);
+          if (tagCondition) {
+            whereConditions.push(tagCondition);
+          }
         }
-      } catch (searchError) {
 
+        if (options.createdAfter) {
+          whereConditions.push(gte(contacts.createdAt, new Date(options.createdAfter)));
+        }
+
+        if (options.createdBefore) {
+          whereConditions.push(lte(contacts.createdAt, new Date(options.createdBefore)));
+        }
+
+        if (options.search) {
+          const searchTerm = `%${options.search}%`;
+          const searchCondition = or(
+            sql`${contacts.name} ILIKE ${searchTerm}`,
+            sql`${contacts.email} ILIKE ${searchTerm}`,
+            sql`${contacts.phone} ILIKE ${searchTerm}`
+          );
+          if (searchCondition) {
+            whereConditions.push(searchCondition);
+          }
+        }
+
+        if (options.channel && options.channel !== 'all' && options.channel !== '') {
+          whereConditions.push(eq(contacts.identifierType, options.channel));
+        }
       }
+
+      const contactsList = await db
+        .select()
+        .from(contacts)
+        .where(and(...whereConditions))
+        .orderBy(desc(contacts.createdAt));
+
+      return contactsList;
+    } catch (error) {
+      console.error('Error getting contacts for export:', error);
+      return [];
     }
+  }
+
+  /**
+   * Get contacts without conversations for a company
+   * These are contacts that can potentially have conversations created for them
+   */
+  async getContactsWithoutConversations(companyId: number, options?: {
+    search?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<{ contacts: Contact[]; total: number }> {
+    let searchTerm = options?.search?.trim();
 
 
-    const contactsWithoutConversationsQuery = db
-      .select({
-        id: contacts.id,
-        companyId: contacts.companyId,
-        name: contacts.name,
-        avatarUrl: contacts.avatarUrl,
-        email: contacts.email,
-        phone: contacts.phone,
-        company: contacts.company,
-        tags: contacts.tags,
-        isActive: contacts.isActive,
-        identifier: contacts.identifier,
-        identifierType: contacts.identifierType,
-        source: contacts.source,
-        notes: contacts.notes,
-        isHistorySync: contacts.isHistorySync,
-        historySyncBatchId: contacts.historySyncBatchId,
-        isArchived: contacts.isArchived,
-        createdAt: contacts.createdAt,
-        updatedAt: contacts.updatedAt
-      })
-      .from(contacts)
-      .leftJoin(conversations, eq(conversations.contactId, contacts.id))
-      .where(
-        and(
-          ...whereConditions,
-          isNull(conversations.id) // No conversation exists for this contact
-        )
-      )
-      .orderBy(desc(contacts.createdAt))
-      .limit(limit)
-      .offset(offset);
+    const queryTimeout = 30000; // 30 seconds timeout
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Query timeout')), queryTimeout);
+    });
 
-
-    const contactsList = await Promise.race([
-      contactsWithoutConversationsQuery,
-      timeoutPromise
-    ]) as Contact[];
-
-
-    let total = 0;
     try {
-      const totalQuery = db
-        .select({ count: sql`COUNT(*)::int` })
+      const limit = Math.min(options?.limit || 50, 100); // Cap limit to prevent large queries
+      const offset = Math.max(options?.offset || 0, 0); // Ensure non-negative offset
+
+      let whereConditions = [
+        eq(contacts.companyId, companyId),
+        eq(contacts.isActive, true),
+        isNotNull(contacts.identifierType),
+        ne(contacts.identifierType, 'email')
+      ];
+
+
+      const phoneNumberFilter = and(
+        or(
+          isNull(contacts.phone),
+          and(
+            sql`${contacts.phone} NOT LIKE 'LID-%'`,
+            sql`LENGTH(REGEXP_REPLACE(${contacts.phone}, '[^0-9]', '', 'g')) >= 7`,
+            sql`LENGTH(REGEXP_REPLACE(${contacts.phone}, '[^0-9]', '', 'g')) <= 14`,
+            sql`NOT (LENGTH(REGEXP_REPLACE(${contacts.phone}, '[^0-9]', '', 'g')) >= 15 AND REGEXP_REPLACE(${contacts.phone}, '[^0-9]', '', 'g') ~ '^120[0-9]+$')`
+          )
+        )
+      );
+
+      if (phoneNumberFilter) {
+        whereConditions.push(phoneNumberFilter);
+      }
+
+
+
+      if (searchTerm && searchTerm.length > 0) {
+
+        if (searchTerm.length > 100) {
+          searchTerm = searchTerm.substring(0, 100);
+        }
+
+
+        const escapedSearchTerm = searchTerm.replace(/[%_\\]/g, '\\$&');
+        const searchPattern = `%${escapedSearchTerm}%`;
+
+        try {
+
+          const searchCondition = or(
+
+            sql`${contacts.name} ILIKE ${searchPattern}`,
+
+            sql`${contacts.email} ILIKE ${searchPattern}`,
+            sql`${contacts.phone} LIKE ${searchPattern}`,
+            sql`${contacts.company} ILIKE ${searchPattern}`,
+
+            sql`${contacts.identifier} LIKE ${searchPattern}`
+          );
+
+          if (searchCondition) {
+            whereConditions.push(searchCondition);
+          }
+        } catch (searchError) {
+
+        }
+      }
+
+
+      const contactsWithoutConversationsQuery = db
+        .select({
+          id: contacts.id,
+          companyId: contacts.companyId,
+          name: contacts.name,
+          avatarUrl: contacts.avatarUrl,
+          email: contacts.email,
+          phone: contacts.phone,
+          company: contacts.company,
+          tags: contacts.tags,
+          isActive: contacts.isActive,
+          identifier: contacts.identifier,
+          identifierType: contacts.identifierType,
+          source: contacts.source,
+          notes: contacts.notes,
+          isHistorySync: contacts.isHistorySync,
+          historySyncBatchId: contacts.historySyncBatchId,
+          isArchived: contacts.isArchived,
+          createdAt: contacts.createdAt,
+          updatedAt: contacts.updatedAt
+        })
         .from(contacts)
         .leftJoin(conversations, eq(conversations.contactId, contacts.id))
         .where(
           and(
             ...whereConditions,
-            isNull(conversations.id)
+            isNull(conversations.id) // No conversation exists for this contact
           )
+        )
+        .orderBy(desc(contacts.createdAt))
+        .limit(limit)
+        .offset(offset);
+
+
+      const contactsList = await Promise.race([
+        contactsWithoutConversationsQuery,
+        timeoutPromise
+      ]) as Contact[];
+
+
+      let total = 0;
+      try {
+        const totalQuery = db
+          .select({ count: sql`COUNT(*)::int` })
+          .from(contacts)
+          .leftJoin(conversations, eq(conversations.contactId, contacts.id))
+          .where(
+            and(
+              ...whereConditions,
+              isNull(conversations.id)
+            )
+          );
+
+        const totalResult = await Promise.race([
+          totalQuery,
+          timeoutPromise
+        ]) as any[];
+        total = Number(totalResult[0]?.count || 0);
+      } catch (totalError) {
+        total = contactsList.length; // Fallback to result length
+      }
+
+      return {
+        contacts: contactsList,
+        total
+      };
+    } catch (error: any) {
+
+      return { contacts: [], total: 0 };
+    }
+  }
+
+  /**
+   * Create a conversation for a contact based on their identifier type
+   */
+  async createConversationForContact(contactId: number, userId: number): Promise<Conversation | null> {
+    try {
+      const contact = await this.getContact(contactId);
+      if (!contact) {
+        throw new Error('Contact not found');
+      }
+
+      const user = await this.getUser(userId);
+      if (!user || !user.companyId) {
+        throw new Error('User or company not found');
+      }
+
+
+      const existingConversations = await this.getConversationsByContact(contactId);
+      if (existingConversations.length > 0) {
+        return existingConversations[0]; // Return existing conversation
+      }
+
+
+      const channelConnections = await this.getChannelConnectionsByCompany(user.companyId);
+
+      let appropriateConnection = null;
+
+
+      if (contact.identifierType) {
+        appropriateConnection = channelConnections.find(conn =>
+          conn.channelType === contact.identifierType && conn.status === 'active'
         );
 
-      const totalResult = await Promise.race([
-        totalQuery,
-        timeoutPromise
-      ]) as any[];
-      total = Number(totalResult[0]?.count || 0);
-    } catch (totalError) {
-      total = contactsList.length; // Fallback to result length
-    }
 
-    return {
-      contacts: contactsList,
-      total
-    };
-  } catch (error: any) {
-
-    return { contacts: [], total: 0 };
-  }
-}
-
-/**
- * Create a conversation for a contact based on their identifier type
- */
-async createConversationForContact(contactId: number, userId: number): Promise<Conversation | null> {
-  try {
-    const contact = await this.getContact(contactId);
-    if (!contact) {
-      throw new Error('Contact not found');
-    }
-
-    const user = await this.getUser(userId);
-    if (!user || !user.companyId) {
-      throw new Error('User or company not found');
-    }
-
-
-    const existingConversations = await this.getConversationsByContact(contactId);
-    if (existingConversations.length > 0) {
-      return existingConversations[0]; // Return existing conversation
-    }
-
-
-    const channelConnections = await this.getChannelConnectionsByCompany(user.companyId);
-
-    let appropriateConnection = null;
-
-
-    if (contact.identifierType) {
-      appropriateConnection = channelConnections.find(conn =>
-        conn.channelType === contact.identifierType && conn.status === 'active'
-      );
-
-
-      if (!appropriateConnection) {
-        if (contact.identifierType === 'whatsapp_official') {
-          appropriateConnection = channelConnections.find(conn =>
-            conn.channelType === 'whatsapp_official' && conn.status === 'active'
-          );
-        } else if (contact.identifierType === 'whatsapp_unofficial' || contact.identifierType === 'whatsapp') {
-          appropriateConnection = channelConnections.find(conn =>
-            (conn.channelType === 'whatsapp_unofficial' || conn.channelType === 'whatsapp') && conn.status === 'active'
-          );
+        if (!appropriateConnection) {
+          if (contact.identifierType === 'whatsapp_official') {
+            appropriateConnection = channelConnections.find(conn =>
+              conn.channelType === 'whatsapp_official' && conn.status === 'active'
+            );
+          } else if (contact.identifierType === 'whatsapp_unofficial' || contact.identifierType === 'whatsapp') {
+            appropriateConnection = channelConnections.find(conn =>
+              (conn.channelType === 'whatsapp_unofficial' || conn.channelType === 'whatsapp') && conn.status === 'active'
+            );
+          }
         }
       }
-    }
 
-    if (!appropriateConnection) {
-      throw new Error(`No active channel connection found for contact type: ${contact.identifierType}`);
-    }
-
-
-    const conversationData: InsertConversation = {
-      companyId: user.companyId,
-      contactId: contact.id,
-      channelId: appropriateConnection.id,
-      channelType: appropriateConnection.channelType,
-      status: 'open',
-      assignedToUserId: userId,
-      lastMessageAt: new Date()
-    };
-
-    const conversation = await this.createConversation(conversationData);
-    return conversation;
-  } catch (error) {
-    console.error('Error creating conversation for contact:', error);
-    return null;
-  }
-}
-
-async createDeal(deal: InsertDeal): Promise<Deal> {
-  try {
-    if (!deal.contactId) {
-      throw new Error('Contact ID is required');
-    }
-
-    const processedDeal = {
-      ...deal,
-      dueDate: deal.dueDate ? new Date(deal.dueDate) : undefined,
-      lastActivityAt: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      stage: deal.stage || 'lead',
-      status: deal.status || 'active',
-      priority: deal.priority || 'medium'
-    };
-
-    const [newDeal] = await db
-      .insert(deals)
-      .values(processedDeal)
-      .returning();
-    return newDeal;
-  } catch (error: any) {
-    console.error('Error creating deal:', error);
-    if (error.message === 'Contact ID is required') {
-      throw error;
-    }
-    throw new Error('Failed to create deal');
-  }
-}
-
-async updateDeal(id: number, updates: Partial<InsertDeal>): Promise<Deal> {
-  try {
-    if (updates.stageId !== undefined) {
-      const stageId = updates.stageId;
-      const otherUpdates = { ...updates };
-      delete otherUpdates.stageId;
-
-      let dealWithNewStage = null;
-      if (stageId !== null) {
-        dealWithNewStage = await this.updateDealStageId(id, stageId);
+      if (!appropriateConnection) {
+        throw new Error(`No active channel connection found for contact type: ${contact.identifierType}`);
       }
 
-      if (Object.keys(otherUpdates).length > 0) {
-        const processedUpdates = {
-          ...otherUpdates,
-          dueDate: otherUpdates.dueDate ? new Date(otherUpdates.dueDate) : undefined,
-          updatedAt: new Date()
-        };
 
-        const [finalUpdatedDeal] = await db
-          .update(deals)
-          .set(processedUpdates)
-          .where(eq(deals.id, id))
-          .returning();
+      const conversationData: InsertConversation = {
+        companyId: user.companyId,
+        contactId: contact.id,
+        channelId: appropriateConnection.id,
+        channelType: appropriateConnection.channelType,
+        status: 'open',
+        assignedToUserId: userId,
+        lastMessageAt: new Date()
+      };
 
-        return finalUpdatedDeal || dealWithNewStage;
+      const conversation = await this.createConversation(conversationData);
+      return conversation;
+    } catch (error) {
+      console.error('Error creating conversation for contact:', error);
+      return null;
+    }
+  }
+
+  async createDeal(deal: InsertDeal): Promise<Deal> {
+    try {
+      if (!deal.contactId) {
+        throw new Error('Contact ID is required');
       }
 
-      if (dealWithNewStage) {
+      const processedDeal = {
+        ...deal,
+        dueDate: deal.dueDate ? new Date(deal.dueDate) : undefined,
+        lastActivityAt: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        stage: deal.stage || 'lead',
+        status: deal.status || 'active',
+        priority: deal.priority || 'medium'
+      };
+
+      const [newDeal] = await db
+        .insert(deals)
+        .values(processedDeal)
+        .returning();
+      return newDeal;
+    } catch (error: any) {
+      console.error('Error creating deal:', error);
+      if (error.message === 'Contact ID is required') {
+        throw error;
+      }
+      throw new Error(`Failed to create deal: ${error.message}`);
+    }
+  }
+
+  async updateDeal(id: number, updates: Partial<InsertDeal>): Promise<Deal> {
+    try {
+      if (updates.stageId !== undefined) {
+        const stageId = updates.stageId;
+        const otherUpdates = { ...updates };
+        delete otherUpdates.stageId;
+
+        let dealWithNewStage = null;
+        if (stageId !== null) {
+          dealWithNewStage = await this.updateDealStageId(id, stageId);
+        }
+
+        if (Object.keys(otherUpdates).length > 0) {
+          const processedUpdates = {
+            ...otherUpdates,
+            dueDate: otherUpdates.dueDate ? new Date(otherUpdates.dueDate) : undefined,
+            updatedAt: new Date()
+          };
+
+          const [finalUpdatedDeal] = await db
+            .update(deals)
+            .set(processedUpdates)
+            .where(eq(deals.id, id))
+            .returning();
+          // Bidirectional Sync: Update Deal -> Contact
+          // If assignedToUserId or tags changed, sync to Contact
+          if (finalUpdatedDeal.contactId) {
+            const contactUpdates: any = {};
+
+            // Sync Assigned User
+            if (updates.assignedToUserId !== undefined) {
+              contactUpdates.assignedToUserId = updates.assignedToUserId;
+            }
+
+            // Sync Tags
+            // We overwrite Contact tags with Deal tags to ensure full sync (including removals)
+            if (updates.tags && Array.isArray(updates.tags)) {
+              try {
+                const contact = await this.getContact(finalUpdatedDeal.contactId);
+                if (contact) {
+                  const currentTags = contact.tags || [];
+                  const newTags = updates.tags;
+
+                  const sortedCurrent = [...currentTags].sort();
+                  const sortedNew = [...newTags].sort();
+
+                  if (JSON.stringify(sortedCurrent) !== JSON.stringify(sortedNew)) {
+                    contactUpdates.tags = newTags;
+                  }
+                }
+              } catch (e) {
+                console.error("Error syncing tags to contact:", e);
+              }
+            }
+
+            if (Object.keys(contactUpdates).length > 0) {
+              const updatedContact = await this.updateContact(finalUpdatedDeal.contactId, contactUpdates);
+
+              broadcastToAll({
+                type: 'contactUpdated',
+                data: updatedContact
+              });
+            }
+          }
+
+          return finalUpdatedDeal || dealWithNewStage;
+        }
+
+        if (!dealWithNewStage) {
+          const fetchedDeal = await this.getDeal(id);
+          if (!fetchedDeal) throw new Error(`Deal with ID ${id} not found`);
+          return fetchedDeal;
+        }
+
         return dealWithNewStage;
       }
 
-      const [currentDeal] = await db
-        .select()
-        .from(deals)
-        .where(eq(deals.id, id));
+      const processedUpdates = {
+        ...updates,
+        dueDate: updates.dueDate ? new Date(updates.dueDate) : undefined,
+        updatedAt: new Date()
+      };
 
-      if (!currentDeal) {
+      const [updatedDeal] = await db
+        .update(deals)
+        .set(processedUpdates)
+        .where(eq(deals.id, id))
+        .returning();
+
+      if (!updatedDeal) {
         throw new Error(`Deal with ID ${id} not found`);
       }
 
-      return currentDeal;
+      return updatedDeal;
+    } catch (error) {
+      console.error(`Error updating deal with ID ${id}:`, error);
+      throw new Error('Failed to update deal');
     }
-
-    const processedUpdates = {
-      ...updates,
-      dueDate: updates.dueDate ? new Date(updates.dueDate) : undefined,
-      updatedAt: new Date()
-    };
-
-    const [updatedDeal] = await db
-      .update(deals)
-      .set(processedUpdates)
-      .where(eq(deals.id, id))
-      .returning();
-
-    if (!updatedDeal) {
-      throw new Error(`Deal with ID ${id} not found`);
-    }
-
-    return updatedDeal;
-  } catch (error) {
-    console.error(`Error updating deal with ID ${id}:`, error);
-    throw new Error('Failed to update deal');
   }
-}
 
-async updateDealStage(id: number, stage: DealStatus): Promise<Deal> {
-  try {
-    const [updatedDeal] = await db
-      .update(deals)
-      .set({
-        stage,
-        lastActivityAt: new Date(),
-        updatedAt: new Date()
-      })
-      .where(eq(deals.id, id))
-      .returning();
-
-    if (!updatedDeal) {
-      throw new Error(`Deal with ID ${id} not found`);
-    }
-
-    return updatedDeal;
-  } catch (error) {
-    console.error(`Error updating stage for deal with ID ${id}:`, error);
-    throw new Error('Failed to update deal stage');
-  }
-}
-
-async deleteDeal(id: number, companyId?: number): Promise<{ success: boolean; reason?: string }> {
-  try {
-
-    const whereConditions = companyId 
-      ? and(eq(deals.id, id), eq(deals.companyId, companyId))
-      : eq(deals.id, id);
-
-    const existingDeal = await db
-      .select({ id: deals.id, status: deals.status, companyId: deals.companyId })
-      .from(deals)
-      .where(whereConditions)
-      .limit(1);
-
-    if (existingDeal.length === 0) {
-      return { success: false, reason: 'Deal not found' };
-    }
-
-
-    if (existingDeal[0].status === 'archived') {
-      return { success: true, reason: 'Already deleted' };
-    }
-
-
-    const [updatedDeal] = await db
-      .update(deals)
-      .set({
-        status: 'archived',
-        updatedAt: new Date()
-      })
-      .where(whereConditions)
-      .returning();
-
-    return { success: !!updatedDeal };
-  } catch (error) {
-    console.error(`Error deleting deal with ID ${id}:`, error);
-    return { success: false, reason: 'Database error' };
-  }
-}
-
-async getDealActivities(dealId: number): Promise<DealActivity[]> {
-  try {
-    return db
-      .select()
-      .from(dealActivities)
-      .where(eq(dealActivities.dealId, dealId))
-      .orderBy(desc(dealActivities.createdAt));
-  } catch (error) {
-    console.error(`Error getting activities for deal ${dealId}:`, error);
-    return [];
-  }
-}
-
-async createDealActivity(activity: InsertDealActivity): Promise<DealActivity> {
-  try {
-    const [newActivity] = await db
-      .insert(dealActivities)
-      .values({
-        ...activity,
-        createdAt: new Date()
-      })
-      .returning();
-
-    await db
-      .update(deals)
-      .set({ lastActivityAt: new Date() })
-      .where(eq(deals.id, activity.dealId));
-
-    return newActivity;
-  } catch (error) {
-    console.error('Error creating deal activity:', error);
-    throw new Error('Failed to create deal activity');
-  }
-}
-
-async getPipelineStages(): Promise<PipelineStage[]> {
-  try {
-    return db
-      .select()
-      .from(pipelineStages)
-      .orderBy(pipelineStages.order);
-  } catch (error) {
-    console.error('Error getting pipeline stages:', error);
-    return [];
-  }
-}
-
-async getPipelineStageById(id: number): Promise<PipelineStage | null> {
-  try {
-    const [stage] = await db
-      .select()
-      .from(pipelineStages)
-      .where(eq(pipelineStages.id, id));
-
-    return stage || null;
-  } catch (error) {
-    console.error(`Error getting pipeline stage with ID ${id}:`, error);
-    return null;
-  }
-}
-
-async getPipelineStagesByCompany(companyId: number): Promise<PipelineStage[]> {
-  try {
-    return db
-      .select()
-      .from(pipelineStages)
-      .where(eq(pipelineStages.companyId, companyId))
-      .orderBy(pipelineStages.order);
-  } catch (error) {
-    console.error(`Error getting pipeline stages for company ${companyId}:`, error);
-    return [];
-  }
-}
-
-async getPipelineStage(id: number): Promise<PipelineStage | undefined> {
-  try {
-    const [stage] = await db
-      .select()
-      .from(pipelineStages)
-      .where(eq(pipelineStages.id, id));
-    return stage;
-  } catch (error) {
-    console.error(`Error getting pipeline stage with ID ${id}:`, error);
-    return undefined;
-  }
-}
-
-async createPipelineStage(stage: InsertPipelineStage): Promise<PipelineStage> {
-  try {
-    const maxOrderResult = await db
-      .select({ maxOrder: sql`MAX(${pipelineStages.order})` })
-      .from(pipelineStages)
-      .where(stage.companyId ? eq(pipelineStages.companyId, stage.companyId) : isNull(pipelineStages.companyId));
-
-    const maxOrder = maxOrderResult[0]?.maxOrder || 0;
-    const newOrder = stage.order || (maxOrder as number) + 1;
-
-    const [newStage] = await db
-      .insert(pipelineStages)
-      .values({
-        ...stage,
-        order: newOrder,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      })
-      .returning();
-
-    return newStage;
-  } catch (error) {
-    console.error('Error creating pipeline stage:', error);
-    throw new Error('Failed to create pipeline stage');
-  }
-}
-
-async updatePipelineStage(id: number, updates: Partial<InsertPipelineStage>): Promise<PipelineStage> {
-  try {
-    const [updatedStage] = await db
-      .update(pipelineStages)
-      .set({
-        ...updates,
-        updatedAt: new Date()
-      })
-      .where(eq(pipelineStages.id, id))
-      .returning();
-
-    if (!updatedStage) {
-      throw new Error(`Pipeline stage with ID ${id} not found`);
-    }
-
-    return updatedStage;
-  } catch (error) {
-    console.error(`Error updating pipeline stage with ID ${id}:`, error);
-    throw new Error('Failed to update pipeline stage');
-  }
-}
-
-async deletePipelineStage(id: number, moveDealsToStageId?: number): Promise<boolean> {
-  try {
-    return await db.transaction(async (tx: any) => {
-      if (moveDealsToStageId) {
-        await tx
-          .update(deals)
-          .set({
-            stageId: moveDealsToStageId,
-            updatedAt: new Date()
-          })
-          .where(eq(deals.stageId, id));
-      }
-
-      await tx
-        .delete(pipelineStages)
-        .where(eq(pipelineStages.id, id));
-
-      const remainingStages = await tx
-        .select()
-        .from(pipelineStages)
-        .orderBy(pipelineStages.order);
-
-      for (let i = 0; i < remainingStages.length; i++) {
-        await tx
-          .update(pipelineStages)
-          .set({ order: i + 1 })
-          .where(eq(pipelineStages.id, remainingStages[i].id));
-      }
-
-      return true;
-    });
-  } catch (error) {
-    console.error(`Error deleting pipeline stage with ID ${id}:`, error);
-    return false;
-  }
-}
-
-async reorderPipelineStages(stageIds: number[]): Promise<boolean> {
-  try {
-    return await db.transaction(async (tx: any) => {
-      for (let i = 0; i < stageIds.length; i++) {
-        await tx
-          .update(pipelineStages)
-          .set({
-            order: i + 1,
-            updatedAt: new Date()
-          })
-          .where(eq(pipelineStages.id, stageIds[i]));
-      }
-      return true;
-    });
-  } catch (error) {
-    console.error('Error reordering pipeline stages:', error);
-    return false;
-  }
-}
-
-async getDeals(filter?: {
-  companyId?: number;
-  generalSearch?: string;
-}): Promise<Deal[]> {
-  try {
-    const conditions = [sql`${deals.status} != 'archived'`];
-
-    if (filter) {
-      if (filter.companyId) {
-        conditions.push(eq(deals.companyId, filter.companyId));
-      }
-
-
-      if (filter.generalSearch) {
-        const searchTerm = '%' + filter.generalSearch + '%';
-        conditions.push(
-          or(
-            sql`${deals.title} ILIKE ${searchTerm}`,
-            sql`${deals.description} ILIKE ${searchTerm}`,
-            sql`${contacts.name} ILIKE ${searchTerm}`,
-            sql`${contacts.phone} ILIKE ${searchTerm}`,
-            sql`${contacts.email} ILIKE ${searchTerm}`,
-            sql`EXISTS (
-              SELECT 1 FROM unnest(${deals.tags}) AS tag 
-              WHERE tag ILIKE ${searchTerm}
-            )`
-          )!
-        );
-      }
-    }
-
-    const result = await db
-      .select({
-        id: deals.id,
-        companyId: deals.companyId,
-        contactId: deals.contactId,
-        title: deals.title,
-        stageId: deals.stageId,
-        stage: deals.stage,
-        value: deals.value,
-        priority: deals.priority,
-        dueDate: deals.dueDate,
-        assignedToUserId: deals.assignedToUserId,
-        description: deals.description,
-        tags: deals.tags,
-        status: deals.status,
-        lastActivityAt: deals.lastActivityAt,
-        createdAt: deals.createdAt,
-        updatedAt: deals.updatedAt,
-        contactName: contacts.name,
-        contactPhone: contacts.phone,
-        contactEmail: contacts.email
-      })
-      .from(deals)
-      .leftJoin(contacts, eq(deals.contactId, contacts.id))
-      .where(and(...conditions))
-      .orderBy(desc(deals.lastActivityAt));
-
-    return result.map(({ contactName, contactPhone, ...deal }: { contactName: string | null; contactPhone: string | null; [key: string]: any }) => deal);
-  } catch (error) {
-    console.error('Error getting deals with filter:', error);
-    return [];
-  }
-}
-
-async getDealsByStageId(stageId: number): Promise<Deal[]> {
-  try {
-    return db
-      .select()
-      .from(deals)
-      .where(
-        and(
-          eq(deals.stageId, stageId),
-          sql`${deals.status} != 'archived'`
-        )
-      )
-      .orderBy(desc(deals.lastActivityAt));
-  } catch (error) {
-    console.error(`Error getting deals for stage ID ${stageId}:`, error);
-    return [];
-  }
-}
-
-async updateDealStageId(id: number, stageId: number): Promise<Deal> {
-  try {
-    return await db.transaction(async (tx: any) => {
-      const [pipelineStage] = await tx
-        .select()
-        .from(pipelineStages)
-        .where(eq(pipelineStages.id, stageId));
-
-      if (!pipelineStage) {
-        throw new Error(`Pipeline stage with ID ${stageId} not found`);
-      }
-
-      const stageEnumValue = this.mapPipelineStageToEnum(pipelineStage.name);
-
-      const [updatedDeal] = await tx
+  async updateDealStage(id: number, stage: DealStatus): Promise<Deal> {
+    try {
+      const [updatedDeal] = await db
         .update(deals)
         .set({
-          stageId,
-          stage: stageEnumValue as any,
-          updatedAt: new Date(),
-          lastActivityAt: new Date()
+          stage,
+          lastActivityAt: new Date(),
+          updatedAt: new Date()
         })
         .where(eq(deals.id, id))
         .returning();
@@ -6792,29 +6614,428 @@ async updateDealStageId(id: number, stageId: number): Promise<Deal> {
         throw new Error(`Deal with ID ${id} not found`);
       }
 
-      const stageName = pipelineStage.name;
+      return updatedDeal;
+    } catch (error) {
+      console.error(`Error updating stage for deal with ID ${id}:`, error);
+      throw new Error('Failed to update deal stage');
+    }
+  }
 
-      await tx
+  async deleteDeal(id: number, companyId?: number): Promise<{ success: boolean; reason?: string }> {
+    try {
+
+      const whereConditions = companyId
+        ? and(eq(deals.id, id), eq(deals.companyId, companyId))
+        : eq(deals.id, id);
+
+      const existingDeal = await db
+        .select({ id: deals.id, status: deals.status, companyId: deals.companyId })
+        .from(deals)
+        .where(whereConditions)
+        .limit(1);
+
+      if (existingDeal.length === 0) {
+        return { success: false, reason: 'Deal not found' };
+      }
+
+
+      if (existingDeal[0].status === 'archived') {
+        return { success: true, reason: 'Already deleted' };
+      }
+
+
+      const [updatedDeal] = await db
+        .update(deals)
+        .set({
+          status: 'archived',
+          updatedAt: new Date()
+        })
+        .where(whereConditions)
+        .returning();
+
+      return { success: !!updatedDeal };
+    } catch (error) {
+      console.error(`Error deleting deal with ID ${id}:`, error);
+      return { success: false, reason: 'Database error' };
+    }
+  }
+
+  async getDealActivities(dealId: number): Promise<DealActivity[]> {
+    try {
+      return db
+        .select()
+        .from(dealActivities)
+        .where(eq(dealActivities.dealId, dealId))
+        .orderBy(desc(dealActivities.createdAt));
+    } catch (error) {
+      console.error(`Error getting activities for deal ${dealId}:`, error);
+      return [];
+    }
+  }
+
+  async createDealActivity(activity: InsertDealActivity): Promise<DealActivity> {
+    try {
+      const [newActivity] = await db
         .insert(dealActivities)
         .values({
-          dealId: id,
-          userId: updatedDeal.assignedToUserId || 1,
-          type: 'stage_change',
-          content: `Deal moved to ${stageName} stage`,
-          metadata: {
-            previousStageId: updatedDeal.stageId,
-            newStageId: stageId
-          },
+          ...activity,
           createdAt: new Date()
-        });
+        })
+        .returning();
 
-      return updatedDeal;
-    });
-  } catch (error) {
-    console.error(`Error updating stage for deal ${id}:`, error);
-    throw new Error(`Failed to update deal stage: ${error instanceof Error ? error.message : String(error)}`);
+      await db
+        .update(deals)
+        .set({ lastActivityAt: new Date() })
+        .where(eq(deals.id, activity.dealId));
+
+      return newActivity;
+    } catch (error) {
+      console.error('Error creating deal activity:', error);
+      throw new Error('Failed to create deal activity');
+    }
   }
-}
+
+  async getPipelineStages(): Promise<PipelineStage[]> {
+    try {
+      return db
+        .select()
+        .from(pipelineStages)
+        .orderBy(pipelineStages.order);
+    } catch (error) {
+      console.error('Error getting pipeline stages:', error);
+      return [];
+    }
+  }
+
+  async getPipelineStageById(id: number): Promise<PipelineStage | null> {
+    try {
+      const [stage] = await db
+        .select()
+        .from(pipelineStages)
+        .where(eq(pipelineStages.id, id));
+
+      return stage || null;
+    } catch (error) {
+      console.error(`Error getting pipeline stage with ID ${id}:`, error);
+      return null;
+    }
+  }
+
+  async getPipelineStagesByCompany(companyId: number): Promise<PipelineStage[]> {
+    try {
+      return db
+        .select()
+        .from(pipelineStages)
+        .where(eq(pipelineStages.companyId, companyId))
+        .orderBy(pipelineStages.order);
+    } catch (error) {
+      console.error(`Error getting pipeline stages for company ${companyId}:`, error);
+      return [];
+    }
+  }
+
+  async getPipelineStage(id: number): Promise<PipelineStage | undefined> {
+    try {
+      const [stage] = await db
+        .select()
+        .from(pipelineStages)
+        .where(eq(pipelineStages.id, id));
+      return stage;
+    } catch (error) {
+      console.error(`Error getting pipeline stage with ID ${id}:`, error);
+      return undefined;
+    }
+  }
+
+  async createPipelineStage(stage: InsertPipelineStage): Promise<PipelineStage> {
+    try {
+      const maxOrderResult = await db
+        .select({ maxOrder: sql`MAX(${pipelineStages.order})` })
+        .from(pipelineStages)
+        .where(stage.companyId ? eq(pipelineStages.companyId, stage.companyId) : isNull(pipelineStages.companyId));
+
+      const maxOrder = maxOrderResult[0]?.maxOrder || 0;
+      const newOrder = stage.order || (maxOrder as number) + 1;
+
+      const [newStage] = await db
+        .insert(pipelineStages)
+        .values({
+          ...stage,
+          order: newOrder,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        })
+        .returning();
+
+      return newStage;
+    } catch (error) {
+      console.error('Error creating pipeline stage:', error);
+      throw new Error('Failed to create pipeline stage');
+    }
+  }
+
+  async updatePipelineStage(id: number, updates: Partial<InsertPipelineStage>): Promise<PipelineStage> {
+    try {
+      const [updatedStage] = await db
+        .update(pipelineStages)
+        .set({
+          ...updates,
+          updatedAt: new Date()
+        })
+        .where(eq(pipelineStages.id, id))
+        .returning();
+
+      if (!updatedStage) {
+        throw new Error(`Pipeline stage with ID ${id} not found`);
+      }
+
+      return updatedStage;
+    } catch (error) {
+      console.error(`Error updating pipeline stage with ID ${id}:`, error);
+      throw new Error('Failed to update pipeline stage');
+    }
+  }
+
+  async deletePipelineStage(id: number, moveDealsToStageId?: number): Promise<boolean> {
+    try {
+      return await db.transaction(async (tx: any) => {
+        if (moveDealsToStageId) {
+          await tx
+            .update(deals)
+            .set({
+              stageId: moveDealsToStageId,
+              updatedAt: new Date()
+            })
+            .where(eq(deals.stageId, id));
+        }
+
+        await tx
+          .delete(pipelineStages)
+          .where(eq(pipelineStages.id, id));
+
+        const remainingStages = await tx
+          .select()
+          .from(pipelineStages)
+          .orderBy(pipelineStages.order);
+
+        for (let i = 0; i < remainingStages.length; i++) {
+          await tx
+            .update(pipelineStages)
+            .set({ order: i + 1 })
+            .where(eq(pipelineStages.id, remainingStages[i].id));
+        }
+
+        return true;
+      });
+    } catch (error) {
+      console.error(`Error deleting pipeline stage with ID ${id}:`, error);
+      return false;
+    }
+  }
+
+  async reorderPipelineStages(stageIds: number[]): Promise<boolean> {
+    try {
+      return await db.transaction(async (tx: any) => {
+        for (let i = 0; i < stageIds.length; i++) {
+          await tx
+            .update(pipelineStages)
+            .set({
+              order: i + 1,
+              updatedAt: new Date()
+            })
+            .where(eq(pipelineStages.id, stageIds[i]));
+        }
+        return true;
+      });
+    } catch (error) {
+      console.error('Error reordering pipeline stages:', error);
+      return false;
+    }
+  }
+
+  async getDeals(filter?: {
+    companyId?: number;
+    generalSearch?: string;
+  }): Promise<(Deal & { unreadCount: number; lastMessageAt: Date | null; lastMessageContent: string | null; properties: { id: number; title: string; }[] })[]> {
+    try {
+      const conditions = [sql`${deals.status} != 'archived'`];
+
+      if (filter) {
+        if (filter.companyId) {
+          conditions.push(eq(deals.companyId, filter.companyId));
+        }
+
+
+        if (filter.generalSearch) {
+          const searchTerm = '%' + filter.generalSearch + '%';
+          conditions.push(
+            or(
+              sql`${deals.title} ILIKE ${searchTerm}`,
+              sql`${deals.description} ILIKE ${searchTerm}`,
+              sql`${contacts.name} ILIKE ${searchTerm}`,
+              sql`${contacts.phone} ILIKE ${searchTerm}`,
+              sql`${contacts.email} ILIKE ${searchTerm}`,
+              sql`EXISTS (
+              SELECT 1 FROM unnest(${deals.tags}) AS tag 
+              WHERE tag ILIKE ${searchTerm}
+            )`
+            )!
+          );
+        }
+      }
+
+      const result = await db
+        .select({
+          id: deals.id,
+          companyId: deals.companyId,
+          contactId: deals.contactId,
+          title: deals.title,
+          stageId: deals.stageId,
+          stage: deals.stage,
+          value: deals.value,
+          priority: deals.priority,
+          dueDate: deals.dueDate,
+          assignedToUserId: deals.assignedToUserId,
+          description: deals.description,
+          tags: deals.tags,
+          status: deals.status,
+          lastActivityAt: deals.lastActivityAt,
+          createdAt: deals.createdAt,
+          updatedAt: deals.updatedAt,
+          contactName: contacts.name,
+          contactPhone: contacts.phone,
+          contactEmail: contacts.email,
+          contactIdentifierType: contacts.identifierType,
+          contactIdentifier: contacts.identifier,
+          propertyCount: sql<number>`(SELECT count(*)::int FROM deal_properties WHERE deal_properties.deal_id = ${deals.id})`,
+          properties: sql<{ id: number; title: string; }[]>`(
+            SELECT COALESCE(
+              json_agg(
+                json_build_object(
+                  'id', p.id,
+                  'title', COALESCE(NULLIF(p.name, ''), 'Propiedad sin nombre')
+                )
+              ),
+              '[]'::json
+            )
+            FROM deal_properties dp
+            JOIN properties p ON dp.property_id = p.id
+            WHERE dp.deal_id = ${deals.id}
+          )`,
+          unreadCount: sql<number>`(SELECT COALESCE(SUM(unread_count), 0)::int FROM conversations WHERE conversations.contact_id = ${deals.contactId})`,
+          lastMessageAt: sql<string>`(
+            SELECT (EXTRACT(EPOCH FROM m.created_at) * 1000)::text
+            FROM messages m 
+            JOIN conversations c ON m.conversation_id = c.id 
+            WHERE c.contact_id = ${deals.contactId} 
+            ORDER BY m.created_at DESC 
+            LIMIT 1
+          )`,
+          lastMessageContent: sql<string>`(
+            SELECT content 
+            FROM messages m 
+            JOIN conversations c ON m.conversation_id = c.id 
+            WHERE c.contact_id = ${deals.contactId} 
+            ORDER BY m.created_at DESC 
+            LIMIT 1
+          )`
+        })
+        .from(deals)
+        .leftJoin(contacts, eq(deals.contactId, contacts.id))
+        .where(and(...conditions))
+        .orderBy(desc(deals.lastActivityAt));
+
+      return result.map(({ contactName, contactPhone, contactEmail, contactIdentifierType, contactIdentifier, unreadCount, lastMessageAt, lastMessageContent, properties, ...deal }: any) => ({
+        ...deal,
+        unreadCount,
+        lastMessageAt: lastMessageAt ? new Date(Math.floor(Number(lastMessageAt))) : null,
+        lastMessageContent,
+        properties: properties || [],
+        contact: {
+          id: deal.contactId,
+          name: contactName,
+          phone: contactPhone,
+          email: contactEmail,
+          identifierType: contactIdentifierType,
+          identifierValue: contactIdentifier
+        }
+      }));
+    } catch (error) {
+      console.error('Error getting deals with filter:', error);
+      return [];
+    }
+  }
+
+  async getDealsByStageId(stageId: number): Promise<Deal[]> {
+    try {
+      return db
+        .select()
+        .from(deals)
+        .where(
+          and(
+            eq(deals.stageId, stageId),
+            sql`${deals.status} != 'archived'`
+          )
+        )
+        .orderBy(desc(deals.lastActivityAt));
+    } catch (error) {
+      console.error(`Error getting deals for stage ID ${stageId}:`, error);
+      return [];
+    }
+  }
+
+  async updateDealStageId(id: number, stageId: number): Promise<Deal> {
+    try {
+      return await db.transaction(async (tx: any) => {
+        const [pipelineStage] = await tx
+          .select()
+          .from(pipelineStages)
+          .where(eq(pipelineStages.id, stageId));
+
+        if (!pipelineStage) {
+          throw new Error(`Pipeline stage with ID ${stageId} not found`);
+        }
+
+        const stageEnumValue = this.mapPipelineStageToEnum(pipelineStage.name);
+
+        const [updatedDeal] = await tx
+          .update(deals)
+          .set({
+            stageId,
+            stage: stageEnumValue as any,
+            updatedAt: new Date(),
+            lastActivityAt: new Date()
+          })
+          .where(eq(deals.id, id))
+          .returning();
+
+        if (!updatedDeal) {
+          throw new Error(`Deal with ID ${id} not found`);
+        }
+
+        const stageName = pipelineStage.name;
+
+        await tx
+          .insert(dealActivities)
+          .values({
+            dealId: id,
+            userId: updatedDeal.assignedToUserId || 1,
+            type: 'stage_change',
+            content: `Deal moved to ${stageName} stage`,
+            metadata: {
+              previousStageId: updatedDeal.stageId,
+              newStageId: stageId
+            },
+            createdAt: new Date()
+          });
+
+        return updatedDeal;
+      });
+    } catch (error) {
+      console.error(`Error updating stage for deal ${id}:`, error);
+      throw new Error(`Failed to update deal stage: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
 
   private mapPipelineStageToEnum(stageName: string): string {
     const lowerStageName = stageName.toLowerCase();
@@ -6892,64 +7113,64 @@ async updateDealStageId(id: number, stageId: number): Promise<Deal> {
     }
   }
 
-async createRolePermissions(rolePermission: InsertRolePermission): Promise<RolePermission> {
-  try {
-    const [newRolePermission] = await db
-      .insert(rolePermissions)
-      .values({
-        ...rolePermission,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      })
-      .returning();
+  async createRolePermissions(rolePermission: InsertRolePermission): Promise<RolePermission> {
+    try {
+      const [newRolePermission] = await db
+        .insert(rolePermissions)
+        .values({
+          ...rolePermission,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        })
+        .returning();
 
-    return {
-      ...newRolePermission,
-      permissions: newRolePermission.permissions as Record<string, boolean>
-    };
-  } catch (error) {
-    console.error("Error creating role permissions:", error);
-    throw error;
-  }
-}
-
-async updateRolePermissions(role: 'admin' | 'agent', permissions: Record<string, boolean>, companyId?: number): Promise<RolePermission> {
-  try {
-    if (!companyId) {
-      throw new Error('Company ID is required for updating role permissions');
-    }
-
-    const [updatedRolePermission] = await db
-      .update(rolePermissions)
-      .set({
-        permissions,
-        updatedAt: new Date()
-      })
-      .where(
-        and(
-          eq(rolePermissions.companyId, companyId),
-          eq(rolePermissions.role, role)
-        )
-      )
-      .returning();
-
-    if (updatedRolePermission) {
       return {
-        ...updatedRolePermission,
-        permissions: updatedRolePermission.permissions as Record<string, boolean>
+        ...newRolePermission,
+        permissions: newRolePermission.permissions as Record<string, boolean>
       };
+    } catch (error) {
+      console.error("Error creating role permissions:", error);
+      throw error;
     }
-
-    return await this.createRolePermissions({
-      companyId,
-      role,
-      permissions
-    });
-  } catch (error) {
-    console.error(`Error updating role permissions for company ${companyId} and role ${role}:`, error);
-    throw error;
   }
-}
+
+  async updateRolePermissions(role: 'admin' | 'agent', permissions: Record<string, boolean>, companyId?: number): Promise<RolePermission> {
+    try {
+      if (!companyId) {
+        throw new Error('Company ID is required for updating role permissions');
+      }
+
+      const [updatedRolePermission] = await db
+        .update(rolePermissions)
+        .set({
+          permissions,
+          updatedAt: new Date()
+        })
+        .where(
+          and(
+            eq(rolePermissions.companyId, companyId),
+            eq(rolePermissions.role, role)
+          )
+        )
+        .returning();
+
+      if (updatedRolePermission) {
+        return {
+          ...updatedRolePermission,
+          permissions: updatedRolePermission.permissions as Record<string, boolean>
+        };
+      }
+
+      return await this.createRolePermissions({
+        companyId,
+        role,
+        permissions
+      });
+    } catch (error) {
+      console.error(`Error updating role permissions for company ${companyId} and role ${role}:`, error);
+      throw error;
+    }
+  }
 
   async getActiveSubscriptionsCount(): Promise<number> {
     try {
@@ -8250,7 +8471,7 @@ async updateRolePermissions(role: 'admin' | 'agent', permissions: Record<string,
         .where(eq(conversations.channelId, channelId))
         .orderBy(desc(conversations.lastMessageAt));
 
-      
+
 
       if (basicConversations.length === 0) {
 
@@ -8280,7 +8501,7 @@ async updateRolePermissions(role: 'admin' | 'agent', permissions: Record<string,
         contact: conv.contactId ? contactsMap.get(conv.contactId) || null : null
       }));
 
-      
+
       return conversationsWithContacts;
     } catch (error) {
       console.error('❌ Error querying conversations:', error);
@@ -8504,10 +8725,10 @@ async updateRolePermissions(role: 'admin' | 'agent', permissions: Record<string,
 
 
       const sortColumn = sortBy === 'name' ? affiliates.name :
-                        sortBy === 'email' ? affiliates.email :
-                        sortBy === 'status' ? affiliates.status :
-                        sortBy === 'totalEarnings' ? affiliates.totalEarnings :
-                        affiliates.createdAt;
+        sortBy === 'email' ? affiliates.email :
+          sortBy === 'status' ? affiliates.status :
+            sortBy === 'totalEarnings' ? affiliates.totalEarnings :
+              affiliates.createdAt;
 
       const orderBy = sortOrder === 'asc' ? sortColumn : desc(sortColumn);
 
@@ -10664,19 +10885,19 @@ async updateRolePermissions(role: 'admin' | 'agent', permissions: Record<string,
 
       if (options?.search) {
         const searchTerm = options.search.toLowerCase();
-        
+
 
         const allContacts = await db
           .select()
           .from(contacts)
           .where(eq(contacts.companyId, companyId));
-        
+
         const contactMap = new Map<number, Contact>(allContacts.map((contact: Contact) => [contact.id, contact]));
-        
+
         allTasks = allTasks.filter((task: ContactTask) => {
-          const contact = contactMap.get(task.contactId);
+          const contact = task.contactId ? contactMap.get(task.contactId) : undefined;
           const contactName = contact?.name || '';
-          
+
           return task.title.toLowerCase().includes(searchTerm) ||
             (task.description && task.description.toLowerCase().includes(searchTerm)) ||
             (task.category && task.category.toLowerCase().includes(searchTerm)) ||
@@ -11206,6 +11427,60 @@ async updateRolePermissions(role: 'admin' | 'agent', permissions: Record<string,
     } catch (error) {
       console.error('Error unarchiving contact:', error);
       throw error;
+    }
+  }
+
+  async getProperties(companyId: number): Promise<Property[]> {
+    try {
+      return await db.select().from(properties).where(eq(properties.companyId, companyId)).orderBy(desc(properties.createdAt));
+    } catch (error) {
+      console.error("Error getting properties:", error);
+      return [];
+    }
+  }
+
+  async getProperty(id: number, companyId: number): Promise<Property | undefined> {
+    try {
+      const [property] = await db.select().from(properties).where(and(eq(properties.id, id), eq(properties.companyId, companyId)));
+      return property || undefined;
+    } catch (error) {
+      console.error(`Error getting property with ID ${id}:`, error);
+      return undefined;
+    }
+  }
+
+  async createProperty(property: InsertProperty): Promise<Property> {
+    try {
+      const [newProperty] = await db.insert(properties).values({
+        ...property,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }).returning();
+      return newProperty;
+    } catch (error) {
+      console.error("Error creating property:", error);
+      throw error;
+    }
+  }
+
+  async updateProperty(id: number, updates: Partial<InsertProperty>): Promise<Property> {
+    try {
+      const [updatedProperty] = await db.update(properties).set({ ...updates, updatedAt: new Date() }).where(eq(properties.id, id)).returning();
+      if (!updatedProperty) throw new Error(`Property ${id} not found`);
+      return updatedProperty;
+    } catch (error) {
+      console.error("Error updating property:", error);
+      throw error;
+    }
+  }
+
+  async deleteProperty(id: number, companyId: number): Promise<boolean> {
+    try {
+      await db.delete(properties).where(and(eq(properties.id, id), eq(properties.companyId, companyId)));
+      return true;
+    } catch (error) {
+      console.error(`Error deleting property ${id}:`, error);
+      return false;
     }
   }
 }

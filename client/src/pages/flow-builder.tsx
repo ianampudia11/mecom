@@ -19,15 +19,18 @@ import WhatsAppPollNode from '@/components/flow-builder/WhatsAppPollNode';
 import { HTTPRequestNode } from '@/components/flow-builder/HTTPRequestNode';
 import { CodeExecutionNode } from '@/components/flow-builder/CodeExecutionNode';
 import { WhatsAppFlowsNode } from '@/components/flow-builder/WhatsAppFlowsNode';
+import { NotifyUserNode } from '@/components/flow-builder/NotifyUserNode';
 import { TranslationNode } from '@/components/flow-builder/TranslationNode';
 import { TypebotNode } from '@/components/flow-builder/TypebotNode';
 import UpdatePipelineStageNode from '@/components/flow-builder/UpdatePipelineStageNode';
 import { WebhookNode } from '@/components/flow-builder/WebhookNode';
+import { EnhancedVariablePicker } from '@/components/flow-builder/EnhancedVariablePicker';
 import BotIcon from '@/components/ui/bot-icon';
 import { Button } from '@/components/ui/button';
 import { Calendar } from "@/components/ui/calendar";
 import { FileUpload } from '@/components/ui/file-upload';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { NumberInput } from '@/components/ui/number-input';
 import {
   Popover,
@@ -47,12 +50,14 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from '@/hooks/use-translation';
 import { apiRequest, queryClient } from '@/lib/queryClient';
+import { FlowContext, useFlowContext, FlowProvider } from '@/components/flow-builder/FlowContext';
 import { getBrowserTimezone } from '@/utils/timezones';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   AlertCircle,
   ArrowRightCircle,
   Bot,
+  Bell,
   Brain,
   Calendar as CalendarIcon,
   Clock,
@@ -62,6 +67,8 @@ import {
   File,
   FileAudio, FileText, FileVideo,
   Globe,
+  Tag,
+  CheckSquare,
   Image,
   Languages,
   LayoutGrid,
@@ -486,10 +493,13 @@ function NodeToolbar({ id, onDuplicate, onDelete }: { id: string; onDuplicate: (
   );
 }
 
-const FlowContext = React.createContext<{
-  onDeleteNode: (nodeId: string) => void;
-  onDuplicateNode: (nodeId: string) => void;
-} | null>(null);
+const MessageKeyword = {
+  id: '',
+  text: '',
+  value: '',
+  caseSensitive: false
+};
+/* FlowContext imported from components/flow-builder/FlowContext.tsx */
 
 interface MessageKeyword {
   id: string;
@@ -575,27 +585,11 @@ function MessageNode({ data, isConnectable, id }: any) {
     updateNodeData({ keywords: newKeywords });
   };
 
-  const handleMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newMessage = e.target.value;
-    setMessage(newMessage);
-    updateNodeData({ message: newMessage });
-  };
+  /* Removed manual variable insertion logic in favor of EnhancedVariablePicker */
 
-  const insertVariable = (variable: string) => {
-    const textArea = document.getElementById(`message-textarea-${id}`) as HTMLTextAreaElement;
-    if (!textArea) return;
-
-    const cursorPos = textArea.selectionStart;
-    const variableText = `{{${variable}}}`;
-    const newMessage = message.substring(0, cursorPos) + variableText + message.substring(cursorPos);
-
-    setMessage(newMessage);
-    updateNodeData({ message: newMessage });
-
-    setTimeout(() => {
-      textArea.focus();
-      textArea.setSelectionRange(cursorPos + variableText.length, cursorPos + variableText.length);
-    }, 0);
+  const handleMessageChange = (value: string) => {
+    setMessage(value);
+    updateNodeData({ message: value });
   };
 
   const formatMessage = (message: string) => {
@@ -655,29 +649,14 @@ function MessageNode({ data, isConnectable, id }: any) {
         <div className="space-y-3">
           <div>
             <label className="text-xs font-medium mb-1 block">{t('flow_builder.message_content', 'Message Content:')}</label>
-            <textarea
-              id={`message-textarea-${id}`}
-              className="w-full p-2 text-sm border rounded min-h-[80px] resize-none"
+            <EnhancedVariablePicker
               value={message}
               onChange={handleMessageChange}
               placeholder={t('flow_builder.type_message_placeholder', 'Type your message here...')}
+              className="min-h-[80px]"
+              multiline
+              flowId={flowContext?.flowId}
             />
-
-            <div className="mt-2">
-              <p className="text-xs font-medium mb-1">{t('flow_builder.insert_variable', 'Insert Variable:')}</p>
-              <div className="flex flex-wrap gap-1">
-                {availableVariables.map((variable) => (
-                  <button
-                    key={variable.name}
-                    className="text-xs px-2 py-1 bg-secondary rounded hover:bg-secondary/80"
-                    title={variable.description}
-                    onClick={() => insertVariable(variable.name)}
-                  >
-                    {variable.name}
-                  </button>
-                ))}
-              </div>
-            </div>
 
             <div className="text-[10px] text-muted-foreground mt-1">
               {t('flow_builder.variables_help', 'Variables will be replaced with actual values when message is sent.')}
@@ -854,6 +833,22 @@ function MessageNode({ data, isConnectable, id }: any) {
         </div>
       )}
 
+      {/* Recipient Input (Optional) */}
+      {isEditing && (
+        <div className="mt-3 border-t pt-3">
+          <label className="text-xs font-medium mb-1 block">{t('flow_builder.recipient_label', 'Recipient (Optional):')}</label>
+          <input
+            className="w-full p-2 text-sm border rounded bg-background"
+            value={data.recipient || ''}
+            onChange={(e) => updateNodeData({ recipient: e.target.value })}
+            placeholder={t('flow_builder.recipient_placeholder', 'Default: Current Contact')}
+          />
+          <div className="text-[10px] text-muted-foreground mt-1">
+            {t('flow_builder.recipient_help', 'Leave empty to reply to the current contact. Enter a specific number to override.')}
+          </div>
+        </div>
+      )}
+
       {/* Input handle */}
       <Handle
         type="target"
@@ -861,6 +856,16 @@ function MessageNode({ data, isConnectable, id }: any) {
         style={standardHandleStyle}
         isConnectable={isConnectable}
       />
+
+      {/* Default Output Handle (when keywords are disabled) */}
+      {!enableKeywordTriggers && (
+        <Handle
+          type="source"
+          position={Position.Right}
+          style={standardHandleStyle}
+          isConnectable={isConnectable}
+        />
+      )}
 
       {/* Output handles only shown when keyword triggers are enabled */}
     </div>
@@ -3147,6 +3152,9 @@ function DocumentNode({ data, isConnectable, id }: any) {
 function TriggerNode({ data, isConnectable, id }: any) {
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [triggerType, setTriggerType] = useState<string>(data.triggerType || 'message_received');
+
+  // Message Received State
   const [localConditionType, setLocalConditionType] = useState(data.conditionType || 'any');
   const [localConditionValue, setLocalConditionValue] = useState(data.conditionValue || '');
   const [selectedChannelType, setSelectedChannelType] = useState<string>(
@@ -3156,68 +3164,39 @@ function TriggerNode({ data, isConnectable, id }: any) {
   const [hardResetConfirmationMessage, setHardResetConfirmationMessage] = useState(
     data.hardResetConfirmationMessage || t('flow_builder.trigger_default_reset_message', 'Bot has been reactivated. Starting fresh conversation...')
   );
+
+  // Session Persistence State
   const [sessionTimeout, setSessionTimeout] = useState(data.sessionTimeout || 30);
   const [sessionTimeoutUnit, setSessionTimeoutUnit] = useState(data.sessionTimeoutUnit || 'minutes');
   const [enableSessionPersistence, setEnableSessionPersistence] = useState(data.enableSessionPersistence !== false);
   const [multipleKeywords, setMultipleKeywords] = useState(data.multipleKeywords || '');
   const [keywordsCaseSensitive, setKeywordsCaseSensitive] = useState(data.keywordsCaseSensitive || false);
+
+  // New Trigger State
+  const [selectedTag, setSelectedTag] = useState<string>(data.selectedTag || '');
+  const [selectedAgentId, setSelectedAgentId] = useState<string>(data.selectedAgentId || '');
+  const [selectedPipelineStageId, setSelectedPipelineStageId] = useState<string>(data.selectedPipelineStageId || '');
+
+  // Data Lists
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
+  const [availableAgents, setAvailableAgents] = useState<any[]>([]);
+  const [pipelineStages, setPipelineStages] = useState<any[]>([]);
+
   const { setNodes, setEdges, getEdges } = useReactFlow();
   const flowContext = useFlowContext();
 
-  const getConditionLabel = (conditionType: string): string => {
-    switch (conditionType) {
-      case 'multiple_keywords': return t('flow_builder.trigger_condition_contains_any', 'contains any of');
-      case 'regex': return t('flow_builder.trigger_condition_matches_pattern', 'matches pattern');
-      case 'media': return t('flow_builder.trigger_condition_has_media', 'has media attachment');
-      default: return '';
+  // Fetch helper data based on trigger type
+  useEffect(() => {
+    if (isExpanded) {
+      if (triggerType === 'tag_assigned') {
+        fetch('/api/contacts/tags').then(res => res.json()).then(setAvailableTags).catch(console.error);
+      } else if (triggerType === 'agent_assigned') {
+        fetch('/api/agents').then(res => res.json()).then(setAvailableAgents).catch(console.error);
+      } else if (triggerType === 'pipeline_stage_changed') {
+        fetch('/api/pipeline-stages').then(res => res.json()).then(setPipelineStages).catch(console.error);
+      }
     }
-  };
-
-  const getConditionPlaceholder = (conditionType: string): string => {
-    switch (conditionType) {
-      case 'multiple_keywords': return t('flow_builder.trigger_placeholder_keywords', 'Enter keywords separated by commas (e.g., help, support, agent)');
-      case 'regex': return t('flow_builder.trigger_placeholder_regex', '\\b\\w+\\b');
-      default: return '';
-    }
-  };
-
-  const channelTypes = [
-    { value: 'whatsapp_unofficial', label: t('flow_builder.trigger_channel_whatsapp_unofficial', 'WhatsApp (Unofficial)'), icon: 'fab fa-whatsapp', color: 'text-green-600' },
-    { value: 'whatsapp_official', label: t('flow_builder.trigger_channel_whatsapp_official', 'WhatsApp (Official)'), icon: 'fab fa-whatsapp', color: 'text-green-700' },
-    { value: 'messenger', label: t('flow_builder.trigger_channel_messenger', 'Facebook Messenger'), icon: 'fab fa-facebook-messenger', color: 'text-blue-500' },
-    { value: 'instagram', label: t('flow_builder.trigger_channel_instagram', 'Instagram'), icon: 'fab fa-instagram', color: 'text-pink-500' },
-    { value: 'email', label: t('flow_builder.trigger_channel_email', 'Email'), icon: 'fas fa-envelope', color: 'text-gray-600' }
-  ];
-
-  const getConditionTypesForChannels = (channels: string[]) => {
-    const baseConditions = [
-      { value: 'any', label: t('flow_builder.any_message', 'Any Message') },
-      { value: 'multiple_keywords', label: t('flow_builder.multiple_keywords', 'Multiple Keywords') },
-      { value: 'regex', label: t('flow_builder.regex_pattern', 'Regex Pattern') }
-    ];
-
-
-    const supportsMedia = channels.some(ch =>
-      ['whatsapp_unofficial', 'whatsapp_official', 'messenger', 'instagram'].includes(ch)
-    );
-    if (supportsMedia) {
-      baseConditions.push({ value: 'media', label: t('flow_builder.has_media', 'Has Media') });
-    }
-
-
-    const hasEmail = channels.includes('email');
-    if (hasEmail) {
-      baseConditions.push(
-        { value: 'subject_contains', label: t('flow_builder.subject_contains', 'Subject Contains') },
-        { value: 'from_domain', label: t('flow_builder.from_domain', 'From Domain') },
-        { value: 'has_attachment', label: t('flow_builder.has_attachment', 'Has Attachment') }
-      );
-    }
-
-    return baseConditions;
-  };
-
-  const conditionTypes = getConditionTypesForChannels([selectedChannelType]);
+  }, [isExpanded, triggerType]);
 
   const updateNodeData = useCallback((updates: any) => {
     setNodes((nodes) =>
@@ -3236,6 +3215,10 @@ function TriggerNode({ data, isConnectable, id }: any) {
     );
   }, [id, setNodes]);
 
+  const handleTriggerTypeChange = (newType: string) => {
+    setTriggerType(newType);
+    updateNodeData({ triggerType: newType });
+  };
 
   const parseKeywords = (keywordString: string): string[] => {
     return keywordString
@@ -3244,20 +3227,17 @@ function TriggerNode({ data, isConnectable, id }: any) {
       .filter(keyword => keyword.length > 0);
   };
 
-
   const validateKeywords = (keywordString: string): boolean => {
     const keywords = parseKeywords(keywordString);
     return keywords.length > 0;
   };
 
-
   useEffect(() => {
-    if (localConditionType === 'multiple_keywords') {
+    if (localConditionType === 'multiple_keywords' && triggerType === 'message_received') {
       const currentKeywords = parseKeywords(multipleKeywords);
       const currentHandleIds = currentKeywords.map(keyword =>
         `keyword-${keyword.toLowerCase().replace(/\s+/g, '-')}`
       );
-
 
       const currentEdges = getEdges();
       const edgesToRemove = currentEdges.filter(edge =>
@@ -3269,15 +3249,32 @@ function TriggerNode({ data, isConnectable, id }: any) {
 
       if (edgesToRemove.length > 0) {
         setEdges(edges => edges.filter(edge => !edgesToRemove.includes(edge)));
-
       }
     }
-  }, [multipleKeywords, localConditionType, id, getEdges, setEdges]);
+  }, [multipleKeywords, localConditionType, triggerType, id, getEdges, setEdges]);
+
+  // Handler wrappers
+  const handleSelectedTagChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newVal = e.target.value;
+    setSelectedTag(newVal);
+    updateNodeData({ selectedTag: newVal });
+  };
+
+  const handleSelectedAgentChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newVal = e.target.value;
+    setSelectedAgentId(newVal);
+    updateNodeData({ selectedAgentId: newVal });
+  };
+
+  const handlePipelineStageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newVal = e.target.value;
+    setSelectedPipelineStageId(newVal);
+    updateNodeData({ selectedPipelineStageId: newVal });
+  };
 
   const handleChannelTypeSelect = (channelType: string) => {
     setSelectedChannelType(channelType);
-    updateNodeData({ channelTypes: [channelType] }); // Keep as array for backward compatibility
-
+    updateNodeData({ channelTypes: [channelType] });
     const supportedConditions = getConditionTypesForChannels([channelType]);
     if (!supportedConditions.some(ct => ct.value === localConditionType)) {
       setLocalConditionType('any');
@@ -3346,6 +3343,76 @@ function TriggerNode({ data, isConnectable, id }: any) {
     updateNodeData({ keywordsCaseSensitive: checked });
   };
 
+  // Helper for localized trigger names
+  const getTriggerTypeName = (type: string) => {
+    switch (type) {
+      case 'message_received': return t('flow_builder.message_received', 'Message Received');
+      case 'tag_assigned': return t('flow_builder.trigger_tag_assigned', 'Tag Assigned');
+      case 'agent_assigned': return t('flow_builder.trigger_agent_assigned', 'Agent Assigned');
+      case 'task_completed': return t('flow_builder.trigger_task_completed', 'Task Completed');
+      case 'pipeline_stage_changed': return t('flow_builder.trigger_pipeline_stage_changed', 'Pipeline Stage Changed');
+      default: return type;
+    }
+  };
+
+  const getTriggerIcon = (type: string) => {
+    switch (type) {
+      case 'message_received': return <MessageSquare className="h-4 w-4 text-green-500" />;
+      case 'tag_assigned': return <i className="fas fa-tags h-4 w-4 text-blue-500" />;
+      case 'agent_assigned': return <i className="fas fa-user-check h-4 w-4 text-purple-500" />;
+      case 'task_completed': return <i className="fas fa-check-circle h-4 w-4 text-orange-500" />;
+      case 'pipeline_stage_changed': return <i className="fas fa-exchange-alt h-4 w-4 text-indigo-500" />;
+      default: return <MessageSquare className="h-4 w-4 text-gray-500" />;
+    }
+  };
+
+  // Channel types definition (moved inside)
+  const channelTypes = [
+    { value: 'whatsapp_unofficial', label: t('flow_builder.trigger_channel_whatsapp_unofficial', 'WhatsApp (Unofficial)'), icon: 'fab fa-whatsapp', color: 'text-green-600' },
+    { value: 'whatsapp_official', label: t('flow_builder.trigger_channel_whatsapp_official', 'WhatsApp (Official)'), icon: 'fab fa-whatsapp', color: 'text-green-700' },
+    { value: 'messenger', label: t('flow_builder.trigger_channel_messenger', 'Facebook Messenger'), icon: 'fab fa-facebook-messenger', color: 'text-blue-500' },
+    { value: 'instagram', label: t('flow_builder.trigger_channel_instagram', 'Instagram'), icon: 'fab fa-instagram', color: 'text-pink-500' },
+    { value: 'email', label: t('flow_builder.trigger_channel_email', 'Email'), icon: 'fas fa-envelope', color: 'text-gray-600' }
+  ];
+
+  const getConditionTypesForChannels = (channels: string[]) => {
+    const baseConditions = [
+      { value: 'any', label: t('flow_builder.any_message', 'Any Message') },
+      { value: 'multiple_keywords', label: t('flow_builder.multiple_keywords', 'Multiple Keywords') },
+      { value: 'regex', label: t('flow_builder.regex_pattern', 'Regex Pattern') }
+    ];
+    const supportsMedia = channels.some(ch => ['whatsapp_unofficial', 'whatsapp_official', 'messenger', 'instagram'].includes(ch));
+    if (supportsMedia) baseConditions.push({ value: 'media', label: t('flow_builder.has_media', 'Has Media') });
+    const hasEmail = channels.includes('email');
+    if (hasEmail) {
+      baseConditions.push(
+        { value: 'subject_contains', label: t('flow_builder.subject_contains', 'Subject Contains') },
+        { value: 'from_domain', label: t('flow_builder.from_domain', 'From Domain') },
+        { value: 'has_attachment', label: t('flow_builder.has_attachment', 'Has Attachment') }
+      );
+    }
+    return baseConditions;
+  };
+
+  const getConditionLabel = (conditionType: string): string => {
+    switch (conditionType) {
+      case 'multiple_keywords': return t('flow_builder.trigger_condition_contains_any', 'contains any of');
+      case 'regex': return t('flow_builder.trigger_condition_matches_pattern', 'matches pattern');
+      case 'media': return t('flow_builder.trigger_condition_has_media', 'has media attachment');
+      default: return '';
+    }
+  };
+
+  const getConditionPlaceholder = (conditionType: string): string => {
+    switch (conditionType) {
+      case 'multiple_keywords': return t('flow_builder.trigger_placeholder_keywords', 'Enter keywords separated by commas (e.g., help, support, agent)');
+      case 'regex': return t('flow_builder.trigger_placeholder_regex', '\\b\\w+\\b');
+      default: return '';
+    }
+  };
+
+  const conditionTypes = getConditionTypesForChannels([selectedChannelType]);
+
   return (
     <div className="node-trigger p-3 rounded-lg bg-white border border-border shadow-sm max-w-[350px] min-w-[300px] group">
       {flowContext && (
@@ -3353,12 +3420,7 @@ function TriggerNode({ data, isConnectable, id }: any) {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7 text-destructive hover:text-destructive"
-                  onClick={() => flowContext.onDeleteNode(id)}
-                >
+                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => flowContext.onDeleteNode(id)}>
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
               </TooltipTrigger>
@@ -3369,12 +3431,10 @@ function TriggerNode({ data, isConnectable, id }: any) {
           </TooltipProvider>
         </div>
       )}
+
       <div className="font-medium flex items-center gap-2 mb-2">
-        <MessageSquare className="h-4 w-4 text-green-500" />
-        {selectedChannelType && (
-          <i className={`${channelTypes.find(ct => ct.value === selectedChannelType)?.icon || 'fas fa-message'} text-green-600 text-sm`}></i>
-        )}
-        <span>{t('flow_builder.message_received', 'Message Received')}</span>
+        {getTriggerIcon(triggerType)}
+        <span>{getTriggerTypeName(triggerType)}</span>
         <button
           className="ml-auto text-xs text-muted-foreground hover:text-foreground"
           onClick={() => setIsExpanded(!isExpanded)}
@@ -3383,68 +3443,83 @@ function TriggerNode({ data, isConnectable, id }: any) {
         </button>
       </div>
 
-
-      
-
       <div className="text-sm p-2 bg-secondary/40 rounded border border-border">
-        <div className="text-xs text-muted-foreground mb-1">{t('flow_builder.when', 'When')}</div>
-
-        <div className="flex items-center gap-1 flex-wrap">
-          {selectedChannelType && (() => {
-            const channelInfo = channelTypes.find(ct => ct.value === selectedChannelType);
-            return (
-              <span className="flex items-center gap-1">
-                {channelInfo && (
-                  <>
-                    <i className={`${channelInfo.icon} ${channelInfo.color} text-xs`}></i>
-                    <span className="font-medium text-xs">{channelInfo.label}</span>
-                  </>
-                )}
-              </span>
-            );
-          })()}
-          <span className="text-muted-foreground">{t('flow_builder.message_lowercase', 'message')}</span>
-        </div>
-
-        {data.conditionType !== 'any' && (
-          <div className="mt-1 text-xs flex flex-wrap gap-1">
-            <span>{t('flow_builder.that', 'that')} {getConditionLabel(data.conditionType)}</span>
-            {data.conditionType === 'multiple_keywords' && data.multipleKeywords ? (
-              <div className="flex flex-wrap gap-1">
-                {parseKeywords(data.multipleKeywords).slice(0, 3).map((keyword, index) => (
-                  <span key={index} className="font-medium bg-primary/10 rounded px-1">
-                    "{keyword}"
+        {triggerType === 'message_received' && (
+          <>
+            <div className="text-xs text-muted-foreground mb-1">{t('flow_builder.when', 'When')}</div>
+            <div className="flex items-center gap-1 flex-wrap">
+              {selectedChannelType && (() => {
+                const channelInfo = channelTypes.find(ct => ct.value === selectedChannelType);
+                return (
+                  <span className="flex items-center gap-1">
+                    {channelInfo && (
+                      <>
+                        <i className={`${channelInfo.icon} ${channelInfo.color} text-xs`}></i>
+                        <span className="font-medium text-xs">{channelInfo.label}</span>
+                      </>
+                    )}
                   </span>
-                ))}
-                {parseKeywords(data.multipleKeywords).length > 3 && (
-                  <span className="text-muted-foreground">
-                    {t('flow_builder.trigger_more_keywords', '+{{count}} more', { count: parseKeywords(data.multipleKeywords).length - 3 })}
-                  </span>
+                );
+              })()}
+              <span className="text-muted-foreground">{t('flow_builder.message_lowercase', 'message')}</span>
+            </div>
+            {data.conditionType !== 'any' && (
+              <div className="mt-1 text-xs flex flex-wrap gap-1">
+                <span>{t('flow_builder.that', 'that')} {getConditionLabel(data.conditionType)}</span>
+                {data.conditionType === 'multiple_keywords' && data.multipleKeywords ? (
+                  <div className="flex flex-wrap gap-1">
+                    {parseKeywords(data.multipleKeywords).slice(0, 3).map((keyword, index) => (
+                      <span key={index} className="font-medium bg-primary/10 rounded px-1">"{keyword}"</span>
+                    ))}
+                    {parseKeywords(data.multipleKeywords).length > 3 && (
+                      <span className="text-muted-foreground">+{parseKeywords(data.multipleKeywords).length - 3} more</span>
+                    )}
+                  </div>
+                ) : data.conditionValue && (
+                  <span className="font-medium bg-primary/10 rounded px-1">"{data.conditionValue}"</span>
                 )}
               </div>
-            ) : data.conditionValue && (
-              <span className="font-medium bg-primary/10 rounded px-1">
-                "{data.conditionValue}"
-              </span>
             )}
+            {data.hardResetKeyword && (
+              <div className="mt-1 text-xs flex flex-wrap gap-1">
+                <span className="text-orange-600">{t('flow_builder.hard_reset_label', 'Hard Reset')}:</span>
+                <span className="font-medium bg-orange-100 text-orange-700 rounded px-1">"{data.hardResetKeyword}"</span>
+              </div>
+            )}
+            {data.enableSessionPersistence !== false && (
+              <div className="mt-1 text-xs flex flex-wrap gap-1">
+                <span className="text-blue-600">{t('flow_builder.session_active', 'Session')}:</span>
+                <span className="font-medium bg-blue-100 text-blue-700 rounded px-1">{data.sessionTimeout || 30} {data.sessionTimeoutUnit || 'minutes'}</span>
+              </div>
+            )}
+          </>
+        )}
+
+        {triggerType === 'tag_assigned' && (
+          <div className="mt-1 text-xs">
+            <span className="text-muted-foreground">Tag: </span>
+            <span className="font-medium">{selectedTag || 'Any Tag'}</span>
           </div>
         )}
 
-        {data.hardResetKeyword && (
-          <div className="mt-1 text-xs flex flex-wrap gap-1">
-            <span className="text-orange-600">{t('flow_builder.hard_reset_label', 'Hard Reset')}:</span>
-            <span className="font-medium bg-orange-100 text-orange-700 rounded px-1">
-              "{data.hardResetKeyword}"
-            </span>
+        {triggerType === 'agent_assigned' && (
+          <div className="mt-1 text-xs">
+            <span className="text-muted-foreground">Agent: </span>
+            <span className="font-medium">{availableAgents.find(a => a.id.toString() === selectedAgentId)?.fullName || 'Any Agent'}</span>
           </div>
         )}
 
-        {data.enableSessionPersistence !== false && (
-          <div className="mt-1 text-xs flex flex-wrap gap-1">
-            <span className="text-blue-600">{t('flow_builder.session_active', 'Session')}:</span>
-            <span className="font-medium bg-blue-100 text-blue-700 rounded px-1">
-              {data.sessionTimeout || 30} {data.sessionTimeoutUnit || 'minutes'}
-            </span>
+        {triggerType === 'pipeline_stage_changed' && (
+          <div className="mt-1 text-xs">
+            <span className="text-muted-foreground">New Stage: </span>
+            <span className="font-medium">{pipelineStages.find(s => s.id.toString() === selectedPipelineStageId)?.name || 'Any Stage'}</span>
+          </div>
+        )}
+
+        {triggerType === 'task_completed' && (
+          <div className="mt-1 text-xs">
+            <span className="text-muted-foreground">When: </span>
+            <span className="font-medium">Any Task Completed</span>
           </div>
         )}
       </div>
@@ -3452,194 +3527,159 @@ function TriggerNode({ data, isConnectable, id }: any) {
       {isExpanded && (
         <div className="mt-3 text-xs space-y-2 p-2 border rounded bg-secondary/10">
           <div>
-            <label className="block mb-1 font-medium text-blue-600">
-              {t('flow_builder.channel_types', 'Channel Types')}
-            </label>
-            <div className="grid grid-cols-2 gap-1 max-h-32 overflow-y-auto">
-              {channelTypes.map(channelType => (
-                <label key={channelType.value} className="flex items-center space-x-1 p-1 hover:bg-secondary/20 rounded cursor-pointer">
-                  <input
-                    type="radio"
-                    name="channelType"
-                    checked={selectedChannelType === channelType.value}
-                    onChange={() => handleChannelTypeSelect(channelType.value)}
-                    className="w-3 h-3"
-                  />
-                  <i className={`${channelType.icon} ${channelType.color} text-[10px]`}></i>
-                  <span className="text-[10px] truncate">{channelType.label}</span>
-                </label>
-              ))}
-            </div>
-            <div className="text-[9px] text-muted-foreground mt-1">
-              {t('flow_builder.channel_types_help_radio', 'Select which channel type this trigger should respond to.')}
-            </div>
-          </div>
-
-          <div>
-            <label className="block mb-1 font-medium">{t('flow_builder.trigger_condition_type', 'Condition Type')}</label>
+            <label className="block mb-1 font-medium">{t('flow_builder.trigger_type', 'Trigger Type')}</label>
             <select
               className="w-full p-1 border rounded bg-background text-xs"
-              value={localConditionType}
-              onChange={handleConditionTypeChange}
+              value={triggerType}
+              onChange={(e) => handleTriggerTypeChange(e.target.value)}
             >
-              {conditionTypes.map(type => (
-                <option key={type.value} value={type.value}>
-                  {type.label}
-                </option>
-              ))}
+              <option value="message_received">{t('flow_builder.message_received', 'Message Received')}</option>
+              <option value="tag_assigned">{t('flow_builder.trigger_tag_assigned', 'Tag Assigned')}</option>
+              <option value="agent_assigned">{t('flow_builder.trigger_agent_assigned', 'Agent Assigned')}</option>
+              <option value="task_completed">{t('flow_builder.trigger_task_completed', 'Task Completed')}</option>
+              <option value="pipeline_stage_changed">{t('flow_builder.trigger_pipeline_stage_changed', 'Pipeline Stage Changed')}</option>
             </select>
           </div>
 
-          {localConditionType !== 'any' && localConditionType !== 'media' && (
-            <div>
-              <label className="block mb-1 font-medium">
-                {localConditionType === 'multiple_keywords' ? t('flow_builder.trigger_multiple_keywords', 'Multiple Keywords') : t('flow_builder.trigger_pattern', 'Pattern')}
-              </label>
-              {localConditionType === 'multiple_keywords' ? (
+          {triggerType === 'message_received' && (
+            <div className="space-y-2">
+              <div>
+                <label className="block mb-1 font-medium text-blue-600">{t('flow_builder.channel_types', 'Channel Types')}</label>
+                <div className="grid grid-cols-2 gap-1 max-h-32 overflow-y-auto">
+                  {channelTypes.map(channelType => (
+                    <label key={channelType.value} className="flex items-center space-x-1 p-1 hover:bg-secondary/20 rounded cursor-pointer">
+                      <input
+                        type="radio"
+                        name="channelType"
+                        checked={selectedChannelType === channelType.value}
+                        onChange={() => handleChannelTypeSelect(channelType.value)}
+                        className="w-3 h-3"
+                      />
+                      <i className={`${channelType.icon} ${channelType.color} text-[10px]`}></i>
+                      <span className="text-[10px] truncate">{channelType.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block mb-1 font-medium">{t('flow_builder.trigger_condition_type', 'Condition Type')}</label>
+                <select className="w-full p-1 border rounded bg-background text-xs" value={localConditionType} onChange={handleConditionTypeChange}>
+                  {conditionTypes.map(type => (
+                    <option key={type.value} value={type.value}>{type.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              {localConditionType !== 'any' && localConditionType !== 'media' && (
                 <div>
-                  <input
-                    className={`w-full p-1 border rounded bg-background text-xs ${
-                      multipleKeywords && !validateKeywords(multipleKeywords) ? 'border-red-300' : ''
-                    }`}
-                    placeholder={getConditionPlaceholder(localConditionType)}
-                    value={multipleKeywords}
-                    onChange={handleMultipleKeywordsChange}
-                  />
-                  {!multipleKeywords && (
-                    <div className="text-[9px] text-muted-foreground mt-1">
-                      {t('flow_builder.trigger_keywords_help', 'Enter keywords separated by commas. The trigger will activate when any of these keywords is detected in a message.')}
-                    </div>
-                  )}
-                  {multipleKeywords && (
-                    <div className="mt-2">
-                      <div className="text-[9px] text-muted-foreground mb-1">{t('flow_builder.trigger_keywords_label', 'Keywords:')}</div>
-                      <div className="flex flex-wrap gap-1">
-                        {parseKeywords(multipleKeywords).map((keyword, index) => (
-                          <span
-                            key={index}
-                            className="inline-block bg-blue-100 text-blue-800 text-[9px] px-1.5 py-0.5 rounded"
-                          >
-                            {keyword}
-                          </span>
-                        ))}
-                      </div>
-                      {!validateKeywords(multipleKeywords) && (
-                        <div className="text-[9px] text-red-600 mt-1">
-                          {t('flow_builder.trigger_keywords_required', 'At least one keyword is required')}
+                  <label className="block mb-1 font-medium">
+                    {localConditionType === 'multiple_keywords' ? t('flow_builder.trigger_multiple_keywords', 'Multiple Keywords') : t('flow_builder.trigger_pattern', 'Pattern')}
+                  </label>
+                  {localConditionType === 'multiple_keywords' ? (
+                    <div>
+                      <input
+                        className={`w-full p-1 border rounded bg-background text-xs ${multipleKeywords && !validateKeywords(multipleKeywords) ? 'border-red-300' : ''}`}
+                        placeholder={getConditionPlaceholder(localConditionType)}
+                        value={multipleKeywords}
+                        onChange={handleMultipleKeywordsChange}
+                      />
+                      {!multipleKeywords && <div className="text-[9px] text-muted-foreground mt-1">{t('flow_builder.trigger_keywords_help', 'Enter keywords separated by commas.')}</div>}
+
+                      {multipleKeywords && (
+                        <div className="mt-2 text-muted-foreground text-[9px]">
+                          Keywords: {parseKeywords(multipleKeywords).join(', ')}
                         </div>
                       )}
+                      <div className="mt-2 flex items-center space-x-2">
+                        <input type="checkbox" id="case-sensitive-keywords" checked={keywordsCaseSensitive} onChange={(e) => handleKeywordsCaseSensitiveChange(e.target.checked)} className="w-3 h-3" />
+                        <label htmlFor="case-sensitive-keywords" className="text-[10px] text-muted-foreground">{t('flow_builder.trigger_case_sensitive', 'Case sensitive matching')}</label>
+                      </div>
                     </div>
+                  ) : (
+                    <input className="w-full p-1 border rounded bg-background text-xs" placeholder={getConditionPlaceholder(localConditionType)} value={localConditionValue} onChange={handleConditionValueChange} />
                   )}
-                  <div className="mt-2 flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="case-sensitive-keywords"
-                      checked={keywordsCaseSensitive}
-                      onChange={(e) => handleKeywordsCaseSensitiveChange(e.target.checked)}
-                      className="w-3 h-3"
-                    />
-                    <label htmlFor="case-sensitive-keywords" className="text-[10px] text-muted-foreground">
-                      {t('flow_builder.trigger_case_sensitive', 'Case sensitive matching')}
-                    </label>
-                  </div>
                 </div>
-              ) : (
-                <input
-                  className="w-full p-1 border rounded bg-background text-xs"
-                  placeholder={getConditionPlaceholder(localConditionType)}
-                  value={localConditionValue}
-                  onChange={handleConditionValueChange}
-                />
               )}
+
+              <div className="border-t pt-2 mt-2">
+                <label className="block mb-1 font-medium text-orange-600">{t('flow_builder.hard_reset_keyword', 'Hard Reset Keyword')}</label>
+                <input className="w-full p-1 border rounded bg-background text-xs" placeholder="reset, restart" value={hardResetKeyword} onChange={handleHardResetKeywordChange} />
+              </div>
+
+              {hardResetKeyword && (
+                <div>
+                  <label className="block mb-1 font-medium text-orange-600">{t('flow_builder.hard_reset_confirmation_message', 'Reset Confirmation Message')}</label>
+                  <textarea className="w-full p-1 border rounded bg-background text-xs h-12 resize-none" value={hardResetConfirmationMessage} onChange={handleHardResetConfirmationMessageChange} />
+                </div>
+              )}
+
+              <div className="border-t pt-2 mt-2">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block font-medium text-blue-600">{t('flow_builder.session_persistence', 'Session-Based Triggering')}</label>
+                  <input type="checkbox" checked={enableSessionPersistence} disabled className="w-3 h-3 opacity-50 cursor-not-allowed" />
+                </div>
+                {enableSessionPersistence && (
+                  <div className="space-y-2 pt-2 border-t">
+                    <label className="block mb-1 font-medium text-xs">{t('flow_builder.session_timeout', 'Session Timeout')}</label>
+                    <div className="flex gap-2">
+                      <NumberInput min={1} max={1440} value={sessionTimeout} onChange={(v) => { setSessionTimeout(v); updateNodeData({ sessionTimeout: v }); }} fallbackValue={30} className="flex-1 p-1 border rounded bg-background text-xs" />
+                      <select className="p-1 border rounded bg-background text-xs" value={sessionTimeoutUnit} onChange={handleSessionTimeoutUnitChange}>
+                        <option value="minutes">Minutes</option>
+                        <option value="hours">Hours</option>
+                        <option value="days">Days</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
-          <div className="border-t pt-2 mt-2">
-            <label className="block mb-1 font-medium text-orange-600">
-              {t('flow_builder.hard_reset_keyword', 'Hard Reset Keyword')}
-            </label>
-            <input
-              className="w-full p-1 border rounded bg-background text-xs"
-              placeholder={t('flow_builder.hard_reset_keyword_placeholder', 'reset, restart, newchat, etc.')}
-              value={hardResetKeyword}
-              onChange={handleHardResetKeywordChange}
-            />
-            <div className="text-[9px] text-muted-foreground mt-1">
-              {t('flow_builder.hard_reset_keyword_help', 'When bot is disabled, users can type this keyword to re-enable the bot and start fresh')}
-            </div>
-          </div>
-
-          {hardResetKeyword && (
-            <div>
-              <label className="block mb-1 font-medium text-orange-600">
-                {t('flow_builder.hard_reset_confirmation_message', 'Reset Confirmation Message')}
-              </label>
-              <textarea
-                className="w-full p-1 border rounded bg-background text-xs h-12 resize-none"
-                placeholder={t('flow_builder.hard_reset_confirmation_placeholder', 'Bot has been reactivated. Starting fresh conversation...')}
-                value={hardResetConfirmationMessage}
-                onChange={handleHardResetConfirmationMessageChange}
-              />
-              <div className="text-[9px] text-muted-foreground mt-1">
-                {t('flow_builder.hard_reset_confirmation_help', 'Message sent to user when hard reset is triggered')}
-              </div>
+          {triggerType === 'tag_assigned' && (
+            <div className="space-y-2">
+              <label className="block mb-1 font-medium">Select Tag</label>
+              <select className="w-full p-1 border rounded bg-background text-xs" value={selectedTag} onChange={handleSelectedTagChange}>
+                <option value="">Any Tag</option>
+                {availableTags.map((tag, idx) => (
+                  <option key={idx} value={tag}>{tag}</option>
+                ))}
+              </select>
+              <div className="text-[9px] text-muted-foreground">Trigger when this specific tag is added to a contact. Select "Any Tag" to trigger for all tag assignments.</div>
             </div>
           )}
 
-          <div className="border-t pt-2 mt-2">
-            <div className="flex items-center justify-between mb-2">
-              <label className="block font-medium text-blue-600">
-                {t('flow_builder.session_persistence', 'Session-Based Triggering')}
-              </label>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id={`session-persistence-${id}`}
-                  checked={enableSessionPersistence}
-                  readOnly
-                  disabled
-                  className="w-3 h-3 opacity-50 cursor-not-allowed"
-                />
-                <label htmlFor={`session-persistence-${id}`} className="text-xs text-gray-500 cursor-not-allowed">{t('flow_builder.trigger_enable', 'Enable')}</label>
-              </div>
+          {triggerType === 'agent_assigned' && (
+            <div className="space-y-2">
+              <label className="block mb-1 font-medium">Select Agent</label>
+              <select className="w-full p-1 border rounded bg-background text-xs" value={selectedAgentId} onChange={handleSelectedAgentChange}>
+                <option value="">Any Agent</option>
+                {availableAgents.map((agent: any) => (
+                  <option key={agent.id} value={agent.id}>{agent.fullName || agent.username}</option>
+                ))}
+              </select>
+              <div className="text-[9px] text-muted-foreground">Trigger when a conversation or deal is assigned to this agent.</div>
             </div>
-            <div className="text-[9px] text-muted-foreground mb-2">
-              {t('flow_builder.session_persistence_help', 'When enabled, users who match the condition will continue triggering this flow for subsequent messages until session expires')}
-            </div>
+          )}
 
-            {enableSessionPersistence && (
-              <div className="space-y-2 pt-2 border-t">
-                <label className="block mb-1 font-medium text-xs">
-                  {t('flow_builder.session_timeout', 'Session Timeout')}
-                </label>
-                <div className="flex gap-2">
-                  <NumberInput
-                    min={1}
-                    max={1440}
-                    value={sessionTimeout}
-                    onChange={(value) => {
-                      setSessionTimeout(value);
-                      updateNodeData({ sessionTimeout: value });
-                    }}
-                    fallbackValue={30}
-                    className="flex-1 p-1 border rounded bg-background text-xs"
-                  />
-                  <select
-                    className="p-1 border rounded bg-background text-xs"
-                    value={sessionTimeoutUnit}
-                    onChange={handleSessionTimeoutUnitChange}
-                  >
-                    <option value="minutes">{t('flow_builder.trigger_minutes', 'Minutes')}</option>
-                    <option value="hours">{t('flow_builder.trigger_hours', 'Hours')}</option>
-                    <option value="days">{t('flow_builder.trigger_days', 'Days')}</option>
-                  </select>
-                </div>
-                <div className="text-[9px] text-muted-foreground">
-                  {t('flow_builder.session_timeout_help', 'After this period of inactivity, the user session will reset and conditions will be evaluated again')}
-                </div>
-              </div>
-            )}
-          </div>
+          {triggerType === 'pipeline_stage_changed' && (
+            <div className="space-y-2">
+              <label className="block mb-1 font-medium">Select Pipeline Stage</label>
+              <select className="w-full p-1 border rounded bg-background text-xs" value={selectedPipelineStageId} onChange={handlePipelineStageChange}>
+                <option value="">Any Stage</option>
+                {pipelineStages.map((stage: any) => (
+                  <option key={stage.id} value={stage.id}>{stage.name}</option>
+                ))}
+              </select>
+              <div className="text-[9px] text-muted-foreground">Trigger when a deal moves to this stage.</div>
+            </div>
+          )}
+
+          {triggerType === 'task_completed' && (
+            <div className="text-[10px] text-muted-foreground">
+              This flow will start whenever an agent marks a task as completed.
+            </div>
+          )}
 
           <div className="text-[10px] text-muted-foreground mt-2">
             {t('flow_builder.changes_saved_automatically', 'Changes are saved automatically when you save the flow.')}
@@ -3647,43 +3687,18 @@ function TriggerNode({ data, isConnectable, id }: any) {
         </div>
       )}
 
-      {/* Dynamic output handles based on condition type */}
-      {localConditionType === 'multiple_keywords' && multipleKeywords ? (
+      {/* Dynamic Output Handles */}
+      {triggerType === 'message_received' && localConditionType === 'multiple_keywords' && multipleKeywords ? (
         <div className="relative">
-          {/* Multiple keyword handles */}
           {parseKeywords(multipleKeywords).map((keyword, index) => (
             <div key={`keyword-${keyword}`} className="absolute" style={{ left: `${20 + (index * 60)}px`, bottom: '-30px' }}>
-              <Handle
-                type="source"
-                position={Position.Bottom}
-                id={`keyword-${keyword.toLowerCase().replace(/\s+/g, '-')}`}
-                style={{
-                  ...standardHandleStyle,
-                  position: 'relative',
-                  left: '0px',
-                  bottom: '0px'
-                }}
-                isConnectable={isConnectable}
-              />
-              <div className="absolute top-5 left-1/2 transform -translate-x-1/2 text-[8px] text-muted-foreground whitespace-nowrap bg-white px-1 rounded border">
-                {keyword}
-              </div>
+              <Handle type="source" position={Position.Bottom} id={`keyword-${keyword.toLowerCase().replace(/\s+/g, '-')}`} style={{ ...standardHandleStyle, position: 'relative', left: '0px', bottom: '0px' }} isConnectable={isConnectable} />
+              <div className="absolute top-5 left-1/2 transform -translate-x-1/2 text-[8px] text-muted-foreground whitespace-nowrap bg-white px-1 rounded border">{keyword}</div>
             </div>
           ))}
         </div>
       ) : (
-
-        <Handle
-          type="source"
-          position={Position.Right}
-          style={{
-            ...standardHandleStyle,
-            right: '-6px', // Position at the very right edge
-            top: '50%',    // Center vertically (middle)
-            transform: 'translateY(-50%)' // Perfect center alignment
-          }}
-          isConnectable={isConnectable}
-        />
+        <Handle type="source" position={Position.Right} style={{ ...standardHandleStyle, right: '-6px', top: '50%', transform: 'translateY(-50%)' }} isConnectable={isConnectable} />
       )}
     </div>
   );
@@ -4123,7 +4138,7 @@ function QuickReplyNode({ data, isConnectable, id }: any) {
 
 
       if ((e.ctrlKey || e.metaKey) && e.key === 'a' && e.target instanceof HTMLElement &&
-          e.target.closest('.node-quickreply')) {
+        e.target.closest('.node-quickreply')) {
         e.preventDefault();
         selectAllOptions();
         return;
@@ -4138,7 +4153,7 @@ function QuickReplyNode({ data, isConnectable, id }: any) {
 
 
       if (e.key === 'Delete' && selectedOptions.size > 0 &&
-          e.target instanceof HTMLElement && e.target.closest('.node-quickreply')) {
+        e.target instanceof HTMLElement && e.target.closest('.node-quickreply')) {
         e.preventDefault();
         bulkDeleteOptions();
         return;
@@ -4259,11 +4274,10 @@ function QuickReplyNode({ data, isConnectable, id }: any) {
         parts.push(
           <span
             key={match.index}
-            className={`px-1 rounded ${
-              isValid
-                ? 'bg-primary/10 text-primary'
-                : 'bg-red-100 text-red-600 border border-red-200'
-            }`}
+            className={`px-1 rounded ${isValid
+              ? 'bg-primary/10 text-primary'
+              : 'bg-red-100 text-red-600 border border-red-200'
+              }`}
             title={isValid ? `Variable: ${variableName}` : `Invalid variable: ${variableName}`}
           >
             {match[0]}
@@ -4405,11 +4419,10 @@ function QuickReplyNode({ data, isConnectable, id }: any) {
               {options.map((option, index) => (
                 <div
                   key={index}
-                  className={`space-y-2 relative border rounded-lg p-2 transition-all ${
-                    draggedIndex === index
-                      ? 'opacity-50 scale-95 border-blue-300'
-                      : 'border-transparent hover:border-border'
-                  }`}
+                  className={`space-y-2 relative border rounded-lg p-2 transition-all ${draggedIndex === index
+                    ? 'opacity-50 scale-95 border-blue-300'
+                    : 'border-transparent hover:border-border'
+                    }`}
                   draggable
                   onDragStart={(e) => handleDragStart(e, index)}
                   onDragOver={handleDragOver}
@@ -4429,7 +4442,7 @@ function QuickReplyNode({ data, isConnectable, id }: any) {
                     {/* 🔧 NEW: Drag handle */}
                     <div className="flex-shrink-0 cursor-move text-muted-foreground hover:text-foreground">
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M7 2a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 2zM7 8a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 8zM7 14a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 14zM13 2a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 2zM13 8a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 8zM13 14a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 14z"/>
+                        <path d="M7 2a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 2zM7 8a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 8zM7 14a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 14zM13 2a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 2zM13 8a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 8zM13 14a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 14z" />
                       </svg>
                     </div>
                     <div className="flex-shrink-0 w-6 h-6 rounded-md bg-blue-500 text-white flex items-center justify-center text-xs font-medium">
@@ -4557,7 +4570,7 @@ function QuickReplyNode({ data, isConnectable, id }: any) {
                 <span className="text-muted-foreground">Enable Go Back</span>
               </label>
             </div>
-            
+
             {enableGoBack && (
               <div className="space-y-2 p-3 border rounded-lg bg-secondary/20">
                 <div>
@@ -4679,7 +4692,7 @@ function QuickReplyNode({ data, isConnectable, id }: any) {
                 />
               </div>
             ))}
-            
+
             {/* 🔧 NEW: Go Back Option Display */}
             {enableGoBack && (
               <div className="flex items-center gap-2 relative">
@@ -4781,7 +4794,9 @@ const nodeTypes: NodeTypes = {
   documind: DocumindNode,
   chat_pdf: ChatPdfNode,
   bot_disable: BotDisableNode,
-  bot_reset: BotResetNode
+
+  bot_reset: BotResetNode,
+  notify_user: NotifyUserNode
 };
 
 const CustomEdge = ({
@@ -4843,6 +4858,11 @@ const edgeTypes = {
 };
 
 
+
+
+
+
+
 function SidebarContent({ onAdd, nodes, flowId }: { onAdd: (type: string) => void; nodes: Node[]; flowId?: number }) {
   const { t } = useTranslation();
 
@@ -4885,7 +4905,7 @@ function NodeSelector({ onAdd, nodes }: { onAdd: (type: string) => void; nodes: 
 
   const getSingletonNodeState = (nodeType: string) => {
     switch (nodeType) {
-      
+
       case 'typebot':
         return {
           disabled: hasTypebotNode,
@@ -4900,11 +4920,43 @@ function NodeSelector({ onAdd, nodes }: { onAdd: (type: string) => void; nodes: 
 
   const allNodes = [
     {
-      type: 'trigger',
+      type: 'trigger_message',
       name: t('flow_builder.node_types.message_received', 'Message Received'),
       section: t('flow_builder.sections.triggers', 'Triggers'),
       icon: MessageSquare,
       color: 'text-green-500',
+      ...getSingletonNodeState('trigger')
+    },
+    {
+      type: 'trigger_tag',
+      name: t('flow_builder.node_types.tag_assigned', 'Tag Assigned'),
+      section: t('flow_builder.sections.triggers', 'Triggers'),
+      icon: Tag, // Will define or use existing
+      color: 'text-blue-500',
+      ...getSingletonNodeState('trigger')
+    },
+    {
+      type: 'trigger_agent',
+      name: t('flow_builder.node_types.agent_assigned', 'Agent Assigned'),
+      section: t('flow_builder.sections.triggers', 'Triggers'),
+      icon: UserCheck,
+      color: 'text-purple-500',
+      ...getSingletonNodeState('trigger')
+    },
+    {
+      type: 'trigger_stage',
+      name: t('flow_builder.node_types.pipeline_stage_changed', 'Pipeline Stage'),
+      section: t('flow_builder.sections.triggers', 'Triggers'),
+      icon: ArrowRightCircle,
+      color: 'text-teal-500',
+      ...getSingletonNodeState('trigger')
+    },
+    {
+      type: 'trigger_task',
+      name: t('flow_builder.node_types.task_completed', 'Task Completed'),
+      section: t('flow_builder.sections.triggers', 'Triggers'),
+      icon: CheckSquare,
+      color: 'text-orange-500',
       ...getSingletonNodeState('trigger')
     },
 
@@ -4927,11 +4979,12 @@ function NodeSelector({ onAdd, nodes }: { onAdd: (type: string) => void; nodes: 
     { type: 'wait', name: t('flow_builder.node_types.wait', 'Wait'), section: t('flow_builder.sections.flow_control', 'Flow Control'), icon: Clock, color: 'text-orange-500', disabled: false },
     { type: 'ai_assistant', name: t('flow_builder.node_types.ai_assistant', 'AI Assistant'), section: t('flow_builder.sections.flow_control', 'Flow Control'), icon: ({ className }: { className?: string }) => <BotIcon className={className} size={16} />, color: 'text-violet-500', ...getSingletonNodeState('ai_assistant') },
     { type: 'translation', name: t('flow_builder.node_types.translation', 'Translation'), section: t('flow_builder.sections.flow_control', 'Flow Control'), icon: Languages, color: 'text-blue-600', disabled: false },
-    { type: 'update_pipeline_stage', name: t('flow_builder.node_types.pipeline', 'Pipeline'), section: t('flow_builder.sections.flow_control', 'Flow Control'), icon: ArrowRightCircle, color: 'text-teal-500', disabled: false },
+    { type: 'update_pipeline_stage', name: t('flow_builder.node_types.pipeline', 'Ruta Lead'), section: t('flow_builder.sections.flow_control', 'Flow Control'), icon: ArrowRightCircle, color: 'text-teal-500', disabled: false },
     { type: 'bot_disable', name: t('flow_builder.node_types.agent_handoff', 'Agent Handoff'), section: t('flow_builder.sections.flow_control', 'Flow Control'), icon: UserCheck, color: 'text-orange-600', disabled: false },
     { type: 'n8n', name: t('flow_builder.node_types.n8n', 'n8n'), section: t('flow_builder.sections.integrations', 'Integrations'), icon: Workflow, color: 'text-orange-600', disabled: false },
     { type: 'make', name: t('flow_builder.node_types.make_com', 'Make.com'), section: t('flow_builder.sections.integrations', 'Integrations'), icon: Zap, color: 'text-blue-600', disabled: false },
     { type: 'http_request', name: t('flow_builder.node_types.http_request', 'HTTP Request'), section: t('flow_builder.sections.integrations', 'Integrations'), icon: Network, color: 'text-purple-500', disabled: false },
+    { type: 'notify_user', name: t('flow_builder.node_types.notify_user', 'Notify User'), section: t('flow_builder.sections.flow_control', 'Flow Control'), icon: Bell, color: 'text-orange-500', disabled: false },
     { type: 'code_execution', name: t('flow_builder.node_types.code_execution', 'Code Execution'), section: t('flow_builder.sections.flow_control', 'Flow Control'), icon: Code, color: 'text-gray-700', disabled: false },
     { type: 'google_sheets', name: t('flow_builder.node_types.google_sheets', 'Google Sheets'), section: t('flow_builder.sections.integrations', 'Integrations'), icon: Sheet, color: 'text-green-600', disabled: false },
     { type: 'data_capture', name: t('flow_builder.node_types.data_capture', 'Data Capture'), section: t('flow_builder.sections.flow_control', 'Flow Control'), icon: Database, color: 'text-blue-600', disabled: false },
@@ -5035,9 +5088,8 @@ function NodeSelector({ onAdd, nodes }: { onAdd: (type: string) => void; nodes: 
                       <Button
                         key={node.type}
                         variant="outline"
-                        className={`${sectionName === 'Triggers' ? 'justify-start w-full' : 'justify-start'} ${
-                          node.disabled ? 'opacity-50 cursor-not-allowed' : ''
-                        }`}
+                        className={`${sectionName === 'Triggers' ? 'justify-start w-full' : 'justify-start'} ${node.disabled ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
                         onClick={() => onAdd(node.type)}
                         disabled={node.disabled}
                         title={getTooltipText()}
@@ -5299,8 +5351,47 @@ function FlowEditor() {
       const newNodeId = `node_${nanoid()}`;
 
       let nodeData: any = { label: `${type.charAt(0).toUpperCase() + type.slice(1)} Node` };
+      let actualType = type;
+
+      // Handle specific trigger types from sidebar
+      if (type.startsWith('trigger_') || type === 'trigger') {
+        const triggerType = type === 'trigger' ? 'message_received' : type.replace('trigger_', '');
+        // Map simplified names back to full internal names if needed, though we used short names in sidebar types
+        // Actually, let's explicit map:
+        let internalTriggerType = 'message_received';
+        let label = 'Trigger Node';
+
+        switch (type) {
+          case 'trigger':
+          case 'trigger_message':
+            internalTriggerType = 'message_received';
+            label = t('flow_builder.node_types.message_received', 'Message Received');
+            break;
+          case 'trigger_tag':
+            internalTriggerType = 'tag_assigned';
+            label = t('flow_builder.node_types.tag_assigned', 'Tag Assigned');
+            break;
+          case 'trigger_agent':
+            internalTriggerType = 'agent_assigned';
+            label = t('flow_builder.node_types.agent_assigned', 'Agent Assigned');
+            break;
+          case 'trigger_stage':
+            internalTriggerType = 'pipeline_stage_changed';
+            label = t('flow_builder.node_types.pipeline_stage_changed', 'Pipeline Stage');
+            break;
+          case 'trigger_task':
+            internalTriggerType = 'task_completed';
+            label = t('flow_builder.node_types.task_completed', 'Task Completed');
+            break;
+        }
+
+        actualType = 'trigger';
+        nodeData = { ...nodeData, triggerType: internalTriggerType, label: label };
+      }
 
       switch (type) {
+        // Triggers are handled above, but we keep this for consistency if needed
+
         case 'message':
           nodeData = { ...nodeData, message: 'Hello! How can I help you?' };
           break;
@@ -5386,6 +5477,14 @@ function FlowEditor() {
         case 'wait':
           nodeData = { ...nodeData, timeValue: 5, timeUnit: 'minutes' };
           break;
+        case 'notify_user':
+          nodeData = {
+            ...nodeData,
+            recipientType: 'lead_owner',
+            message: 'Notification: {{contact.firstName}} requires attention.',
+            action: 'notify_user'
+          };
+          break;
 
         case 'ai_assistant':
           nodeData = {
@@ -5458,7 +5557,7 @@ function FlowEditor() {
             onDuplicateNode: onDuplicateNode
           };
           break;
-        
+
         case 'whatsapp_flows':
           nodeData = {
             ...nodeData,
@@ -5592,7 +5691,7 @@ function FlowEditor() {
 
       const newNode: Node = {
         id: newNodeId,
-        type,
+        type: actualType,
         position: {
           x: triggerNode ? triggerNode.position.x : 250,
           y: triggerNode ? triggerNode.position.y + 150 : 150
@@ -5602,7 +5701,7 @@ function FlowEditor() {
 
       setNodes((nds) => nds.concat(newNode));
 
-      if (triggerNode && !hasExistingConnection && type !== 'trigger') {
+      if (triggerNode && !hasExistingConnection && actualType !== 'trigger') {
         const newEdge: Edge = {
           id: `edge-${triggerNodeId}-${newNodeId}`,
           source: triggerNodeId,
@@ -5624,7 +5723,7 @@ function FlowEditor() {
             minZoom: 0.5
           });
         } catch (error) {
-          
+
         }
       }, 100);
     },
@@ -5938,11 +6037,10 @@ function FlowEditor() {
           />
         )}
 
-        <div className={`flow-sidebar border-r bg-background shadow-lg md:shadow-none z-20 transition-all duration-300 ease-in-out ${
-          sidebarOpen
-            ? 'absolute md:relative h-full w-full sm:w-80 md:w-auto md:min-w-[280px] md:max-w-[320px] lg:min-w-[300px] lg:max-w-[350px]'
-            : 'hidden md:flex md:min-w-[280px] md:max-w-[320px] lg:min-w-[300px] lg:max-w-[350px]'
-        }`}>
+        <div className={`flow-sidebar border-r bg-background shadow-lg md:shadow-none z-20 transition-all duration-300 ease-in-out ${sidebarOpen
+          ? 'absolute md:relative h-full w-full sm:w-80 md:w-auto md:min-w-[280px] md:max-w-[320px] lg:min-w-[300px] lg:max-w-[350px]'
+          : 'hidden md:flex md:min-w-[280px] md:max-w-[320px] lg:min-w-[300px] lg:max-w-[350px]'
+          }`}>
           <div className="flex justify-between items-center p-4 border-b md:hidden">
             <h3 className="font-medium">{t('flow_builder.main.node_selection', 'Node Selection')}</h3>
             <Button
@@ -5969,13 +6067,12 @@ function FlowEditor() {
         </div>
 
         <div
-          className={`flow-container flex-1 relative ${
-            sidebarOpen ? 'hidden md:flex' : 'flex'
-          }`}
+          className={`flow-container flex-1 relative ${sidebarOpen ? 'hidden md:flex' : 'flex'
+            }`}
           ref={reactFlowWrapper}
           style={{ minHeight: '90vh' }}
         >
-          <FlowProvider onDeleteNode={onDeleteNode} onDuplicateNode={onDuplicateNode}>
+          <FlowProvider onDeleteNode={onDeleteNode} onDuplicateNode={onDuplicateNode} flowId={flowId || undefined}>
             <ReactFlow
               nodes={nodes}
               edges={edges}
@@ -5986,34 +6083,33 @@ function FlowEditor() {
               edgeTypes={edgeTypes}
               proOptions={{ hideAttribution: true }}
               defaultEdgeOptions={{
-          animated: true,
-          type: 'smoothstep',
-          style: { stroke: '#64748b' }
+                animated: true,
+                type: 'smoothstep',
+                style: { stroke: '#64748b' }
               }}
             >
               <Background />
               <Controls />
               <MiniMap />
               <Panel position="top-right" className="bg-background p-2 rounded-md shadow-sm border">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="text-xs flex items-center gap-1">
-            <div className={`w-2 h-2 rounded-full ${
-              isEditMode ? (
-                flowData?.status === 'active' ? 'bg-green-500' : 'bg-amber-500'
-              ) : 'bg-blue-500'
-            }`} />
-            {isEditMode ? (
-              flowData?.status === 'active' ? t('flow_builder.active', 'Active') : t('flow_builder.draft', 'Draft')
-            ) : t('flow_builder.creating_new_flow', 'Creating New Flow')}
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{t('flow_builder.current_flow_status', 'Current flow status')}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="text-xs flex items-center gap-1">
+                        <div className={`w-2 h-2 rounded-full ${isEditMode ? (
+                          flowData?.status === 'active' ? 'bg-green-500' : 'bg-amber-500'
+                        ) : 'bg-blue-500'
+                          }`} />
+                        {isEditMode ? (
+                          flowData?.status === 'active' ? t('flow_builder.active', 'Active') : t('flow_builder.draft', 'Draft')
+                        ) : t('flow_builder.creating_new_flow', 'Creating New Flow')}
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{t('flow_builder.current_flow_status', 'Current flow status')}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </Panel>
             </ReactFlow>
           </FlowProvider>
@@ -6032,25 +6128,7 @@ function FlowEditor() {
   );
 }
 
-function FlowProvider({ children, onDeleteNode, onDuplicateNode }: {
-  children: React.ReactNode;
-  onDeleteNode: (nodeId: string) => void;
-  onDuplicateNode: (nodeId: string) => void;
-}) {
-  return (
-    <FlowContext.Provider value={{ onDeleteNode, onDuplicateNode }}>
-      {children}
-    </FlowContext.Provider>
-  );
-}
 
-export function useFlowContext() {
-  const context = useContext(FlowContext);
-  if (!context) {
-    throw new Error('useFlowContext must be used within a FlowProvider');
-  }
-  return context;
-}
 
 export default function FlowBuilderPage() {
   return (

@@ -21,11 +21,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, Plus, Search, Filter, MoreHorizontal, CheckSquare, Square, AlertTriangle, ChevronDown, SortAsc, SortDesc, Calendar as CalendarIcon, User, Flag, Clock, Trash2, Edit, X, Grid3x3, List, FolderPlus, Pencil } from 'lucide-react';
+import { Loader2, Plus, Search, Filter, MoreHorizontal, CheckSquare, Square, AlertTriangle, ChevronDown, SortAsc, SortDesc, Calendar as CalendarIcon, User, Flag, Clock, Trash2, Edit, X, Grid3x3, List, FolderPlus, Pencil, Layout, Kanban } from 'lucide-react';
 
 interface Task {
   id: number;
-  contactId: number;
+  contactId: number | null;
   companyId: number;
   title: string;
   description: string | null;
@@ -36,6 +36,7 @@ interface Task {
   assignedTo: string | null;
   category: string | null;
   tags: string[] | null;
+  checklist: { id: string; text: string; completed: boolean }[] | null;
   backgroundColor: string | null;
   createdBy: number | null;
   updatedBy: number | null;
@@ -71,8 +72,13 @@ interface TaskFormData {
   assignedTo: string | null;
   category: string;
   tags: string[];
+  checklist: { id: string; text: string; completed: boolean }[];
   backgroundColor: string;
 }
+
+import TaskKanbanBoard from '@/components/tasks/TaskKanbanBoard';
+
+// ... existing imports
 
 export default function TasksPage() {
   const { t } = useTranslation();
@@ -82,9 +88,7 @@ export default function TasksPage() {
   const { hasPermission, PERMISSIONS } = usePermissions();
   const { branding } = useBranding();
 
-
   const canManageTasks = hasPermission(PERMISSIONS.MANAGE_TASKS);
-
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -92,8 +96,8 @@ export default function TasksPage() {
   const [assigneeFilter, setAssigneeFilter] = useState<string>('all');
   const [contactFilter, setContactFilter] = useState<number | null>(null);
   const [page, setPage] = useState(1);
-  const [limit] = useState(9);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
+  const [limit] = useState(100); // Increase limit for board view to see more tasks
+  const [viewMode, setViewMode] = useState<'grid' | 'list' | 'board'>('board');
   const [isMobile, setIsMobile] = useState(false);
 
 
@@ -143,6 +147,7 @@ export default function TasksPage() {
     assignedTo: '',
     category: '',
     tags: [],
+    checklist: [],
     backgroundColor: '#ffffff'
   });
 
@@ -241,7 +246,7 @@ export default function TasksPage() {
 
 
   const contacts = allLoadedContacts.length > 0 ? allLoadedContacts : allContacts;
-  
+
 
   const displayContacts = allContactsData?.contacts || contacts;
 
@@ -254,7 +259,7 @@ export default function TasksPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({
-        title: t('tasks.createSuccess', 'Task created successfully'),
+        title: t('tasks.createSuccess', 'Tarea creada exitosamente'),
         variant: 'default'
       });
       setShowCreateModal(false);
@@ -262,7 +267,7 @@ export default function TasksPage() {
     },
     onError: (error: any) => {
       toast({
-        title: t('tasks.createError', 'Failed to create task'),
+        title: t('tasks.createError', 'Error al crear la tarea'),
         description: error.message,
         variant: 'destructive'
       });
@@ -278,7 +283,7 @@ export default function TasksPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({
-        title: t('tasks.updateSuccess', 'Task updated successfully'),
+        title: t('tasks.updateSuccess', 'Tarea actualizada exitosamente'),
         variant: 'default'
       });
       setShowEditModal(false);
@@ -287,7 +292,7 @@ export default function TasksPage() {
     },
     onError: (error: any) => {
       toast({
-        title: t('tasks.updateError', 'Failed to update task'),
+        title: t('tasks.updateError', 'Error al actualizar la tarea'),
         description: error.message,
         variant: 'destructive'
       });
@@ -303,7 +308,7 @@ export default function TasksPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({
-        title: t('tasks.deleteSuccess', 'Task deleted successfully'),
+        title: t('tasks.deleteSuccess', 'Tarea eliminada exitosamente'),
         variant: 'default'
       });
       setShowDeleteDialog(false);
@@ -311,7 +316,7 @@ export default function TasksPage() {
     },
     onError: (error: any) => {
       toast({
-        title: t('tasks.deleteError', 'Failed to delete task'),
+        title: t('tasks.deleteError', 'Error al eliminar la tarea'),
         description: error.message,
         variant: 'destructive'
       });
@@ -327,7 +332,7 @@ export default function TasksPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({
-        title: t('tasks.bulkUpdateSuccess', 'Tasks updated successfully'),
+        title: t('tasks.bulkUpdateSuccess', 'Tareas actualizadas exitosamente'),
         variant: 'default'
       });
       setSelectedTasks(new Set());
@@ -335,7 +340,7 @@ export default function TasksPage() {
     },
     onError: (error: any) => {
       toast({
-        title: t('tasks.bulkUpdateError', 'Failed to update tasks'),
+        title: t('tasks.bulkUpdateError', 'Error al actualizar las tareas'),
         description: error.message,
         variant: 'destructive'
       });
@@ -354,13 +359,13 @@ export default function TasksPage() {
       setNewCategoryName('');
       setShowNewCategoryInput(false);
       toast({
-        title: t('tasks.categoryCreated', 'Category created successfully'),
+        title: t('tasks.categoryCreated', 'Categoría creada exitosamente'),
         variant: 'default'
       });
     },
     onError: (error: any) => {
       toast({
-        title: t('tasks.categoryCreateError', 'Failed to create category'),
+        title: t('tasks.categoryCreateError', 'Error al crear categoría'),
         description: error.message,
         variant: 'destructive'
       });
@@ -370,7 +375,7 @@ export default function TasksPage() {
   const handleCreateCategory = () => {
     if (!newCategoryName.trim()) {
       toast({
-        title: t('tasks.categoryNameRequired', 'Category name is required'),
+        title: t('tasks.categoryNameRequired', 'El nombre de la categoría es obligatorio'),
         variant: 'destructive'
       });
       return;
@@ -396,13 +401,13 @@ export default function TasksPage() {
       setEditingCategory(null);
       setEditCategoryName('');
       toast({
-        title: t('tasks.categoryUpdated', 'Category updated successfully'),
+        title: t('tasks.categoryUpdated', 'Categoría actualizada exitosamente'),
         variant: 'default'
       });
     },
     onError: (error: any) => {
       toast({
-        title: t('tasks.categoryUpdateError', 'Failed to update category'),
+        title: t('tasks.categoryUpdateError', 'Error al actualizar categoría'),
         description: error.message,
         variant: 'destructive'
       });
@@ -412,7 +417,7 @@ export default function TasksPage() {
   const handleUpdateCategory = () => {
     if (!editCategoryName.trim()) {
       toast({
-        title: t('tasks.categoryNameRequired', 'Category name is required'),
+        title: t('tasks.categoryNameRequired', 'El nombre de la categoría es obligatorio'),
         variant: 'destructive'
       });
       return;
@@ -439,6 +444,7 @@ export default function TasksPage() {
       assignedTo: '',
       category: '',
       tags: [],
+      checklist: [],
       backgroundColor: '#ffffff'
     });
 
@@ -452,23 +458,17 @@ export default function TasksPage() {
   const handleCreateTask = () => {
     if (!formData.title.trim()) {
       toast({
-        title: t('tasks.titleRequired', 'Title is required'),
+        title: t('tasks.titleRequired', 'El título es obligatorio'),
         variant: 'destructive'
       });
       return;
     }
 
-    if (!formData.contactId) {
-      toast({
-        title: t('tasks.contactRequired', 'Contact is required'),
-        variant: 'destructive'
-      });
-      return;
-    }
+
 
     if (!formData.dueDate) {
       toast({
-        title: t('tasks.dueDateRequired', 'Due date is required'),
+        title: t('tasks.dueDateRequired', 'La fecha de vencimiento es obligatoria'),
         variant: 'destructive'
       });
       return;
@@ -488,7 +488,7 @@ export default function TasksPage() {
 
     if (!formData.title.trim()) {
       toast({
-        title: t('tasks.titleRequired', 'Title is required'),
+        title: t('tasks.titleRequired', 'El título es obligatorio'),
         variant: 'destructive'
       });
       return;
@@ -496,7 +496,7 @@ export default function TasksPage() {
 
     if (!formData.dueDate) {
       toast({
-        title: t('tasks.dueDateRequired', 'Due date is required'),
+        title: t('tasks.dueDateRequired', 'La fecha de vencimiento es obligatoria'),
         variant: 'destructive'
       });
       return;
@@ -519,6 +519,13 @@ export default function TasksPage() {
     deleteTaskMutation.mutate(selectedTask.id);
   };
 
+  const handleTaskUpdate = (taskId: number, updates: any) => {
+    updateTaskMutation.mutate({
+      id: taskId,
+      data: updates
+    });
+  };
+
   const openEditModal = (task: Task) => {
     setSelectedTask(task);
     setFormData({
@@ -531,6 +538,7 @@ export default function TasksPage() {
       assignedTo: task.assignedTo || 'unassigned',
       category: task.category || '',
       tags: task.tags || [],
+      checklist: task.checklist || [],
       backgroundColor: task.backgroundColor || '#ffffff'
     });
     setShowEditModal(true);
@@ -616,34 +624,34 @@ export default function TasksPage() {
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'not_started': return t('tasks.status.notStarted', 'Not Started');
-      case 'in_progress': return t('tasks.status.inProgress', 'In Progress');
-      case 'completed': return t('tasks.status.completed', 'Completed');
-      case 'cancelled': return t('tasks.status.cancelled', 'Cancelled');
+      case 'not_started': return t('tasks.status.notStarted', 'Pendiente');
+      case 'in_progress': return t('tasks.status.inProgress', 'En Progreso');
+      case 'completed': return t('tasks.status.completed', 'Completada');
+      case 'cancelled': return t('tasks.status.cancelled', 'Cancelada');
       default: return status;
     }
   };
 
   const getPriorityLabel = (priority: string) => {
     switch (priority) {
-      case 'low': return t('tasks.priority.low', 'Low');
-      case 'medium': return t('tasks.priority.medium', 'Medium');
-      case 'high': return t('tasks.priority.high', 'High');
-      case 'urgent': return t('tasks.priority.urgent', 'Urgent');
+      case 'low': return t('tasks.priority.low', 'Baja');
+      case 'medium': return t('tasks.priority.medium', 'Media');
+      case 'high': return t('tasks.priority.high', 'Alta');
+      case 'urgent': return t('tasks.priority.urgent', 'Urgente');
       default: return priority;
     }
   };
 
-  const getContactName = (contactId: number) => {
+  const getContactName = (contactId: number | null) => {
 
     const allDisplayContacts = allContactsData?.contacts || [];
     const contact = allDisplayContacts.find((c: Contact) => c.id === contactId) ||
-                    contacts.find((c: Contact) => c.id === contactId);
-    return contact?.name || t('tasks.unknownContact', 'Unknown Contact');
+      contacts.find((c: Contact) => c.id === contactId);
+    return contact?.name || t('tasks.unknownContact', 'Contacto Desconocido');
   };
 
   const getAssigneeName = (assignedTo: string | null) => {
-    if (!assignedTo) return t('tasks.unassigned', 'Unassigned');
+    if (!assignedTo) return t('tasks.unassigned', 'Sin asignar');
     const member = teamMembers.find((m: any) => m.email === assignedTo);
     return member?.fullName || assignedTo;
   };
@@ -657,10 +665,10 @@ export default function TasksPage() {
   return (
     <div className="h-screen flex flex-col overflow-hidden font-sans text-gray-800">
       <Header />
-      
+
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        
+
         <main className="flex-1 overflow-y-auto">
           <div className="container mx-auto px-4 py-6">
             {/* Header */}
@@ -668,15 +676,25 @@ export default function TasksPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">
-                    {t('tasks.title', 'Tasks')}
+                    {t('tasks.title', 'Tareas')}
                   </h1>
                   <p className="mt-1 text-sm text-gray-500">
-                    {t('tasks.subtitle', 'Manage and track all your tasks')}
+                    {t('tasks.subtitle', 'Gestiona y rastrea todas tus tareas')}
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
                   {/* View Toggle - Hidden on mobile */}
                   <div className="hidden md:flex items-center border border-gray-200 rounded-lg p-1 bg-white">
+                    <Button
+                      variant={viewMode === 'board' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => setViewMode('board')}
+                      className="flex items-center gap-2 h-8 px-3"
+                      style={viewMode === 'board' ? { backgroundColor: branding.primaryColor, color: 'white' } : {}}
+                    >
+                      <Kanban className="h-4 w-4" />
+                      {t('tasks.board', 'Tablero')}
+                    </Button>
                     <Button
                       variant={viewMode === 'grid' ? 'default' : 'ghost'}
                       size="sm"
@@ -685,7 +703,7 @@ export default function TasksPage() {
                       style={viewMode === 'grid' ? { backgroundColor: branding.primaryColor, color: 'white' } : {}}
                     >
                       <Grid3x3 className="h-4 w-4" />
-                      {t('tasks.grid', 'Grid')}
+                      {t('tasks.grid', 'Cuadrícula')}
                     </Button>
                     <Button
                       variant={viewMode === 'list' ? 'default' : 'ghost'}
@@ -695,7 +713,7 @@ export default function TasksPage() {
                       style={viewMode === 'list' ? { backgroundColor: branding.primaryColor, color: 'white' } : {}}
                     >
                       <List className="h-4 w-4" />
-                      {t('tasks.list', 'List')}
+                      {t('tasks.list', 'Lista')}
                     </Button>
                   </div>
                   {canManageTasks && (
@@ -707,7 +725,7 @@ export default function TasksPage() {
                       className="flex items-center gap-2"
                     >
                       <Plus className="h-4 w-4" />
-                      {t('tasks.createTask', 'Create Task')}
+                      {t('tasks.createTask', 'Crear Tarea')}
                     </Button>
                   )}
                 </div>
@@ -724,7 +742,7 @@ export default function TasksPage() {
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                       <Input
                         type="text"
-                        placeholder={t('tasks.searchPlaceholder', 'Search tasks, contacts...')}
+                        placeholder={t('tasks.searchPlaceholder', 'Buscar tareas...')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="pl-10"
@@ -736,14 +754,14 @@ export default function TasksPage() {
                   <div>
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
                       <SelectTrigger>
-                        <SelectValue placeholder={t('tasks.filterByStatus', 'Status')} />
+                        <SelectValue placeholder={t('tasks.filterByStatus', 'Estado')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">{t('tasks.allStatuses', 'All Statuses')}</SelectItem>
-                        <SelectItem value="not_started">{t('tasks.status.notStarted', 'Not Started')}</SelectItem>
-                        <SelectItem value="in_progress">{t('tasks.status.inProgress', 'In Progress')}</SelectItem>
-                        <SelectItem value="completed">{t('tasks.status.completed', 'Completed')}</SelectItem>
-                        <SelectItem value="cancelled">{t('tasks.status.cancelled', 'Cancelled')}</SelectItem>
+                        <SelectItem value="all">{t('tasks.allStatuses', 'Todos los estados')}</SelectItem>
+                        <SelectItem value="not_started">{t('tasks.status.notStarted', 'Pendiente')}</SelectItem>
+                        <SelectItem value="in_progress">{t('tasks.status.inProgress', 'En Progreso')}</SelectItem>
+                        <SelectItem value="completed">{t('tasks.status.completed', 'Completada')}</SelectItem>
+                        <SelectItem value="cancelled">{t('tasks.status.cancelled', 'Cancelada')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -752,14 +770,14 @@ export default function TasksPage() {
                   <div>
                     <Select value={priorityFilter} onValueChange={setPriorityFilter}>
                       <SelectTrigger>
-                        <SelectValue placeholder={t('tasks.filterByPriority', 'Priority')} />
+                        <SelectValue placeholder={t('tasks.filterByPriority', 'Prioridad')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">{t('tasks.allPriorities', 'All Priorities')}</SelectItem>
-                        <SelectItem value="low">{t('tasks.priority.low', 'Low')}</SelectItem>
-                        <SelectItem value="medium">{t('tasks.priority.medium', 'Medium')}</SelectItem>
-                        <SelectItem value="high">{t('tasks.priority.high', 'High')}</SelectItem>
-                        <SelectItem value="urgent">{t('tasks.priority.urgent', 'Urgent')}</SelectItem>
+                        <SelectItem value="all">{t('tasks.allPriorities', 'Todas las prioridades')}</SelectItem>
+                        <SelectItem value="low">{t('tasks.priority.low', 'Baja')}</SelectItem>
+                        <SelectItem value="medium">{t('tasks.priority.medium', 'Media')}</SelectItem>
+                        <SelectItem value="high">{t('tasks.priority.high', 'Alta')}</SelectItem>
+                        <SelectItem value="urgent">{t('tasks.priority.urgent', 'Urgente')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -768,10 +786,10 @@ export default function TasksPage() {
                   <div>
                     <Select value={assigneeFilter} onValueChange={setAssigneeFilter}>
                       <SelectTrigger>
-                        <SelectValue placeholder={t('tasks.filterByAssignee', 'Assignee')} />
+                        <SelectValue placeholder={t('tasks.filterByAssignee', 'Asignado a')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">{t('tasks.allAssignees', 'All Assignees')}</SelectItem>
+                        <SelectItem value="all">{t('tasks.allAssignees', 'Todos los asignados')}</SelectItem>
                         {Array.isArray(teamMembers) && teamMembers.length > 0 ? (
                           teamMembers.map((member: any) => (
                             <SelectItem key={member.id} value={member.email}>
@@ -829,7 +847,7 @@ export default function TasksPage() {
                             <SelectValue placeholder={t('tasks.assignTo', 'Assign To')} />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="unassigned">{t('tasks.unassigned', 'Unassigned')}</SelectItem>
+                            <SelectItem value="unassigned">{t('tasks.unassigned', 'Sin asignar')}</SelectItem>
                             {Array.isArray(teamMembers) && teamMembers.length > 0 && (
                               teamMembers.map((member: any) => (
                                 <SelectItem key={member.id} value={member.email}>
@@ -867,10 +885,10 @@ export default function TasksPage() {
                   <div className="text-center py-12">
                     <CheckSquare className="mx-auto h-12 w-12 text-gray-400" />
                     <h3 className="mt-2 text-sm font-medium text-gray-900">
-                      {t('tasks.noTasks', 'No tasks found')}
+                      {t('tasks.noTasks', 'No se encontraron tareas')}
                     </h3>
                     <p className="mt-1 text-sm text-gray-500">
-                      {t('tasks.noTasksDescription', 'Get started by creating a new task.')}
+                      {t('tasks.noTasksDescription', 'Comienza creando una nueva tarea.')}
                     </p>
                     {canManageTasks && (
                       <div className="mt-6">
@@ -879,183 +897,171 @@ export default function TasksPage() {
                           setShowCreateModal(true);
                         }}>
                           <Plus className="h-4 w-4 mr-2" />
-                          {t('tasks.createTask', 'Create Task')}
+                          {t('tasks.createTask', 'Crear Tarea')}
                         </Button>
                       </div>
                     )}
                   </div>
                 ) : (
                   <>
-                    {viewMode === 'list' ? (
+                    {viewMode === 'board' ? (
+                      <div className="h-[calc(100vh-280px)]">
+                        <TaskKanbanBoard
+                          tasks={tasks}
+                          users={teamMembers || []}
+                          onTaskUpdate={(taskId, updates) => handleTaskUpdate(taskId, updates)}
+                          onEditTask={openEditModal}
+                          onDeleteTask={openDeleteDialog}
+                          isLoading={isLoadingTasks}
+                        />
+                      </div>
+                    ) : viewMode === 'list' ? (
                       <div className="overflow-x-auto">
                         <Table className="table-fixed min-w-full">
-                        <TableHeader>
-                          <TableRow>
-                            {canManageTasks && (
-                              <TableHead className="w-2 px-1">
-                                <Checkbox
-                                  checked={selectedTasks.size === tasks.length && tasks.length > 0}
-                                  onCheckedChange={toggleSelectAll}
-                                />
-                              </TableHead>
-                            )}
-                            <TableHead className="w-20">{t('tasks.title', 'Title')}</TableHead>
-                            <TableHead className="w-16">{t('tasks.contact', 'Contact')}</TableHead>
-                            <TableHead className="w-8">{t('tasks.status', 'Status')}</TableHead>
-                            <TableHead className="w-8">{t('tasks.priority', 'Priority')}</TableHead>
-                            <TableHead className="w-8">{t('tasks.assignedTo', 'Assigned To')}</TableHead>
-                            <TableHead className="w-8">{t('tasks.dueDate', 'Due Date')}</TableHead>
-                            <TableHead className="w-[10px] text-center">{t('tasks.actions', 'Actions')}</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {tasks.map((task: Task) => (
-                          <TableRow 
-                            key={task.id} 
-                            className="hover:bg-gray-50"
-                            style={{ backgroundColor: task.backgroundColor || 'transparent' }}
-                          >
-                            {canManageTasks && (
-                              <TableCell className="px-1">
-                                <Checkbox
-                                  checked={selectedTasks.has(task.id)}
-                                  onCheckedChange={() => toggleTaskSelection(task.id)}
-                                />
-                              </TableCell>
-                            )}
-                            <TableCell className="max-w-40 pl-1">
-                              <div className="min-w-0">
-                                <button
-                                  onClick={() => openTaskDetailsDialog(task)}
-                                  className="font-medium text-gray-900 truncate text-sm hover:text-blue-600 hover:underline text-left w-full"
-                                  title={task.title}
-                                >
-                                  {task.title.replace(/\b\w/g, l => l.toUpperCase())}
-                                </button>
-                                {task.description && (
-                                  <div className="text-xs text-gray-500 truncate" title={task.description}>
-                                    {task.description}
-                                  </div>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell className="max-w-24 px-1">
-                              <button
-                                onClick={() => setLocation(`/contacts?id=${task.contactId}`)}
-                                className="flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline min-w-0"
-                              >
-                                {(() => {
-                                  const contact = displayContacts.find((c: Contact) => c.id === task.contactId);
-                                  return contact?.avatarUrl ? (
-                                    <img
-                                      src={contact.avatarUrl}
-                                      alt={contact.name}
-                                      className="h-5 w-5 rounded-full object-cover"
-                                    />
-                                  ) : (
-                                    <div className="h-5 w-5 rounded-full bg-gray-300 flex items-center justify-center text-xs font-semibold text-gray-700">
-                                      {contact?.name?.charAt(0).toUpperCase() || '?'}
-                                    </div>
-                                  );
-                                })()}
-                                <span className="truncate text-xs font-bold text-gray-600" title={getContactName(task.contactId)}>
-                                  {getContactName(task.contactId).replace(/\b\w/g, (l: string) => l.toUpperCase())}
-                                </span>
-                              </button>
-                            </TableCell>
-                            <TableCell className="px-1">
-                              <Badge className={`${getStatusColor(task.status)} text-xs`}>
-                                {getStatusLabel(task.status)}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="px-1">
-                              <Badge className={`${getPriorityColor(task.priority)} text-xs`}>
-                                <Flag className="h-2 w-2 mr-0.5" />
-                                {getPriorityLabel(task.priority)}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="px-1">
-                              <div className="flex items-center gap-1">
-                                {(() => {
-                                  const profileImage = getAssigneeProfileImage(task.assignedTo);
-                                  const assigneeName = getAssigneeName(task.assignedTo);
-                                  
-                                  if (profileImage) {
-                                    return (
-                                      <img
-                                        src={profileImage}
-                                        alt={assigneeName}
-                                        className="h-5 w-5 rounded-full object-cover"
-                                        onError={(e) => {
-                                          e.currentTarget.style.display = 'none';
-                                          e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                                        }}
-                                      />
-                                    );
-                                  }
-                                  
-
-                                  if (task.assignedTo && assigneeName !== 'Unassigned') {
-                                    const initials = assigneeName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
-                                    return (
-                                      <div className="h-5 w-5 rounded-full bg-gray-300 flex items-center justify-center text-xs font-semibold text-gray-700">
-                                        {initials}
-                                      </div>
-                                    );
-                                  }
-                                  
-                                  return <User className="h-5 w-5 text-gray-400" />;
-                                })()}
-                                <span className="text-xs text-gray-700">
-                                  {getAssigneeName(task.assignedTo)}
-                                </span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="px-1">
-                              {task.dueDate ? (
-                                <div className="flex items-center gap-1">
-                                  <CalendarIcon className="h-3 w-3 text-gray-400" />
-                                  <span className="text-xs text-gray-700">
-                                    {format(parseISO(task.dueDate), 'MMM dd, yyyy')}
-                                  </span>
-                                </div>
-                              ) : (
-                                <span className="text-xs text-gray-400">-</span>
-                              )}
-                            </TableCell>
-                            <TableCell className="px-1">
+                          <TableHeader>
+                            <TableRow>
                               {canManageTasks && (
-                                <div className="flex items-center justify-center gap-0.5">
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => openEditModal(task)}
-                                    className="h-6 w-6 p-0"
-                                  >
-                                    <Edit className="h-3 w-3" />
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => openDeleteDialog(task)}
-                                    className="h-6 w-6 p-0"
-                                  >
-                                    <Trash2 className="h-3 w-3 text-red-600" />
-                                  </Button>
-                                </div>
+                                <TableHead className="w-2 px-1">
+                                  <Checkbox
+                                    checked={selectedTasks.size === tasks.length && tasks.length > 0}
+                                    onCheckedChange={toggleSelectAll}
+                                  />
+                                </TableHead>
                               )}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                              <TableHead className="w-20">{t('tasks.title', 'Título')}</TableHead>
+
+                              <TableHead className="w-8">{t('tasks.status', 'Estado')}</TableHead>
+                              <TableHead className="w-8">{t('tasks.priority', 'Prioridad')}</TableHead>
+                              <TableHead className="w-8">{t('tasks.assignedTo', 'Asignado a')}</TableHead>
+                              <TableHead className="w-8">{t('tasks.dueDate', 'Fecha Venc.')}</TableHead>
+                              <TableHead className="w-[10px] text-center">{t('tasks.actions', 'Acciones')}</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {tasks.map((task: Task) => (
+                              <TableRow
+                                key={task.id}
+                                className="hover:bg-gray-50"
+                                style={{ backgroundColor: task.backgroundColor || 'transparent' }}
+                              >
+                                {canManageTasks && (
+                                  <TableCell className="px-1">
+                                    <Checkbox
+                                      checked={selectedTasks.has(task.id)}
+                                      onCheckedChange={() => toggleTaskSelection(task.id)}
+                                    />
+                                  </TableCell>
+                                )}
+                                <TableCell className="max-w-40 pl-1">
+                                  <div className="min-w-0">
+                                    <button
+                                      onClick={() => openTaskDetailsDialog(task)}
+                                      className="font-medium text-gray-900 truncate text-sm hover:text-blue-600 hover:underline text-left w-full"
+                                      title={task.title}
+                                    >
+                                      {task.title.replace(/\b\w/g, l => l.toUpperCase())}
+                                    </button>
+                                    {task.description && (
+                                      <div className="text-xs text-gray-500 truncate" title={task.description}>
+                                        {task.description}
+                                      </div>
+                                    )}
+                                  </div>
+                                </TableCell>
+
+                                <TableCell className="px-1">
+                                  <Badge className={`${getStatusColor(task.status)} text-xs`}>
+                                    {getStatusLabel(task.status)}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="px-1">
+                                  <Badge className={`${getPriorityColor(task.priority)} text-xs`}>
+                                    <Flag className="h-2 w-2 mr-0.5" />
+                                    {getPriorityLabel(task.priority)}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="px-1">
+                                  <div className="flex items-center gap-1">
+                                    {(() => {
+                                      const profileImage = getAssigneeProfileImage(task.assignedTo);
+                                      const assigneeName = getAssigneeName(task.assignedTo);
+
+                                      if (profileImage) {
+                                        return (
+                                          <img
+                                            src={profileImage}
+                                            alt={assigneeName}
+                                            className="h-5 w-5 rounded-full object-cover"
+                                            onError={(e) => {
+                                              e.currentTarget.style.display = 'none';
+                                              e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                                            }}
+                                          />
+                                        );
+                                      }
+
+
+                                      if (task.assignedTo && assigneeName !== 'Unassigned') {
+                                        const initials = assigneeName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
+                                        return (
+                                          <div className="h-5 w-5 rounded-full bg-gray-300 flex items-center justify-center text-xs font-semibold text-gray-700">
+                                            {initials}
+                                          </div>
+                                        );
+                                      }
+
+                                      return <User className="h-5 w-5 text-gray-400" />;
+                                    })()}
+                                    <span className="text-xs text-gray-700">
+                                      {getAssigneeName(task.assignedTo)}
+                                    </span>
+                                  </div>
+                                </TableCell>
+                                <TableCell className="px-1">
+                                  {task.dueDate ? (
+                                    <div className="flex items-center gap-1">
+                                      <CalendarIcon className="h-3 w-3 text-gray-400" />
+                                      <span className="text-xs text-gray-700">
+                                        {format(parseISO(task.dueDate), 'MMM dd, yyyy')}
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    <span className="text-xs text-gray-400">-</span>
+                                  )}
+                                </TableCell>
+                                <TableCell className="px-1">
+                                  {canManageTasks && (
+                                    <div className="flex items-center justify-center gap-0.5">
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => openEditModal(task)}
+                                        className="h-6 w-6 p-0"
+                                      >
+                                        <Edit className="h-3 w-3" />
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => openDeleteDialog(task)}
+                                        className="h-6 w-6 p-0"
+                                      >
+                                        <Trash2 className="h-3 w-3 text-red-600" />
+                                      </Button>
+                                    </div>
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
                       </div>
                     ) : (
                       /* Grid View */
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
                         {tasks.map((task: Task) => (
-                          <Card 
-                            key={task.id} 
+                          <Card
+                            key={task.id}
                             className="hover:shadow-lg transition-shadow overflow-hidden"
                             style={{ backgroundColor: task.backgroundColor || 'white' }}
                           >
@@ -1153,7 +1159,7 @@ export default function TasksPage() {
                                 {(() => {
                                   const profileImage = getAssigneeProfileImage(task.assignedTo);
                                   const assigneeName = getAssigneeName(task.assignedTo);
-                                  
+
                                   if (profileImage) {
                                     return (
                                       <img
@@ -1167,7 +1173,7 @@ export default function TasksPage() {
                                       />
                                     );
                                   }
-                                  
+
 
                                   if (task.assignedTo && assigneeName !== 'Unassigned') {
                                     const initials = assigneeName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
@@ -1177,7 +1183,7 @@ export default function TasksPage() {
                                       </div>
                                     );
                                   }
-                                  
+
                                   return <User className="h-5 w-5 md:h-6 md:w-6 text-gray-400" />;
                                 })()}
                                 <span className="text-xs md:text-sm text-gray-700 truncate" title={getAssigneeName(task.assignedTo)}>
@@ -1245,132 +1251,38 @@ export default function TasksPage() {
       <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{t('tasks.createTask', 'Create Task')}</DialogTitle>
+            <DialogTitle>{t('tasks.createTask', 'Crear Tarea')}</DialogTitle>
             <DialogDescription>
-              {t('tasks.createTaskDescription', 'Create a new task and assign it to a contact.')}
+              {t('tasks.createTaskDescription', 'Crea una nueva tarea y asígnala a un contacto.')}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
-            {/* Contact Selection with Search and Infinite Scroll */}
-            <div>
-              <Label htmlFor="contact">{t('tasks.contact', 'Contact')} *</Label>
-              <Popover open={contactPopoverOpen} onOpenChange={setContactPopoverOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal"
-                  >
-                    {formData.contactId
-                      ? (allContacts.find((c: Contact) => c.id === formData.contactId)?.name ||
-                         contacts.find((c: Contact) => c.id === formData.contactId)?.name ||
-                         t('tasks.selectContact', 'Select a contact'))
-                      : t('tasks.selectContact', 'Select a contact')}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-full p-0" align="start">
-                  <div className="flex flex-col max-h-96">
-                    {/* Search Input */}
-                    <div className="p-3 border-b sticky top-0 bg-white">
-                      <Input
-                        placeholder={t('tasks.searchContact', 'Search by name, phone, email...')}
-                        value={contactSearchTerm}
-                        onChange={(e) => {
-                          setContactSearchTerm(e.target.value);
-                          setContactPage(1);
-                          setAllLoadedContacts([]);
-                        }}
-                        className="h-8"
-                        autoFocus
-                      />
-                    </div>
-
-                    {/* Contacts List with Infinite Scroll */}
-                    <div
-                      className="overflow-y-auto flex-1"
-                      onScroll={(e) => {
-                        const element = e.currentTarget;
-                        if (
-                          element.scrollHeight - element.scrollTop <= element.clientHeight + 50 &&
-                          !isLoadingContacts &&
-                          contactsData?.contacts?.length === 100
-                        ) {
-                          setContactPage(prev => prev + 1);
-                        }
-                      }}
-                    >
-                      {isLoadingContacts && contactPage === 1 ? (
-                        <div className="flex items-center justify-center py-8">
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        </div>
-                      ) : contacts.length === 0 ? (
-                        <div className="px-4 py-8 text-center text-sm text-gray-500">
-                          {t('tasks.noContactsFound', 'No contacts found')}
-                        </div>
-                      ) : (
-                        contacts.map((contact: Contact) => (
-                          <div
-                            key={contact.id}
-                            onClick={() => {
-
-                              if (!allContacts.some(c => c.id === contact.id)) {
-                                setAllContacts(prev => [...prev, contact]);
-                              }
-                              setFormData({ ...formData, contactId: contact.id });
-                              setContactPopoverOpen(false);
-                            }}
-                            className="w-full px-4 py-2 text-left hover:bg-gray-100 border-b last:border-b-0 flex items-center gap-2 transition-colors cursor-pointer"
-                          >
-                            {contact.avatarUrl ? (
-                              <img
-                                src={contact.avatarUrl}
-                                alt={contact.name}
-                                className="h-6 w-6 rounded-full object-cover flex-shrink-0"
-                              />
-                            ) : (
-                              <div className="h-6 w-6 rounded-full bg-gray-300 flex items-center justify-center text-xs font-semibold text-gray-700 flex-shrink-0">
-                                {contact.name?.charAt(0).toUpperCase() || '?'}
-                              </div>
-                            )}
-                            <div className="flex-1 min-w-0">
-                              <div className="text-sm font-medium truncate">{contact.name}</div>
-                              {contact.phone && (
-                                <div className="text-xs text-gray-500 truncate">{contact.phone}</div>
-                              )}
-                            </div>
-                          </div>
-                        ))
-                      )}
-                      {isLoadingContacts && contactPage > 1 && (
-                        <div className="flex items-center justify-center py-4">
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </PopoverContent>
-              </Popover>
-            </div>
+            {/* Contact - Removed as per request */}
+            {/* <div>
+              <Label htmlFor="contact">{t('tasks.contact', 'Contact')}</Label>
+              ...
+            </div> */}
 
             {/* Title */}
             <div>
-              <Label htmlFor="title">{t('tasks.title', 'Title')} *</Label>
+              <Label htmlFor="title">{t('tasks.title', 'Título')} *</Label>
               <Input
                 id="title"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder={t('tasks.titlePlaceholder', 'Enter task title')}
+                placeholder={t('tasks.titlePlaceholder', 'Ingresar título de la tarea')}
               />
             </div>
 
             {/* Description */}
             <div>
-              <Label htmlFor="description">{t('tasks.description', 'Description')}</Label>
+              <Label htmlFor="description">{t('tasks.description', 'Descripción')}</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder={t('tasks.descriptionPlaceholder', 'Enter task description')}
+                placeholder={t('tasks.descriptionPlaceholder', 'Ingresar descripción de la tarea')}
                 rows={3}
               />
             </div>
@@ -1378,7 +1290,7 @@ export default function TasksPage() {
             <div className="grid grid-cols-2 gap-4">
               {/* Priority */}
               <div>
-                <Label htmlFor="priority">{t('tasks.priority', 'Priority')}</Label>
+                <Label htmlFor="priority">{t('tasks.priority', 'Prioridad')}</Label>
                 <Select
                   value={formData.priority}
                   onValueChange={(value: any) => setFormData({ ...formData, priority: value })}
@@ -1387,17 +1299,17 @@ export default function TasksPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="low">{t('tasks.priority.low', 'Low')}</SelectItem>
-                    <SelectItem value="medium">{t('tasks.priority.medium', 'Medium')}</SelectItem>
-                    <SelectItem value="high">{t('tasks.priority.high', 'High')}</SelectItem>
-                    <SelectItem value="urgent">{t('tasks.priority.urgent', 'Urgent')}</SelectItem>
+                    <SelectItem value="low">{t('tasks.priority.low', 'Baja')}</SelectItem>
+                    <SelectItem value="medium">{t('tasks.priority.medium', 'Media')}</SelectItem>
+                    <SelectItem value="high">{t('tasks.priority.high', 'Alta')}</SelectItem>
+                    <SelectItem value="urgent">{t('tasks.priority.urgent', 'Urgente')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {/* Status */}
               <div>
-                <Label htmlFor="status">{t('tasks.status', 'Status')}</Label>
+                <Label htmlFor="status">{t('tasks.status', 'Estado')}</Label>
                 <Select
                   value={formData.status}
                   onValueChange={(value: any) => setFormData({ ...formData, status: value })}
@@ -1406,10 +1318,10 @@ export default function TasksPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="not_started">{t('tasks.status.notStarted', 'Not Started')}</SelectItem>
-                    <SelectItem value="in_progress">{t('tasks.status.inProgress', 'In Progress')}</SelectItem>
-                    <SelectItem value="completed">{t('tasks.status.completed', 'Completed')}</SelectItem>
-                    <SelectItem value="cancelled">{t('tasks.status.cancelled', 'Cancelled')}</SelectItem>
+                    <SelectItem value="not_started">{t('tasks.status.notStarted', 'No iniciada')}</SelectItem>
+                    <SelectItem value="in_progress">{t('tasks.status.inProgress', 'En progreso')}</SelectItem>
+                    <SelectItem value="completed">{t('tasks.status.completed', 'Completada')}</SelectItem>
+                    <SelectItem value="cancelled">{t('tasks.status.cancelled', 'Cancelada')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -1418,7 +1330,7 @@ export default function TasksPage() {
             <div className="grid grid-cols-2 gap-4">
               {/* Due Date */}
               <div>
-                <Label htmlFor="dueDate">{t('tasks.dueDate', 'Due Date')} <span className="text-red-500">*</span></Label>
+                <Label htmlFor="dueDate">{t('tasks.dueDate', 'Fecha de vencimiento')} <span className="text-red-500">*</span></Label>
                 <Input
                   id="dueDate"
                   type="date"
@@ -1430,16 +1342,16 @@ export default function TasksPage() {
 
               {/* Assigned To */}
               <div>
-                <Label htmlFor="assignedTo">{t('tasks.assignedTo', 'Assigned To')}</Label>
+                <Label htmlFor="assignedTo">{t('tasks.assignedTo', 'Asignado a')}</Label>
                 <Select
                   value={formData.assignedTo || 'unassigned'}
                   onValueChange={(value) => setFormData({ ...formData, assignedTo: value })}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder={t('tasks.selectAssignee', 'Select assignee')} />
+                    <SelectValue placeholder={t('tasks.selectAssignee', 'Seleccionar asignado')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="unassigned">{t('tasks.unassigned', 'Unassigned')}</SelectItem>
+                    <SelectItem value="unassigned">{t('tasks.unassigned', 'Sin asignar')}</SelectItem>
                     {teamMembers.map((member: any) => (
                       <SelectItem key={member.id} value={member.email}>
                         {member.fullName}
@@ -1452,13 +1364,13 @@ export default function TasksPage() {
 
             {/* Category */}
             <div>
-              <Label htmlFor="category">{t('tasks.category', 'Category')}</Label>
+              <Label htmlFor="category">{t('tasks.category', 'Categoría')}</Label>
               {editingCategory ? (
                 <div className="flex gap-2">
                   <Input
                     value={editCategoryName}
                     onChange={(e) => setEditCategoryName(e.target.value)}
-                    placeholder={t('tasks.enterCategoryName', 'Enter category name')}
+                    placeholder={t('tasks.enterCategoryName', 'Ingresar nombre de la categoría')}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         handleUpdateCategory();
@@ -1498,7 +1410,7 @@ export default function TasksPage() {
                   <Input
                     value={newCategoryName}
                     onChange={(e) => setNewCategoryName(e.target.value)}
-                    placeholder={t('tasks.enterCategoryName', 'Enter category name')}
+                    placeholder={t('tasks.enterCategoryName', 'Ingresar nombre de la categoría')}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         handleCreateCategory();
@@ -1530,7 +1442,7 @@ export default function TasksPage() {
                       setNewCategoryName('');
                     }}
                   >
-                    {t('common.cancel', 'Cancel')}
+                    {t('common.cancel', 'Cancelar')}
                   </Button>
                 </div>
               ) : (
@@ -1540,7 +1452,7 @@ export default function TasksPage() {
                       variant="outline"
                       className="w-full justify-start text-left font-normal"
                     >
-                      {formData.category || t('tasks.selectCategory', 'Select category')}
+                      {formData.category || t('tasks.selectCategory', 'Seleccionar categoría')}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-56 p-0" align="start">
@@ -1553,7 +1465,7 @@ export default function TasksPage() {
                         className="px-4 py-2 text-left hover:bg-gray-100 text-sm"
                         type="button"
                       >
-                        {t('tasks.noCategory', 'No Category')}
+                        {t('tasks.noCategory', 'Sin Categoría')}
                       </button>
                       {categories.map((category) => (
                         <div
@@ -1585,7 +1497,7 @@ export default function TasksPage() {
                         type="button"
                       >
                         <FolderPlus className="h-4 w-4" />
-                        {t('tasks.createNewCategory', 'Create New Category')}
+                        {t('tasks.createNewCategory', 'Crear Nueva Categoría')}
                       </button>
                     </div>
                   </PopoverContent>
@@ -1593,9 +1505,62 @@ export default function TasksPage() {
               )}
             </div>
 
+            {/* Checklist */}
+            <div>
+              <Label className="mb-2 block">{t('tasks.checklist', 'Lista de verificación')}</Label>
+              <div className="space-y-2">
+                {formData.checklist?.map((item, index) => (
+                  <div key={item.id || index} className="flex items-center gap-2">
+                    <Checkbox
+                      checked={item.completed}
+                      onCheckedChange={(checked) => {
+                        const newChecklist = [...(formData.checklist || [])];
+                        newChecklist[index].completed = !!checked;
+                        setFormData({ ...formData, checklist: newChecklist });
+                      }}
+                    />
+                    <Input
+                      value={item.text}
+                      onChange={(e) => {
+                        const newChecklist = [...(formData.checklist || [])];
+                        newChecklist[index].text = e.target.value;
+                        setFormData({ ...formData, checklist: newChecklist });
+                      }}
+                      className={item.completed ? "line-through text-gray-500" : ""}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        const newChecklist = formData.checklist?.filter((_, i) => i !== index);
+                        setFormData({ ...formData, checklist: newChecklist || [] });
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4 text-red-500" />
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setFormData({
+                      ...formData,
+                      checklist: [...(formData.checklist || []), { id: crypto.randomUUID(), text: '', completed: false }]
+                    });
+                  }}
+                  className="mt-2"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t('tasks.addChecklistItem', 'Agregar ítem')}
+                </Button>
+              </div>
+            </div>
+
             {/* Background Color */}
             <div>
-              <Label htmlFor="backgroundColor">{t('tasks.backgroundColor', 'Background Color')}</Label>
+              <Label htmlFor="backgroundColor">{t('tasks.backgroundColor', 'Color de fondo')}</Label>
               <div className="flex items-center gap-3 mt-2">
                 <input
                   type="color"
@@ -1612,7 +1577,7 @@ export default function TasksPage() {
                     className="font-mono text-sm"
                   />
                 </div>
-                <div 
+                <div
                   className="w-10 h-10 rounded border border-gray-300"
                   style={{ backgroundColor: formData.backgroundColor }}
                 />
@@ -1625,11 +1590,11 @@ export default function TasksPage() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowCreateModal(false)}>
-              {t('common.cancel', 'Cancel')}
+              {t('common.cancel', 'Cancelar')}
             </Button>
             <Button onClick={handleCreateTask} disabled={createTaskMutation.isPending}>
               {createTaskMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {t('tasks.create', 'Create')}
+              {t('tasks.create', 'Crear')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1639,42 +1604,34 @@ export default function TasksPage() {
       <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{t('tasks.editTask', 'Edit Task')}</DialogTitle>
+            <DialogTitle>{t('tasks.editTask', 'Editar Tarea')}</DialogTitle>
             <DialogDescription>
-              {t('tasks.editTaskDescription', 'Update task details.')}
+              {t('tasks.editTaskDescription', 'Actualizar detalles de la tarea.')}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
-            {/* Contact Selection (Read-only in edit mode) */}
-            <div>
-              <Label htmlFor="contact">{t('tasks.contact', 'Contact')}</Label>
-              <Input
-                value={selectedTask ? getContactName(selectedTask.contactId) : ''}
-                disabled
-                className="bg-gray-50"
-              />
-            </div>
+
 
             {/* Title */}
             <div>
-              <Label htmlFor="title">{t('tasks.title', 'Title')} *</Label>
+              <Label htmlFor="title">{t('tasks.title', 'Título')} *</Label>
               <Input
                 id="title"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder={t('tasks.titlePlaceholder', 'Enter task title')}
+                placeholder={t('tasks.titlePlaceholder', 'Ingresar título de la tarea')}
               />
             </div>
 
             {/* Description */}
             <div>
-              <Label htmlFor="description">{t('tasks.description', 'Description')}</Label>
+              <Label htmlFor="description">{t('tasks.description', 'Descripción')}</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder={t('tasks.descriptionPlaceholder', 'Enter task description')}
+                placeholder={t('tasks.descriptionPlaceholder', 'Ingresar descripción de la tarea')}
                 rows={3}
               />
             </div>
@@ -1895,6 +1852,59 @@ export default function TasksPage() {
                   </PopoverContent>
                 </Popover>
               )}
+            </div>
+
+            {/* Checklist */}
+            <div>
+              <Label className="mb-2 block">{t('tasks.checklist', 'Checklist')}</Label>
+              <div className="space-y-2">
+                {formData.checklist?.map((item, index) => (
+                  <div key={item.id || index} className="flex items-center gap-2">
+                    <Checkbox
+                      checked={item.completed}
+                      onCheckedChange={(checked) => {
+                        const newChecklist = [...(formData.checklist || [])];
+                        newChecklist[index].completed = !!checked;
+                        setFormData({ ...formData, checklist: newChecklist });
+                      }}
+                    />
+                    <Input
+                      value={item.text}
+                      onChange={(e) => {
+                        const newChecklist = [...(formData.checklist || [])];
+                        newChecklist[index].text = e.target.value;
+                        setFormData({ ...formData, checklist: newChecklist });
+                      }}
+                      className={item.completed ? "line-through text-gray-500" : ""}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        const newChecklist = formData.checklist?.filter((_, i) => i !== index);
+                        setFormData({ ...formData, checklist: newChecklist || [] });
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4 text-red-500" />
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setFormData({
+                      ...formData,
+                      checklist: [...(formData.checklist || []), { id: crypto.randomUUID(), text: '', completed: false }]
+                    });
+                  }}
+                  className="mt-2"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t('tasks.addChecklistItem', 'Add Item')}
+                </Button>
+              </div>
             </div>
 
             {/* Background Color */}
@@ -1916,7 +1926,7 @@ export default function TasksPage() {
                     className="font-mono text-sm"
                   />
                 </div>
-                <div 
+                <div
                   className="w-10 h-10 rounded border border-gray-300"
                   style={{ backgroundColor: formData.backgroundColor }}
                 />
@@ -1974,7 +1984,7 @@ export default function TasksPage() {
               {t('tasks.taskDetails', 'View task details and information')}
             </DialogDescription>
           </DialogHeader>
-          
+
           {selectedTask && (
             <div className="space-y-6">
               {/* Task Information */}
@@ -1987,7 +1997,7 @@ export default function TasksPage() {
                     </Badge>
                   </div>
                 </div>
-                
+
                 <div>
                   <Label className="text-sm font-medium text-gray-700">{t('tasks.priority', 'Priority')}</Label>
                   <div className="mt-1">
@@ -1997,14 +2007,14 @@ export default function TasksPage() {
                     </Badge>
                   </div>
                 </div>
-                
+
                 <div>
                   <Label className="text-sm font-medium text-gray-700">{t('tasks.assignedTo', 'Assigned To')}</Label>
                   <div className="mt-1 text-sm text-gray-900">
                     {selectedTask.assignedTo || t('tasks.unassigned', 'Unassigned')}
                   </div>
                 </div>
-                
+
                 <div>
                   <Label className="text-sm font-medium text-gray-700">{t('tasks.dueDate', 'Due Date')}</Label>
                   <div className="mt-1 text-sm text-gray-900">
@@ -2064,7 +2074,7 @@ export default function TasksPage() {
                     </div>
                   </div>
                 )}
-                
+
                 {selectedTask.tags && selectedTask.tags.length > 0 && (
                   <div>
                     <Label className="text-sm font-medium text-gray-700">{t('tasks.tags', 'Tags')}</Label>
@@ -2087,7 +2097,7 @@ export default function TasksPage() {
                     {format(parseISO(selectedTask.createdAt), 'MMM dd, yyyy HH:mm')}
                   </div>
                 </div>
-                
+
                 <div>
                   <Label className="text-sm font-medium text-gray-700">{t('tasks.updatedAt', 'Last Updated')}</Label>
                   <div className="mt-1">
@@ -2097,7 +2107,7 @@ export default function TasksPage() {
               </div>
             </div>
           )}
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowTaskDetailsDialog(false)}>
               {t('common.close', 'Close')}

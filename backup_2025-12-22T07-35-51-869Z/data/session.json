@@ -1,0 +1,87 @@
+[
+  {
+    "sid": "ob4mGbpoGT7TZKZRGgc8Mkh6zAMZIfMG",
+    "sess": {
+      "cookie": {
+        "originalMaxAge": 604800000,
+        "expires": "2025-12-27T22:06:24.792Z",
+        "secure": false,
+        "httpOnly": true,
+        "path": "/",
+        "sameSite": "lax"
+      },
+      "passport": {
+        "user": 7
+      }
+    },
+    "expire": "2025-12-29 07:35:27"
+  },
+  {
+    "sid": "EViXX01efWXKyne3I33XJypUvd2or0i4",
+    "sess": {
+      "cookie": {
+        "originalMaxAge": 604800000,
+        "expires": "2025-12-23T10:43:25.180Z",
+        "secure": false,
+        "httpOnly": true,
+        "path": "/",
+        "sameSite": "lax"
+      },
+      "passport": {
+        "user": 7
+      }
+    },
+    "expire": "2025-12-24 01:18:51"
+  },
+  {
+    "sid": "smZw_uXV9qfTJr_u9ekfCkS9PklBnGs8",
+    "sess": {
+      "cookie": {
+        "originalMaxAge": 604800000,
+        "expires": "2025-12-28T23:12:11.146Z",
+        "secure": false,
+        "httpOnly": true,
+        "path": "/",
+        "sameSite": "lax"
+      },
+      "passport": {
+        "user": 9
+      }
+    },
+    "expire": "2025-12-29 02:25:57"
+  },
+  {
+    "sid": "ngoGfAcLCVw8jAwU8O0DAv_skBStp2IR",
+    "sess": {
+      "cookie": {
+        "originalMaxAge": 604800000,
+        "expires": "2025-12-28T22:46:28.476Z",
+        "secure": false,
+        "httpOnly": true,
+        "path": "/",
+        "sameSite": "lax"
+      },
+      "passport": {
+        "user": 8
+      }
+    },
+    "expire": "2025-12-29 02:31:04"
+  },
+  {
+    "sid": "eo_N-ePa_bBLrZ2BB-nOhHN1IP2pJOKm",
+    "sess": {
+      "cookie": {
+        "originalMaxAge": 604800000,
+        "expires": "2025-12-27T21:55:47.185Z",
+        "secure": false,
+        "httpOnly": true,
+        "path": "/",
+        "sameSite": "lax"
+      },
+      "passport": {
+        "user": 3
+      }
+    },
+    "expire": "2025-12-29 07:35:34"
+  }
+]

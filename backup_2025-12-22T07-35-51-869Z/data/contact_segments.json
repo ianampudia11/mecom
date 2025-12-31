@@ -1,0 +1,40 @@
+[
+  {
+    "id": 2,
+    "company_id": 4,
+    "created_by_id": 3,
+    "name": "Pendientes de pago",
+    "description": null,
+    "criteria": {
+      "tags": [
+        "conocidos"
+      ],
+      "created_after": "",
+      "created_before": "",
+      "excludedContactIds": []
+    },
+    "contact_count": 36,
+    "last_updated_at": "2025-12-22 07:11:08.136564",
+    "created_at": "2025-12-22 07:01:00.233368",
+    "updated_at": "2025-12-22 07:11:08.136564"
+  },
+  {
+    "id": 1,
+    "company_id": 4,
+    "created_by_id": 3,
+    "name": "Conocidos TAG",
+    "description": "de conocidos tags prueba",
+    "criteria": {
+      "tags": [
+        "conocidos"
+      ],
+      "created_after": "",
+      "created_before": "",
+      "excludedContactIds": []
+    },
+    "contact_count": 36,
+    "last_updated_at": "2025-12-22 07:11:08.136564",
+    "created_at": "2025-12-08 19:35:31.308908",
+    "updated_at": "2025-12-22 07:11:08.136564"
+  }
+]

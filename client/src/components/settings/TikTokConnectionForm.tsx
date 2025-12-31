@@ -69,7 +69,7 @@ export function TikTokConnectionForm({ isOpen, onClose, onSuccess }: Props) {
     setCheckingConfig(true);
     try {
       const response = await fetch('/api/admin/partner-configurations/tiktok');
-      
+
       if (response.ok) {
         const config = await response.json();
         if (config && config.isActive) {
@@ -315,7 +315,7 @@ export function TikTokConnectionForm({ isOpen, onClose, onSuccess }: Props) {
               <AlertDescription>
                 <strong>Ready to Connect</strong>
                 <p className="mt-2">
-                  Click the button below to authorize PowerChat to access your TikTok Business account.
+                  Click the button below to authorize Iawarrior tech to access your TikTok Business account.
                 </p>
               </AlertDescription>
             </Alert>

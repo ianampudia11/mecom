@@ -1,0 +1,46 @@
+[
+  {
+    "id": 1,
+    "checklist_id": 1,
+    "text": "visita",
+    "is_completed": true,
+    "order_num": 0,
+    "completed_at": "2025-12-10 11:43:19.336339",
+    "completed_by": 3,
+    "created_at": "2025-12-10 11:41:23.492496",
+    "updated_at": "2025-12-10 11:41:23.492496"
+  },
+  {
+    "id": 3,
+    "checklist_id": 2,
+    "text": "visita",
+    "is_completed": true,
+    "order_num": 0,
+    "completed_at": "2025-12-10 11:43:41.037626",
+    "completed_by": 3,
+    "created_at": "2025-12-10 11:42:06.962501",
+    "updated_at": "2025-12-10 11:42:06.962501"
+  },
+  {
+    "id": 4,
+    "checklist_id": 2,
+    "text": "cierre",
+    "is_completed": true,
+    "order_num": 1,
+    "completed_at": "2025-12-10 11:43:47.69536",
+    "completed_by": 3,
+    "created_at": "2025-12-10 11:42:15.434265",
+    "updated_at": "2025-12-10 11:42:15.434265"
+  },
+  {
+    "id": 2,
+    "checklist_id": 1,
+    "text": "negociacion",
+    "is_completed": true,
+    "order_num": 1,
+    "completed_at": "2025-12-10 14:00:07.916202",
+    "completed_by": 3,
+    "created_at": "2025-12-10 11:41:48.412243",
+    "updated_at": "2025-12-10 11:41:48.412243"
+  }
+]

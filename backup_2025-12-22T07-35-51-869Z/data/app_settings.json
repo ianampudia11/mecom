@@ -1,0 +1,107 @@
+[
+  {
+    "id": 1,
+    "key": "social_login_google",
+    "value": {
+      "enabled": false,
+      "client_id": "",
+      "callback_url": "/api/auth/google/callback",
+      "client_secret": ""
+    },
+    "created_at": "2025-12-08 15:35:00.897794",
+    "updated_at": "2025-12-08 15:35:00.897794"
+  },
+  {
+    "id": 2,
+    "key": "social_login_facebook",
+    "value": {
+      "app_id": "",
+      "enabled": false,
+      "app_secret": "",
+      "callback_url": "/api/auth/facebook/callback"
+    },
+    "created_at": "2025-12-08 15:35:00.897794",
+    "updated_at": "2025-12-08 15:35:00.897794"
+  },
+  {
+    "id": 3,
+    "key": "social_login_apple",
+    "value": {
+      "key_id": "",
+      "enabled": false,
+      "team_id": "",
+      "client_id": "",
+      "private_key": "",
+      "callback_url": "/api/auth/apple/callback"
+    },
+    "created_at": "2025-12-08 15:35:00.897794",
+    "updated_at": "2025-12-08 15:35:00.897794"
+  },
+  {
+    "id": 6,
+    "key": "registration_settings",
+    "value": {
+      "enabled": true,
+      "requireApproval": false
+    },
+    "created_at": "2025-12-08 16:05:45.051493",
+    "updated_at": "2025-12-08 16:05:45.051493"
+  },
+  {
+    "id": 7,
+    "key": "branding",
+    "value": {
+      "appName": "iAwarriorTech",
+      "primaryColor": "#333235",
+      "secondaryColor": "#4F46E5"
+    },
+    "created_at": "2025-12-08 16:41:59.534148",
+    "updated_at": "2025-12-08 16:41:59.534148"
+  },
+  {
+    "id": 8,
+    "key": "general_settings",
+    "value": {
+      "dateFormat": "MM/DD/YYYY",
+      "timeFormat": "12h",
+      "helpSupportUrl": "",
+      "defaultCurrency": "USD",
+      "customCurrencies": [],
+      "planRenewalEnabled": true,
+      "frontendWebsiteEnabled": true,
+      "subdomainAuthentication": false
+    },
+    "created_at": "2025-12-16 10:46:36.563367",
+    "updated_at": "2025-12-16 10:46:36.563367"
+  },
+  {
+    "id": 4,
+    "key": "subdomain_authentication",
+    "value": false,
+    "created_at": "2025-12-08 15:35:03.905252",
+    "updated_at": "2025-12-16 10:46:36.571"
+  },
+  {
+    "id": 5,
+    "key": "postgres_tools_status",
+    "value": {
+      "psql": {
+        "error": "Command failed: psql --version\n\"psql\" no se reconoce como un comando interno o externo,\r\nprograma o archivo por lotes ejecutable.\r\n",
+        "version": "",
+        "available": false
+      },
+      "pg_dump": {
+        "error": "Command failed: pg_dump --version\n\"pg_dump\" no se reconoce como un comando interno o externo,\r\nprograma o archivo por lotes ejecutable.\r\n",
+        "version": "",
+        "available": false
+      },
+      "pg_restore": {
+        "error": "Command failed: pg_restore --version\n\"pg_restore\" no se reconoce como un comando interno o externo,\r\nprograma o archivo por lotes ejecutable.\r\n",
+        "version": "",
+        "available": false
+      }
+    },
+    "created_at": "2025-12-08 15:51:29.586116",
+    "updated_at": "2025-12-22 06:47:09.764"
+  }
+]

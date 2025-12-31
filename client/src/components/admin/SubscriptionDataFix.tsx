@@ -51,13 +51,13 @@ export default function SubscriptionDataFix() {
   const runDataFix = async () => {
     setIsRunningFix(true);
     setValidationResult(null);
-    
+
     try {
       const response = await apiRequest('POST', '/api/subscription-data-fix/validate-and-fix');
       const data = await response.json();
-      
+
       setValidationResult(data);
-      
+
       if (data.success) {
         toast({
           title: "Success",
@@ -70,10 +70,10 @@ export default function SubscriptionDataFix() {
           variant: "destructive",
         });
       }
-      
+
 
       await loadReport();
-      
+
     } catch (error) {
       toast({
         title: "Error",
@@ -123,8 +123,8 @@ export default function SubscriptionDataFix() {
         <Bug className="h-4 w-4" />
         <AlertTitle>Critical Bug Fix Available</AlertTitle>
         <AlertDescription>
-          This tool fixes the critical bug where existing PowerChat deployments show incorrect renewal dialogs 
-          for users with active subscriptions, while fresh installations work correctly. The issue is caused by 
+          This tool fixes the critical bug where existing Iawarrior tech deployments show incorrect renewal dialogs
+          for users with active subscriptions, while fresh installations work correctly. The issue is caused by
           NULL values in subscription fields that were added in later migrations.
         </AlertDescription>
       </Alert>
@@ -197,15 +197,15 @@ export default function SubscriptionDataFix() {
             Data Validation & Fix
           </CardTitle>
           <CardDescription>
-            {hasIssues 
+            {hasIssues
               ? "Issues detected - run the fix to resolve subscription data inconsistencies"
               : "No issues detected - your subscription data is consistent"
             }
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Button 
-            onClick={runDataFix} 
+          <Button
+            onClick={runDataFix}
             disabled={isRunningFix}
             className={hasIssues ? "bg-yellow-600 hover:bg-yellow-700" : ""}
           >
@@ -263,7 +263,7 @@ export default function SubscriptionDataFix() {
         </CardHeader>
         <CardContent className="space-y-3 text-sm text-muted-foreground">
           <p>
-            <strong>Problem:</strong> Existing PowerChat deployments may have NULL values in subscription fields 
+            <strong>Problem:</strong> Existing Iawarrior tech deployments may have NULL values in subscription fields
             that were added in later migrations, causing incorrect renewal dialog behavior.
           </p>
           <p>

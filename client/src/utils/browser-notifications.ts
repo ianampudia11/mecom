@@ -61,7 +61,7 @@ class BrowserNotificationManager {
         const permission = await Notification.requestPermission();
         return permission as NotificationPermission;
       }
-      
+
 
       return new Promise((resolve) => {
         Notification.requestPermission((permission) => {
@@ -273,7 +273,7 @@ class BrowserNotificationManager {
     if (this.isSupported && this.getPermissionStatus() === 'granted') {
       try {
 
-        const directNotification = new Notification('PowerChat Test', {
+        const directNotification = new Notification('Iawarrior tech Test', {
           body: 'Direct notification test',
           icon: '/favicon.ico'
         });
@@ -291,7 +291,7 @@ class BrowserNotificationManager {
 
 
     return this.showNotification({
-      title: 'PowerChat Notifications',
+      title: 'Iawarrior tech Notifications',
       body: 'Notifications are working! You\'ll receive alerts for new messages.',
       tag: 'test-notification',
       requireInteraction: false,
@@ -335,8 +335,8 @@ export const showMessageNotification = async (
   isGroup: boolean = false
 ): Promise<boolean> => {
   const title = isGroup ? `${senderName} (Group)` : senderName;
-  const body = messagePreview.length > 100 
-    ? messagePreview.substring(0, 100) + '...' 
+  const body = messagePreview.length > 100
+    ? messagePreview.substring(0, 100) + '...'
     : messagePreview;
 
   return notificationManager.showNotification({

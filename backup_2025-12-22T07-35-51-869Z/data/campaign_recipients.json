@@ -1,0 +1,77 @@
+[
+  {
+    "id": 1,
+    "campaign_id": 1,
+    "contact_id": 4,
+    "personalized_content": null,
+    "variables": {
+      "name": "ian Ampudia nash",
+      "email": "",
+      "phone": "+51906770420",
+      "company": ""
+    },
+    "status": "sent",
+    "scheduled_at": null,
+    "sent_at": "2025-12-08 19:47:15.284",
+    "delivered_at": null,
+    "read_at": null,
+    "failed_at": null,
+    "error_message": null,
+    "retry_count": 0,
+    "max_retries": 3,
+    "external_message_id": null,
+    "conversation_id": null,
+    "created_at": "2025-12-08 19:47:04.439665",
+    "updated_at": "2025-12-08 19:47:15.284088"
+  },
+  {
+    "id": 2,
+    "campaign_id": 1,
+    "contact_id": 3,
+    "personalized_content": null,
+    "variables": {
+      "name": "ian",
+      "email": "",
+      "phone": "+51981139299",
+      "company": ""
+    },
+    "status": "sent",
+    "scheduled_at": null,
+    "sent_at": "2025-12-08 19:47:20.766",
+    "delivered_at": null,
+    "read_at": null,
+    "failed_at": null,
+    "error_message": null,
+    "retry_count": 0,
+    "max_retries": 3,
+    "external_message_id": null,
+    "conversation_id": null,
+    "created_at": "2025-12-08 19:47:04.439665",
+    "updated_at": "2025-12-08 19:47:20.767918"
+  },
+  {
+    "id": 3,
+    "campaign_id": 1,
+    "contact_id": 2,
+    "personalized_content": null,
+    "variables": {
+      "name": "Ian Ampudia Guerrero",
+      "email": "",
+      "phone": "+51965001709",
+      "company": ""
+    },
+    "status": "sent",
+    "scheduled_at": null,
+    "sent_at": "2025-12-08 19:47:30.698",
+    "delivered_at": null,
+    "read_at": null,
+    "failed_at": null,
+    "error_message": null,
+    "retry_count": 0,
+    "max_retries": 3,
+    "external_message_id": null,
+    "conversation_id": null,
+    "created_at": "2025-12-08 19:47:04.439665",
+    "updated_at": "2025-12-08 19:47:30.70087"
+  }
+]

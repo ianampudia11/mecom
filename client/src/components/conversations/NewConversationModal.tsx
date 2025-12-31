@@ -26,21 +26,29 @@ interface NewConversationModalProps {
 export default function NewConversationModal({
   isOpen,
   onClose,
-  onConversationCreated
-}: NewConversationModalProps) {
+  onConversationCreated,
+  prefillData
+}: NewConversationModalProps & { prefillData?: { name: string; phoneNumber: string } }) {
   const [name, setName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [selectedChannelId, setSelectedChannelId] = useState<number | null>(null);
   const [initialMessage, setInitialMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
-  
+
 
   const [isTemplatePopoverOpen, setIsTemplatePopoverOpen] = useState(false);
   const [templateSearchTerm, setTemplateSearchTerm] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState<WhatsAppTemplate | null>(null);
   const [isVariableModalOpen, setIsVariableModalOpen] = useState(false);
   const [variableValues, setVariableValues] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (isOpen && prefillData) {
+      setName(prefillData.name);
+      setPhoneNumber(prefillData.phoneNumber);
+    }
+  }, [isOpen, prefillData]);
 
   const { toast } = useToast();
   const { t } = useTranslation();
@@ -66,8 +74,8 @@ export default function NewConversationModal({
   const activeWhatsAppConnections = channelConnections.filter(
     (conn: ChannelConnection) =>
       (conn.channelType === 'whatsapp_unofficial' ||
-       conn.channelType === 'whatsapp' ||
-       conn.channelType === 'whatsapp_official') &&
+        conn.channelType === 'whatsapp' ||
+        conn.channelType === 'whatsapp_official') &&
       conn.status === 'active'
   );
 
@@ -99,7 +107,7 @@ export default function NewConversationModal({
 
   const searchFilteredTemplates = filteredTemplates.filter((template: WhatsAppTemplate) => {
     const matchesSearch = template.name.toLowerCase().includes(templateSearchTerm.toLowerCase()) ||
-                         template.content.toLowerCase().includes(templateSearchTerm.toLowerCase());
+      template.content.toLowerCase().includes(templateSearchTerm.toLowerCase());
     return matchesSearch;
   });
 
@@ -277,7 +285,7 @@ export default function NewConversationModal({
 
   const handleSelectTemplate = (template: WhatsAppTemplate) => {
     setSelectedTemplate(template);
-    
+
 
     if (template.variables && template.variables.length > 0) {
 
@@ -495,7 +503,7 @@ export default function NewConversationModal({
                       <span className="truncate">{selectedTemplate.name}</span>
                     ) : (
                       <span className="text-gray-500">
-                        {isLoadingTemplates 
+                        {isLoadingTemplates
                           ? t('templates.loading', 'Loading templates...')
                           : t('templates.select_template', 'Select Template')}
                       </span>

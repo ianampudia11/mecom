@@ -32,7 +32,7 @@ import {
 import { standardHandleStyle } from '../StyledHandle';
 import { useTranslation } from '@/hooks/use-translation';
 import { toast } from '@/hooks/use-toast';
-import { useFlowContext } from '../../../pages/flow-builder';
+import { useFlowContext } from '../FlowContext';
 import { TimezoneSelector } from '@/components/ui/timezone-selector';
 import { getBrowserTimezone } from '@/utils/timezones';
 
@@ -320,22 +320,22 @@ export function FollowUpNode({ id, data, isConnectable }: FollowUpNodeProps) {
         <div className="font-medium flex items-center gap-2">
           <Clock className="h-4 w-4 text-orange-600" />
           <span>{t('flow_builder.follow_up_message', 'Follow-up Message')}</span>
-        <button
-                className="ml-auto text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
-                onClick={() => setIsEditing(!isEditing)}
-              >
-                {isEditing ? (
-                  <>
-                    <EyeOff className="h-3 w-3" />
-                    Hide
-                  </>
-                ) : (
-                  <>
-                    <Eye className="h-3 w-3" />
-                    Edit
-                  </>
-                )}
-              </button>
+          <button
+            className="ml-auto text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+            onClick={() => setIsEditing(!isEditing)}
+          >
+            {isEditing ? (
+              <>
+                <EyeOff className="h-3 w-3" />
+                Hide
+              </>
+            ) : (
+              <>
+                <Eye className="h-3 w-3" />
+                Edit
+              </>
+            )}
+          </button>
         </div>
       </div>
 

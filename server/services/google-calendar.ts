@@ -245,7 +245,8 @@ class GoogleCalendarService {
     companyId: number,
     startDateTime: string,
     endDateTime: string,
-    bufferMinutes: number = 0
+    bufferMinutes: number = 0,
+    calendarId: string = 'primary'
   ): Promise<{ available: boolean, conflictingEvents?: any[], error?: string }> {
     try {
       const calendar = await this.getCalendarClient(userId, companyId);
@@ -272,12 +273,12 @@ class GoogleCalendarService {
           requestBody: {
             timeMin: timeMin,
             timeMax: timeMax,
-            items: [{ id: 'primary' }],
+            items: [{ id: calendarId }],
           },
         })
       );
 
-      const busySlots = busyTimeSlotsResponse.data.calendars?.primary?.busy || [];
+      const busySlots = busyTimeSlotsResponse.data.calendars?.[calendarId]?.busy || [];
 
 
 
@@ -336,12 +337,14 @@ class GoogleCalendarService {
    * @param companyId The company ID
    * @param eventData Event data including start, end, summary, etc.
    * @param eventData.bufferMinutes Optional buffer minutes to respect when checking for conflicts
+   * @param calendarId The ID of the calendar to create the event in (default: 'primary')
    * @returns Success status with event ID and link, or error message
    */
   public async createCalendarEvent(
     userId: number,
     companyId: number,
-    eventData: any
+    eventData: any,
+    calendarId: string = 'primary'
   ): Promise<{ success: boolean, eventId?: string, error?: string, eventLink?: string }> {
 
 
@@ -377,11 +380,12 @@ class GoogleCalendarService {
       companyId,
       startDateTime,
       endDateTime,
-      bufferMinutes
+      bufferMinutes,
+      calendarId
     );
 
     if (!availabilityCheck.available) {
-      
+
       return {
         success: false,
         error: 'The requested time slot is not available. Please choose a different time.'
@@ -445,9 +449,11 @@ class GoogleCalendarService {
 
       const sendUpdatesParam = send_updates ? 'all' : 'none';
 
+      console.log(`Creating event in calendar: ${calendarId}`);
+
       const response = await this.withRetry(() =>
         calendar.events.insert({
-          calendarId: 'primary',
+          calendarId: calendarId,
           requestBody: event,
           sendUpdates: sendUpdatesParam,
         })
@@ -494,6 +500,44 @@ class GoogleCalendarService {
   }
 
   /**
+   * List all calendars for the user
+   * @param userId The user ID
+   * @param companyId The company ID
+   */
+  public async listCalendars(
+    userId: number,
+    companyId: number
+  ): Promise<{ success: boolean, items?: any[], error?: string }> {
+    try {
+      const calendar = await this.getCalendarClient(userId, companyId);
+
+      if (!calendar) {
+        return { success: false, error: 'Google Calendar client not available' };
+      }
+
+      console.log(`Listing calendars for user ${userId}, company ${companyId}`);
+      const response = await this.withRetry(() =>
+        calendar.calendarList.list({
+          minAccessRole: 'reader'
+        })
+      );
+
+      console.log(`Found ${response.data.items?.length} calendars`);
+      return {
+        success: true,
+        items: response.data.items || []
+      };
+    } catch (error: any) {
+      console.error('Error listing calendars:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to list calendars',
+        items: []
+      };
+    }
+  }
+
+  /**
    * List calendar events for a specific time range
    * @param userId The user ID
    * @param companyId The company ID
@@ -501,6 +545,7 @@ class GoogleCalendarService {
    * @param timeMax End time for the range
    * @param maxResults Maximum number of events to return
    * @param requesterEmail Optional email of the requester to filter events for privacy
+   * @param calendarId The ID of the calendar to fetch events from (default: 'primary')
    */
   public async listCalendarEvents(
     userId: number,
@@ -508,7 +553,8 @@ class GoogleCalendarService {
     timeMin: string,
     timeMax: string,
     maxResults: number = 10,
-    requesterEmail?: string
+    requesterEmail?: string,
+    calendarId: string = 'primary'
   ): Promise<any> {
     try {
       const calendar = await this.getCalendarClient(userId, companyId);
@@ -541,7 +587,7 @@ class GoogleCalendarService {
 
       const response = await this.withRetry(() =>
         calendar.events.list({
-          calendarId: 'primary',
+          calendarId: calendarId,
           timeMin: startTime,
           timeMax: endTime,
           maxResults: maxResults,
@@ -613,12 +659,14 @@ class GoogleCalendarService {
    * @param companyId The company ID
    * @param eventId The ID of the event to delete
    * @param sendUpdates Whether to send cancellation notifications to attendees
+   * @param calendarId The ID of the calendar to delete the event from (default: 'primary')
    */
   public async deleteCalendarEvent(
     userId: number,
     companyId: number,
     eventId: string,
-    sendUpdates: boolean = true
+    sendUpdates: boolean = true,
+    calendarId: string = 'primary'
   ): Promise<{ success: boolean, error?: string }> {
     try {
       const calendar = await this.getCalendarClient(userId, companyId);
@@ -632,7 +680,7 @@ class GoogleCalendarService {
 
       const response = await this.withRetry(() =>
         calendar.events.delete({
-          calendarId: 'primary',
+          calendarId: calendarId,
           eventId: eventId,
           sendUpdates: sendUpdatesParam
         })
@@ -1082,7 +1130,7 @@ class GoogleCalendarService {
         dateArray = [formattedToday];
       }
 
-      
+
 
       const busyTimeSlotsResponse = await this.withRetry(() =>
         calendar.freebusy.query({
@@ -1111,7 +1159,7 @@ class GoogleCalendarService {
         };
       });
 
-      const allAvailableSlots: Array<{date: string, slots: string[]}> = [];
+      const allAvailableSlots: Array<{ date: string, slots: string[] }> = [];
 
       for (const currentDate of dateArray) {
         const availableSlots: string[] = [];
@@ -1126,7 +1174,7 @@ class GoogleCalendarService {
           slotEnd.setMinutes(slotEnd.getMinutes() + durationMinutes);
 
           if (slotEnd.getHours() > businessHoursEnd ||
-              (slotEnd.getHours() === businessHoursEnd && slotEnd.getMinutes() > 0)) {
+            (slotEnd.getHours() === businessHoursEnd && slotEnd.getMinutes() > 0)) {
             break;
           }
 

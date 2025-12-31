@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, FC, memo } from 'react';
 import { Handle, Position, useReactFlow } from 'reactflow';
 import { Trash2, Copy, Settings, Languages, Eye, EyeOff } from 'lucide-react';
-import { useFlowContext } from '../../pages/flow-builder';
+import { useFlowContext } from './FlowContext';
 import { useTranslation } from '@/hooks/use-translation';
 
 import { Button } from "@/components/ui/button";

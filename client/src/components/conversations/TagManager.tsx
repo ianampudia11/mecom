@@ -22,6 +22,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { useTranslation } from '@/hooks/use-translation';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { ColoredTag } from '@/components/ui/colored-tag';
 
 interface TagManagerProps {
     contactId: number;
@@ -64,6 +65,7 @@ export function TagManager({ contactId, initialTags = [], readOnly = false }: Ta
         },
         onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: ['/api/contacts', contactId] });
+            queryClient.invalidateQueries({ queryKey: ['/api/contacts'] });
             queryClient.invalidateQueries({ queryKey: ['/api/conversations'] });
             // Update local available tags if we added a new one
             queryClient.invalidateQueries({ queryKey: ['/api/contacts/tags'] });
@@ -108,9 +110,7 @@ export function TagManager({ contactId, initialTags = [], readOnly = false }: Ta
         return (
             <div className="flex flex-wrap gap-1">
                 {tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="px-1.5 py-0 text-xs">
-                        {tag}
-                    </Badge>
+                    <ColoredTag key={tag} name={tag} size="sm" />
                 ))}
             </div>
         );
@@ -119,23 +119,12 @@ export function TagManager({ contactId, initialTags = [], readOnly = false }: Ta
     return (
         <div className="flex flex-wrap items-center gap-1.5 align-middle">
             {tags.map((tag) => (
-                <Badge
+                <ColoredTag
                     key={tag}
-                    variant="secondary"
-                    className="px-2 py-0.5 text-xs h-6 flex items-center gap-1 hover:bg-secondary/80"
-                >
-                    {tag}
-                    <div
-                        role="button"
-                        className="ml-0.5 cursor-pointer rounded-full p-0.5 hover:bg-secondary-foreground/10"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            handleToggleTag(tag);
-                        }}
-                    >
-                        <X className="h-3 w-3" />
-                    </div>
-                </Badge>
+                    name={tag}
+                    onRemove={() => handleToggleTag(tag)}
+                    size="md"
+                />
             ))}
 
             <Popover open={open} onOpenChange={setOpen}>

@@ -39,7 +39,7 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Handle, Position, useReactFlow } from 'reactflow';
-import { useFlowContext } from '../../pages/flow-builder';
+import { useFlowContext } from './FlowContext';
 import { GoogleSheetsOAuthStatus } from './GoogleSheetsOAuthStatus';
 import { useGoogleSheetsAuth } from '@/hooks/useGoogleSheetsAuth';
 import React from 'react';

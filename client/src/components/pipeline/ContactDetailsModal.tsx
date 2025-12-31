@@ -6,16 +6,18 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ContactAvatar } from '@/components/contacts/ContactAvatar';
+import { ColoredTag } from '@/components/ui/colored-tag';
 import { Button } from '@/components/ui/button';
-import { 
-  User, 
-  Phone, 
-  Mail, 
-  Building, 
+import {
+  User,
+  Phone,
+  Mail,
+  Building,
   MessageCircle,
   Activity,
   ExternalLink,
-  MapPin} from 'lucide-react';
+  MapPin
+} from 'lucide-react';
 
 interface ContactDetailsModalProps {
   contactId: number | null;
@@ -93,7 +95,7 @@ export default function ContactDetailsModal({ contactId, isOpen, onClose }: Cont
             Contact Details
           </DialogTitle>
         </DialogHeader>
-        
+
         <ScrollArea className="flex-1 px-6 pb-6">
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
@@ -113,7 +115,7 @@ export default function ContactDetailsModal({ contactId, isOpen, onClose }: Cont
                       </span>
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {contact.phone && (
                       <div className="flex items-center gap-2 text-sm">
@@ -167,7 +169,7 @@ export default function ContactDetailsModal({ contactId, isOpen, onClose }: Cont
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">First Contacted</p>
                       <p className="text-sm">
-                        {contact.createdAt 
+                        {contact.createdAt
                           ? format(new Date(contact.createdAt), 'PPP')
                           : 'Unknown'
                         }
@@ -176,7 +178,7 @@ export default function ContactDetailsModal({ contactId, isOpen, onClose }: Cont
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Last Activity</p>
                       <p className="text-sm">
-                        {contact.lastContactedAt 
+                        {contact.lastContactedAt
                           ? formatDistanceToNow(new Date(contact.lastContactedAt), { addSuffix: true })
                           : 'No recent activity'
                         }
@@ -203,9 +205,7 @@ export default function ContactDetailsModal({ contactId, isOpen, onClose }: Cont
                     <h3 className="text-lg font-semibold">Tags</h3>
                     <div className="flex flex-wrap gap-2">
                       {contact.tags.map((tag: string, index: number) => (
-                        <Badge key={index} variant="secondary">
-                          {tag}
-                        </Badge>
+                        <ColoredTag key={index} name={tag} size="md" />
                       ))}
                     </div>
                   </div>

@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ColoredTag } from "@/components/ui/colored-tag";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 import { Switch } from "@/components/ui/switch";
@@ -41,7 +42,8 @@ import {
   Building,
   Hash,
   Type,
-  MessageSquare
+  MessageSquare,
+  CheckSquare
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
@@ -59,7 +61,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { useFlowContext } from "@/pages/flow-builder";
+import { useFlowContext } from './FlowContext';
 import { PipelineStage } from "@shared/schema";
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
@@ -278,7 +280,7 @@ export type UpdatePipelineStageData = {
   id: string;
   type: "update_pipeline_stage";
 
-  operation: 'update_stage' | 'create_stage' | 'create_deal' | 'update_deal' | 'manage_tags';
+  operation: 'update_stage' | 'create_stage' | 'create_deal' | 'update_deal' | 'manage_tags' | 'create_task';
   stageId?: string | null;
   stageName?: string;
   stageColor?: string;
@@ -303,6 +305,13 @@ export type UpdatePipelineStageData = {
   showAdvanced?: boolean;
   showTagManagement?: boolean;
   showDealCreation?: boolean;
+
+  // Task specific fields
+  taskTitle?: string;
+  taskDescription?: string;
+  taskCategory?: string;
+  taskPriority?: 'low' | 'medium' | 'high' | 'urgent';
+  taskDueDate?: string;
 };
 
 function UpdatePipelineStageNode({
@@ -321,7 +330,12 @@ function UpdatePipelineStageNode({
   });
 
   const { data: dealTags } = useQuery<string[]>({
-    queryKey: ['/api/deals/tags'],
+    queryKey: ['/api/contacts/tags'],
+    staleTime: 60 * 1000,
+  });
+
+  const { data: taskCategories } = useQuery<any[]>({
+    queryKey: ['/api/tasks/categories'],
     staleTime: 60 * 1000,
   });
 
@@ -420,6 +434,7 @@ function UpdatePipelineStageNode({
       case 'create_deal': return <DollarSign className="w-4 h-4" />;
       case 'update_deal': return <Target className="w-4 h-4" />;
       case 'manage_tags': return <Tag className="w-4 h-4" />;
+      case 'create_task': return <CheckSquare className="w-4 h-4" />;
       default: return <ArrowRightCircle className="w-4 h-4" />;
     }
   };
@@ -430,6 +445,7 @@ function UpdatePipelineStageNode({
       case 'create_deal': return 'Create Deal';
       case 'update_deal': return 'Update Deal';
       case 'manage_tags': return 'Manage Tags';
+      case 'create_task': return 'Create Task';
       default: return 'Update Pipeline Stage';
     }
   };
@@ -440,6 +456,7 @@ function UpdatePipelineStageNode({
       case 'create_deal': return 'Create a new deal in pipeline';
       case 'update_deal': return 'Update existing deal properties';
       case 'manage_tags': return 'Add or remove tags from deals';
+      case 'create_task': return 'Create a new task for the contact';
       default: return 'Move contact/deal to pipeline stage';
     }
   };
@@ -555,6 +572,12 @@ function UpdatePipelineStageNode({
                     <div className="flex items-center gap-2">
                       <Tag className="w-3 h-3" />
                       Manage Tags
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="create_task">
+                    <div className="flex items-center gap-2">
+                      <CheckSquare className="w-3 h-3" />
+                      Create Task
                     </div>
                   </SelectItem>
                 </SelectContent>
@@ -828,47 +851,72 @@ function UpdatePipelineStageNode({
                   <CollapsibleContent className="space-y-3 mt-2">
                     <div className="space-y-2">
                       <Label className="text-xs font-medium text-green-600">Tags to Add</Label>
-                      <div className="flex gap-1">
-                        <Input
-                          value={data.tagInput || ''}
-                          onChange={handleInputChange('tagInput')}
-                          placeholder="Enter tag name"
-                          className="h-8 text-xs"
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                              e.preventDefault();
-                              handleAddTag(data.tagInput || '');
-                            }
-                          }}
-                        />
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="h-8 px-2"
-                          onClick={() => handleAddTag(data.tagInput || '')}
-                        >
-                          <Plus className="w-3 h-3" />
-                        </Button>
-                      </div>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full h-8 justify-between"
+                          >
+                            <span className="text-xs">Select tags to add...</span>
+                            <Plus className="h-3 w-3" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[250px] p-0" align="start">
+                          <Command>
+                            <CommandInput
+                              placeholder="Search or create tag..."
+                              value={data.tagInput || ''}
+                              onValueChange={(value) => updateNodeData({ tagInput: value })}
+                            />
+                            <CommandList>
+                              <CommandEmpty>
+                                {data.tagInput && (
+                                  <div
+                                    className="p-2 text-xs cursor-pointer hover:bg-accent flex items-center gap-2"
+                                    onClick={() => {
+                                      handleAddTag(data.tagInput || '');
+                                      updateNodeData({ tagInput: '' });
+                                    }}
+                                  >
+                                    <Plus className="h-3 w-3" />
+                                    Create "{data.tagInput}"
+                                  </div>
+                                )}
+                              </CommandEmpty>
+                              {dealTags && dealTags.length > 0 && (
+                                <CommandGroup heading="Available Tags">
+                                  {dealTags
+                                    .filter(tag => !data.tagsToAdd?.includes(tag))
+                                    .map((tag: string) => (
+                                      <CommandItem
+                                        key={tag}
+                                        value={tag}
+                                        onSelect={() => {
+                                          handleAddTag(tag);
+                                          updateNodeData({ tagInput: '' });
+                                        }}
+                                        className="text-xs"
+                                      >
+                                        <ColoredTag name={tag} size="sm" />
+                                      </CommandItem>
+                                    ))}
+                                </CommandGroup>
+                              )}
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
 
                       {data.tagsToAdd && data.tagsToAdd.length > 0 && (
                         <div className="flex flex-wrap gap-1">
                           {data.tagsToAdd.map((tag, index) => (
-                            <Badge
+                            <ColoredTag
                               key={index}
-                              variant="secondary"
-                              className="text-xs bg-green-100 text-green-700 dark:bg-green-900/20"
-                            >
-                              {tag}
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="h-3 w-3 p-0 ml-1"
-                                onClick={() => handleRemoveTag(tag, true)}
-                              >
-                                <X className="w-2 h-2" />
-                              </Button>
-                            </Badge>
+                              name={tag}
+                              onRemove={() => handleRemoveTag(tag, true)}
+                              size="sm"
+                            />
                           ))}
                         </div>
                       )}
@@ -896,45 +944,134 @@ function UpdatePipelineStageNode({
 
                     <div className="space-y-2">
                       <Label className="text-xs font-medium text-red-600">Tags to Remove</Label>
-                      <div className="flex gap-1">
-                        <Select onValueChange={handleAddRemoveTag}>
-                          <SelectTrigger className="h-8">
-                            <SelectValue placeholder="Select tag to remove" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {dealTags?.map((tag) => (
-                              <SelectItem key={tag} value={tag}>
-                                {tag}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full h-8 justify-between"
+                          >
+                            <span className="text-xs">Select tags to remove...</span>
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[250px] p-0" align="start">
+                          <Command>
+                            <CommandInput placeholder="Search tags..." />
+                            <CommandList>
+                              <CommandEmpty>No tags available</CommandEmpty>
+                              {dealTags && dealTags.length > 0 && (
+                                <CommandGroup heading="Available to Remove">
+                                  {dealTags
+                                    .filter(tag => !data.tagsToRemove?.includes(tag))
+                                    .map((tag: string) => (
+                                      <CommandItem
+                                        key={tag}
+                                        value={tag}
+                                        onSelect={() => handleAddRemoveTag(tag)}
+                                        className="text-xs"
+                                      >
+                                        <ColoredTag name={tag} size="sm" />
+                                      </CommandItem>
+                                    ))}
+                                </CommandGroup>
+                              )}
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
 
                       {data.tagsToRemove && data.tagsToRemove.length > 0 && (
                         <div className="flex flex-wrap gap-1">
                           {data.tagsToRemove.map((tag, index) => (
-                            <Badge
+                            <ColoredTag
                               key={index}
-                              variant="secondary"
-                              className="text-xs bg-red-100 text-red-700 dark:bg-red-900/20"
-                            >
-                              {tag}
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="h-3 w-3 p-0 ml-1"
-                                onClick={() => handleRemoveTag(tag, false)}
-                              >
-                                <X className="w-2 h-2" />
-                              </Button>
-                            </Badge>
+                              name={tag}
+                              onRemove={() => handleRemoveTag(tag, false)}
+                              size="sm"
+                            />
                           ))}
                         </div>
                       )}
                     </div>
                   </CollapsibleContent>
                 </Collapsible>
+              </div>
+            )}
+
+            {data.operation === 'create_task' && (
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <Label className="text-xs font-medium">Task Category</Label>
+                  <Select
+                    value={data.taskCategory || ''}
+                    onValueChange={(value) => updateNodeData({ taskCategory: value })}
+                  >
+                    <SelectTrigger className="h-8">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {taskCategories?.map((category) => (
+                        <SelectItem key={category.id} value={category.id.toString()}>
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: category.color || '#ccc' }} />
+                            {category.name}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-xs font-medium">Title</Label>
+                  <VariablePicker
+                    value={data.taskTitle || ''}
+                    onChange={(value) => updateNodeData({ taskTitle: value })}
+                    placeholder="Task title..."
+                    className="h-8"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-xs font-medium">Description</Label>
+                  <VariablePicker
+                    value={data.taskDescription || ''}
+                    onChange={(value) => updateNodeData({ taskDescription: value })}
+                    placeholder="Task details..."
+                    className="h-16"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-2">
+                    <Label className="text-xs font-medium">Priority</Label>
+                    <Select
+                      value={data.taskPriority || 'medium'}
+                      onValueChange={(value) => updateNodeData({ taskPriority: value as any })}
+                    >
+                      <SelectTrigger className="h-8">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                        <SelectItem value="urgent">Urgent</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs font-medium">Due Date</Label>
+                    <VariablePicker
+                      value={data.taskDueDate || ''}
+                      onChange={(value) => updateNodeData({ taskDueDate: value })}
+                      placeholder="+3 days or variable"
+                      className="h-8"
+                    />
+                    <p className="text-[10px] text-muted-foreground">Relative (e.g. +3 days) or specific date</p>
+                  </div>
+                </div>
               </div>
             )}
 

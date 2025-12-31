@@ -3,7 +3,7 @@ import { Handle, Position } from 'reactflow';
 import { useReactFlow } from 'reactflow';
 import { useQuery } from '@tanstack/react-query';
 import { Trash2, Copy, Pause, UserCheck, Loader2, Users, Eye, EyeOff } from 'lucide-react';
-import { useFlowContext } from '../../pages/flow-builder';
+import { useFlowContext } from './FlowContext';
 import { apiRequest } from '@/lib/queryClient';
 import { useTranslation } from '@/hooks/use-translation';
 

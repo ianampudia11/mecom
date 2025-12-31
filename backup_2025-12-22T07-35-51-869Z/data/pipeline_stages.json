@@ -1,0 +1,752 @@
+[
+  {
+    "id": 45,
+    "company_id": null,
+    "name": "Nuevos",
+    "color": "#3B82F6",
+    "order_num": 0,
+    "created_at": "2025-12-21 21:22:59.343364",
+    "updated_at": "2025-12-21 21:22:59.343364",
+    "pipeline_id": 3
+  },
+  {
+    "id": 47,
+    "company_id": null,
+    "name": "Interesados",
+    "color": "#F97316",
+    "order_num": 2,
+    "created_at": "2025-12-21 21:22:59.347963",
+    "updated_at": "2025-12-21 21:22:59.347963",
+    "pipeline_id": 3
+  },
+  {
+    "id": 43,
+    "company_id": null,
+    "name": "Negociación",
+    "color": "#EC4899",
+    "order_num": 28,
+    "created_at": "2025-12-21 21:22:59.33944",
+    "updated_at": "2025-12-21 21:22:59.33944",
+    "pipeline_id": 2
+  },
+  {
+    "id": 37,
+    "company_id": null,
+    "name": "Negociación",
+    "color": "#EC4899",
+    "order_num": 30,
+    "created_at": "2025-12-21 21:22:59.324545",
+    "updated_at": "2025-12-21 21:22:59.324545",
+    "pipeline_id": 1
+  },
+  {
+    "id": 25,
+    "company_id": 4,
+    "name": "Lead",
+    "color": "#333235",
+    "order_num": 31,
+    "created_at": "2025-12-08 16:25:57.843147",
+    "updated_at": "2025-12-08 16:25:57.843147",
+    "pipeline_id": null
+  },
+  {
+    "id": 49,
+    "company_id": null,
+    "name": "Negociación",
+    "color": "#EC4899",
+    "order_num": 3,
+    "created_at": "2025-12-21 21:22:59.353152",
+    "updated_at": "2025-12-21 21:22:59.353152",
+    "pipeline_id": 3
+  },
+  {
+    "id": 26,
+    "company_id": 4,
+    "name": "Qualified",
+    "color": "#8B5CF6",
+    "order_num": 36,
+    "created_at": "2025-12-08 16:25:57.843147",
+    "updated_at": "2025-12-08 16:25:57.843147",
+    "pipeline_id": null
+  },
+  {
+    "id": 38,
+    "company_id": null,
+    "name": "Cerrado",
+    "color": "#22C55E",
+    "order_num": 37,
+    "created_at": "2025-12-21 21:22:59.326736",
+    "updated_at": "2025-12-21 21:22:59.326736",
+    "pipeline_id": 1
+  },
+  {
+    "id": 44,
+    "company_id": null,
+    "name": "Cerrado",
+    "color": "#22C55E",
+    "order_num": 38,
+    "created_at": "2025-12-21 21:22:59.340823",
+    "updated_at": "2025-12-21 21:22:59.340823",
+    "pipeline_id": 2
+  },
+  {
+    "id": 50,
+    "company_id": null,
+    "name": "Cerrado",
+    "color": "#22C55E",
+    "order_num": 4,
+    "created_at": "2025-12-21 21:22:59.355099",
+    "updated_at": "2025-12-21 21:22:59.355099",
+    "pipeline_id": 3
+  },
+  {
+    "id": 113,
+    "company_id": null,
+    "name": "Pensandote",
+    "color": "#f3722c",
+    "order_num": 5,
+    "created_at": "2025-12-22 01:43:36.945422",
+    "updated_at": "2025-12-22 01:43:36.945422",
+    "pipeline_id": 3
+  },
+  {
+    "id": 115,
+    "company_id": null,
+    "name": "Nuevos",
+    "color": "#3B82F6",
+    "order_num": 0,
+    "created_at": "2025-12-22 06:29:57.361542",
+    "updated_at": "2025-12-22 06:29:57.361542",
+    "pipeline_id": 13
+  },
+  {
+    "id": 116,
+    "company_id": null,
+    "name": "Contactados",
+    "color": "#EAB308",
+    "order_num": 1,
+    "created_at": "2025-12-22 06:29:57.364702",
+    "updated_at": "2025-12-22 06:29:57.364702",
+    "pipeline_id": 13
+  },
+  {
+    "id": 117,
+    "company_id": null,
+    "name": "Interesados",
+    "color": "#F97316",
+    "order_num": 2,
+    "created_at": "2025-12-22 06:29:57.366404",
+    "updated_at": "2025-12-22 06:29:57.366404",
+    "pipeline_id": 13
+  },
+  {
+    "id": 118,
+    "company_id": null,
+    "name": "Cita Agendada",
+    "color": "#A855F7",
+    "order_num": 3,
+    "created_at": "2025-12-22 06:29:57.367886",
+    "updated_at": "2025-12-22 06:29:57.367886",
+    "pipeline_id": 13
+  },
+  {
+    "id": 119,
+    "company_id": null,
+    "name": "Negociación",
+    "color": "#EC4899",
+    "order_num": 4,
+    "created_at": "2025-12-22 06:29:57.369379",
+    "updated_at": "2025-12-22 06:29:57.369379",
+    "pipeline_id": 13
+  },
+  {
+    "id": 120,
+    "company_id": null,
+    "name": "Cerrado",
+    "color": "#22C55E",
+    "order_num": 5,
+    "created_at": "2025-12-22 06:29:57.370902",
+    "updated_at": "2025-12-22 06:29:57.370902",
+    "pipeline_id": 13
+  },
+  {
+    "id": 93,
+    "company_id": null,
+    "name": "Nuevoskk",
+    "color": "#3B82F6",
+    "order_num": 0,
+    "created_at": "2025-12-21 21:26:54.287813",
+    "updated_at": "2025-12-21 21:26:54.287813",
+    "pipeline_id": 11
+  },
+  {
+    "id": 95,
+    "company_id": null,
+    "name": "Interesados",
+    "color": "#F97316",
+    "order_num": 1,
+    "created_at": "2025-12-21 21:26:54.291553",
+    "updated_at": "2025-12-21 21:26:54.291553",
+    "pipeline_id": 11
+  },
+  {
+    "id": 96,
+    "company_id": null,
+    "name": "Cita Agendada",
+    "color": "#A855F7",
+    "order_num": 2,
+    "created_at": "2025-12-21 21:26:54.293217",
+    "updated_at": "2025-12-21 21:26:54.293217",
+    "pipeline_id": 11
+  },
+  {
+    "id": 39,
+    "company_id": null,
+    "name": "Nuevos",
+    "color": "#3B82F6",
+    "order_num": 2,
+    "created_at": "2025-12-21 21:22:59.332333",
+    "updated_at": "2025-12-21 21:22:59.332333",
+    "pipeline_id": 2
+  },
+  {
+    "id": 97,
+    "company_id": null,
+    "name": "Negociación",
+    "color": "#EC4899",
+    "order_num": 3,
+    "created_at": "2025-12-21 21:26:54.294974",
+    "updated_at": "2025-12-21 21:26:54.294974",
+    "pipeline_id": 11
+  },
+  {
+    "id": 94,
+    "company_id": null,
+    "name": "Contactados",
+    "color": "#EAB308",
+    "order_num": 5,
+    "created_at": "2025-12-21 21:26:54.290008",
+    "updated_at": "2025-12-21 21:26:54.290008",
+    "pipeline_id": 11
+  },
+  {
+    "id": 33,
+    "company_id": null,
+    "name": "Nuevos",
+    "color": "#3B82F6",
+    "order_num": 6,
+    "created_at": "2025-12-21 21:22:59.308267",
+    "updated_at": "2025-12-21 21:22:59.308267",
+    "pipeline_id": 1
+  },
+  {
+    "id": 40,
+    "company_id": null,
+    "name": "Contactados",
+    "color": "#EAB308",
+    "order_num": 8,
+    "created_at": "2025-12-21 21:22:59.334422",
+    "updated_at": "2025-12-21 21:22:59.334422",
+    "pipeline_id": 2
+  },
+  {
+    "id": 9,
+    "company_id": 2,
+    "name": "Lead",
+    "color": "#333235",
+    "order_num": 9,
+    "created_at": "2025-12-08 15:35:51.708673",
+    "updated_at": "2025-12-08 15:35:51.708673",
+    "pipeline_id": null
+  },
+  {
+    "id": 99,
+    "company_id": 5,
+    "name": "Lead",
+    "color": "#333235",
+    "order_num": 11,
+    "created_at": "2025-12-21 22:43:01.33614",
+    "updated_at": "2025-12-21 22:43:01.33614",
+    "pipeline_id": null
+  },
+  {
+    "id": 34,
+    "company_id": null,
+    "name": "Contactados",
+    "color": "#EAB308",
+    "order_num": 12,
+    "created_at": "2025-12-21 21:22:59.315361",
+    "updated_at": "2025-12-21 21:22:59.315361",
+    "pipeline_id": 1
+  },
+  {
+    "id": 35,
+    "company_id": null,
+    "name": "Interesados",
+    "color": "#F97316",
+    "order_num": 13,
+    "created_at": "2025-12-21 21:22:59.318491",
+    "updated_at": "2025-12-21 21:22:59.318491",
+    "pipeline_id": 1
+  },
+  {
+    "id": 1,
+    "company_id": 1,
+    "name": "Lead",
+    "color": "#333235",
+    "order_num": 15,
+    "created_at": "2025-12-08 15:34:59.499995",
+    "updated_at": "2025-12-08 15:34:59.499995",
+    "pipeline_id": null
+  },
+  {
+    "id": 41,
+    "company_id": null,
+    "name": "Interesados",
+    "color": "#F97316",
+    "order_num": 17,
+    "created_at": "2025-12-21 21:22:59.336088",
+    "updated_at": "2025-12-21 21:22:59.336088",
+    "pipeline_id": 2
+  },
+  {
+    "id": 100,
+    "company_id": 5,
+    "name": "Qualified",
+    "color": "#8B5CF6",
+    "order_num": 19,
+    "created_at": "2025-12-21 22:43:01.33614",
+    "updated_at": "2025-12-21 22:43:01.33614",
+    "pipeline_id": null
+  },
+  {
+    "id": 17,
+    "company_id": 3,
+    "name": "Lead",
+    "color": "#333235",
+    "order_num": 20,
+    "created_at": "2025-12-08 15:54:25.472418",
+    "updated_at": "2025-12-08 15:54:25.472418",
+    "pipeline_id": null
+  },
+  {
+    "id": 42,
+    "company_id": null,
+    "name": "Cita Agendada",
+    "color": "#A855F7",
+    "order_num": 22,
+    "created_at": "2025-12-21 21:22:59.337916",
+    "updated_at": "2025-12-21 21:22:59.337916",
+    "pipeline_id": 2
+  },
+  {
+    "id": 36,
+    "company_id": null,
+    "name": "Cita Agendada",
+    "color": "#A855F7",
+    "order_num": 24,
+    "created_at": "2025-12-21 21:22:59.32241",
+    "updated_at": "2025-12-21 21:22:59.32241",
+    "pipeline_id": 1
+  },
+  {
+    "id": 101,
+    "company_id": 5,
+    "name": "Contacted",
+    "color": "#EC4899",
+    "order_num": 25,
+    "created_at": "2025-12-21 22:43:01.33614",
+    "updated_at": "2025-12-21 22:43:01.33614",
+    "pipeline_id": null
+  },
+  {
+    "id": 106,
+    "company_id": 5,
+    "name": "Closed Lost",
+    "color": "#DC2626",
+    "order_num": 48,
+    "created_at": "2025-12-21 22:43:01.33614",
+    "updated_at": "2025-12-21 22:43:01.33614",
+    "pipeline_id": null
+  },
+  {
+    "id": 19,
+    "company_id": 3,
+    "name": "Contacted",
+    "color": "#EC4899",
+    "order_num": 49,
+    "created_at": "2025-12-08 15:54:25.472418",
+    "updated_at": "2025-12-08 15:54:25.472418",
+    "pipeline_id": null
+  },
+  {
+    "id": 114,
+    "company_id": null,
+    "name": "Finalsasss",
+    "color": "#3a86ff",
+    "order_num": 1,
+    "created_at": "2025-12-22 05:38:00.052841",
+    "updated_at": "2025-12-22 05:47:41.19",
+    "pipeline_id": 3
+  },
+  {
+    "id": 98,
+    "company_id": null,
+    "name": "Cerrados",
+    "color": "#22C55E",
+    "order_num": 4,
+    "created_at": "2025-12-21 21:26:54.297133",
+    "updated_at": "2025-12-21 21:26:54.297133",
+    "pipeline_id": 11
+  },
+  {
+    "id": 107,
+    "company_id": null,
+    "name": "Nuevos",
+    "color": "#3B82F6",
+    "order_num": 3,
+    "created_at": "2025-12-21 22:51:32.406357",
+    "updated_at": "2025-12-21 22:51:32.406357",
+    "pipeline_id": 12
+  },
+  {
+    "id": 108,
+    "company_id": null,
+    "name": "Contactados",
+    "color": "#EAB308",
+    "order_num": 10,
+    "created_at": "2025-12-21 22:51:32.432094",
+    "updated_at": "2025-12-21 22:51:32.432094",
+    "pipeline_id": 12
+  },
+  {
+    "id": 109,
+    "company_id": null,
+    "name": "Interesados",
+    "color": "#F97316",
+    "order_num": 18,
+    "created_at": "2025-12-21 22:51:32.449642",
+    "updated_at": "2025-12-21 22:51:32.449642",
+    "pipeline_id": 12
+  },
+  {
+    "id": 110,
+    "company_id": null,
+    "name": "Cita Agendada",
+    "color": "#A855F7",
+    "order_num": 23,
+    "created_at": "2025-12-21 22:51:32.472755",
+    "updated_at": "2025-12-21 22:51:32.472755",
+    "pipeline_id": 12
+  },
+  {
+    "id": 102,
+    "company_id": 5,
+    "name": "Demo Scheduled",
+    "color": "#F59E0B",
+    "order_num": 32,
+    "created_at": "2025-12-21 22:43:01.33614",
+    "updated_at": "2025-12-21 22:43:01.33614",
+    "pipeline_id": null
+  },
+  {
+    "id": 111,
+    "company_id": null,
+    "name": "Negociación",
+    "color": "#EC4899",
+    "order_num": 34,
+    "created_at": "2025-12-21 22:51:32.516075",
+    "updated_at": "2025-12-21 22:51:32.516075",
+    "pipeline_id": 12
+  },
+  {
+    "id": 112,
+    "company_id": null,
+    "name": "Cerrado",
+    "color": "#22C55E",
+    "order_num": 35,
+    "created_at": "2025-12-21 22:51:32.558925",
+    "updated_at": "2025-12-21 22:51:32.558925",
+    "pipeline_id": 12
+  },
+  {
+    "id": 103,
+    "company_id": 5,
+    "name": "Proposal",
+    "color": "#10B981",
+    "order_num": 42,
+    "created_at": "2025-12-21 22:43:01.33614",
+    "updated_at": "2025-12-21 22:43:01.33614",
+    "pipeline_id": null
+  },
+  {
+    "id": 104,
+    "company_id": 5,
+    "name": "Negotiation",
+    "color": "#3B82F6",
+    "order_num": 43,
+    "created_at": "2025-12-21 22:43:01.33614",
+    "updated_at": "2025-12-21 22:43:01.33614",
+    "pipeline_id": null
+  },
+  {
+    "id": 10,
+    "company_id": 2,
+    "name": "Qualified",
+    "color": "#8B5CF6",
+    "order_num": 44,
+    "created_at": "2025-12-08 15:35:51.708673",
+    "updated_at": "2025-12-08 15:35:51.708673",
+    "pipeline_id": null
+  },
+  {
+    "id": 18,
+    "company_id": 3,
+    "name": "Qualified",
+    "color": "#8B5CF6",
+    "order_num": 45,
+    "created_at": "2025-12-08 15:54:25.472418",
+    "updated_at": "2025-12-08 15:54:25.472418",
+    "pipeline_id": null
+  },
+  {
+    "id": 105,
+    "company_id": 5,
+    "name": "Closed Won",
+    "color": "#059669",
+    "order_num": 46,
+    "created_at": "2025-12-21 22:43:01.33614",
+    "updated_at": "2025-12-21 22:43:01.33614",
+    "pipeline_id": null
+  },
+  {
+    "id": 2,
+    "company_id": 1,
+    "name": "Qualified",
+    "color": "#8B5CF6",
+    "order_num": 47,
+    "created_at": "2025-12-08 15:34:59.499995",
+    "updated_at": "2025-12-08 15:34:59.499995",
+    "pipeline_id": null
+  },
+  {
+    "id": 27,
+    "company_id": 4,
+    "name": "Contacted",
+    "color": "#EC4899",
+    "order_num": 50,
+    "created_at": "2025-12-08 16:25:57.843147",
+    "updated_at": "2025-12-08 16:25:57.843147",
+    "pipeline_id": null
+  },
+  {
+    "id": 11,
+    "company_id": 2,
+    "name": "Contacted",
+    "color": "#EC4899",
+    "order_num": 51,
+    "created_at": "2025-12-08 15:35:51.708673",
+    "updated_at": "2025-12-08 15:35:51.708673",
+    "pipeline_id": null
+  },
+  {
+    "id": 3,
+    "company_id": 1,
+    "name": "Contacted",
+    "color": "#EC4899",
+    "order_num": 52,
+    "created_at": "2025-12-08 15:34:59.499995",
+    "updated_at": "2025-12-08 15:34:59.499995",
+    "pipeline_id": null
+  },
+  {
+    "id": 4,
+    "company_id": 1,
+    "name": "Demo Scheduled",
+    "color": "#F59E0B",
+    "order_num": 53,
+    "created_at": "2025-12-08 15:34:59.499995",
+    "updated_at": "2025-12-08 15:34:59.499995",
+    "pipeline_id": null
+  },
+  {
+    "id": 20,
+    "company_id": 3,
+    "name": "Demo Scheduled",
+    "color": "#F59E0B",
+    "order_num": 54,
+    "created_at": "2025-12-08 15:54:25.472418",
+    "updated_at": "2025-12-08 15:54:25.472418",
+    "pipeline_id": null
+  },
+  {
+    "id": 12,
+    "company_id": 2,
+    "name": "Demo Scheduled",
+    "color": "#F59E0B",
+    "order_num": 55,
+    "created_at": "2025-12-08 15:35:51.708673",
+    "updated_at": "2025-12-08 15:35:51.708673",
+    "pipeline_id": null
+  },
+  {
+    "id": 29,
+    "company_id": 4,
+    "name": "Proposal",
+    "color": "#10B981",
+    "order_num": 56,
+    "created_at": "2025-12-08 16:25:57.843147",
+    "updated_at": "2025-12-08 16:25:57.843147",
+    "pipeline_id": null
+  },
+  {
+    "id": 5,
+    "company_id": 1,
+    "name": "Proposal",
+    "color": "#10B981",
+    "order_num": 57,
+    "created_at": "2025-12-08 15:34:59.499995",
+    "updated_at": "2025-12-08 15:34:59.499995",
+    "pipeline_id": null
+  },
+  {
+    "id": 13,
+    "company_id": 2,
+    "name": "Proposal",
+    "color": "#10B981",
+    "order_num": 58,
+    "created_at": "2025-12-08 15:35:51.708673",
+    "updated_at": "2025-12-08 15:35:51.708673",
+    "pipeline_id": null
+  },
+  {
+    "id": 21,
+    "company_id": 3,
+    "name": "Proposal",
+    "color": "#10B981",
+    "order_num": 59,
+    "created_at": "2025-12-08 15:54:25.472418",
+    "updated_at": "2025-12-08 15:54:25.472418",
+    "pipeline_id": null
+  },
+  {
+    "id": 22,
+    "company_id": 3,
+    "name": "Negotiation",
+    "color": "#3B82F6",
+    "order_num": 60,
+    "created_at": "2025-12-08 15:54:25.472418",
+    "updated_at": "2025-12-08 15:54:25.472418",
+    "pipeline_id": null
+  },
+  {
+    "id": 6,
+    "company_id": 1,
+    "name": "Negotiation",
+    "color": "#3B82F6",
+    "order_num": 61,
+    "created_at": "2025-12-08 15:34:59.499995",
+    "updated_at": "2025-12-08 15:34:59.499995",
+    "pipeline_id": null
+  },
+  {
+    "id": 30,
+    "company_id": 4,
+    "name": "Negotiation",
+    "color": "#3B82F6",
+    "order_num": 62,
+    "created_at": "2025-12-08 16:25:57.843147",
+    "updated_at": "2025-12-08 16:25:57.843147",
+    "pipeline_id": null
+  },
+  {
+    "id": 14,
+    "company_id": 2,
+    "name": "Negotiation",
+    "color": "#3B82F6",
+    "order_num": 63,
+    "created_at": "2025-12-08 15:35:51.708673",
+    "updated_at": "2025-12-08 15:35:51.708673",
+    "pipeline_id": null
+  },
+  {
+    "id": 15,
+    "company_id": 2,
+    "name": "Closed Won",
+    "color": "#059669",
+    "order_num": 64,
+    "created_at": "2025-12-08 15:35:51.708673",
+    "updated_at": "2025-12-08 15:35:51.708673",
+    "pipeline_id": null
+  },
+  {
+    "id": 23,
+    "company_id": 3,
+    "name": "Closed Won",
+    "color": "#059669",
+    "order_num": 65,
+    "created_at": "2025-12-08 15:54:25.472418",
+    "updated_at": "2025-12-08 15:54:25.472418",
+    "pipeline_id": null
+  },
+  {
+    "id": 7,
+    "company_id": 1,
+    "name": "Closed Won",
+    "color": "#059669",
+    "order_num": 66,
+    "created_at": "2025-12-08 15:34:59.499995",
+    "updated_at": "2025-12-08 15:34:59.499995",
+    "pipeline_id": null
+  },
+  {
+    "id": 31,
+    "company_id": 4,
+    "name": "Closed Won",
+    "color": "#059669",
+    "order_num": 67,
+    "created_at": "2025-12-08 16:25:57.843147",
+    "updated_at": "2025-12-08 16:25:57.843147",
+    "pipeline_id": null
+  },
+  {
+    "id": 32,
+    "company_id": 4,
+    "name": "Closed Lost",
+    "color": "#DC2626",
+    "order_num": 68,
+    "created_at": "2025-12-08 16:25:57.843147",
+    "updated_at": "2025-12-08 16:25:57.843147",
+    "pipeline_id": null
+  },
+  {
+    "id": 8,
+    "company_id": 1,
+    "name": "Closed Lost",
+    "color": "#DC2626",
+    "order_num": 69,
+    "created_at": "2025-12-08 15:34:59.499995",
+    "updated_at": "2025-12-08 15:34:59.499995",
+    "pipeline_id": null
+  },
+  {
+    "id": 16,
+    "company_id": 2,
+    "name": "Closed Lost",
+    "color": "#DC2626",
+    "order_num": 70,
+    "created_at": "2025-12-08 15:35:51.708673",
+    "updated_at": "2025-12-08 15:35:51.708673",
+    "pipeline_id": null
+  },
+  {
+    "id": 24,
+    "company_id": 3,
+    "name": "Closed Lost",
+    "color": "#DC2626",
+    "order_num": 71,
+    "created_at": "2025-12-08 15:54:25.472418",
+    "updated_at": "2025-12-08 15:54:25.472418",
+    "pipeline_id": null
+  }
+]

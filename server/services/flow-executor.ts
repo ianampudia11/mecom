@@ -4,7 +4,8 @@ import {
   Message,
   Contact,
   Conversation,
-  ChannelConnection} from '@shared/schema';
+  ChannelConnection
+} from '@shared/schema';
 import whatsAppService from './channels/whatsapp';
 import instagramService from './channels/instagram';
 import messengerService from './channels/messenger';
@@ -23,7 +24,9 @@ import {
 } from '@shared/types/node-types';
 import { EventEmitter } from 'events';
 import * as path from 'path';
+
 import { isWhatsAppGroupChatId } from '../utils/whatsapp-group-filter';
+import { notificationService } from './notification-service';
 
 interface Flow {
   id: number;
@@ -196,6 +199,29 @@ class FlowExecutor extends EventEmitter {
       expiresAt = new Date(now.getTime() + timeoutMs);
     }
 
+    // Initialize variables from initialContext
+    const variables = new Map<string, any>();
+    if (initialContext) {
+      if (initialContext.triggerEvent) {
+        variables.set('trigger.event', initialContext.triggerEvent);
+      }
+      if (initialContext.triggerData) {
+        variables.set('trigger.data', initialContext.triggerData);
+        // Flatten trigger data for easier access
+        if (typeof initialContext.triggerData === 'object') {
+          for (const [key, value] of Object.entries(initialContext.triggerData)) {
+            variables.set(`trigger.${key}`, value);
+          }
+        }
+      }
+      // Copy other context
+      for (const [key, value] of Object.entries(initialContext)) {
+        if (key !== 'triggerEvent' && key !== 'triggerData') {
+          variables.set(key, value);
+        }
+      }
+    }
+
     const session: FlowSessionState = {
       sessionId,
       flowId,
@@ -207,7 +233,7 @@ class FlowExecutor extends EventEmitter {
       triggerNodeId,
       executionPath: [triggerNodeId],
       branchingHistory: [],
-      variables: new Map(),
+      variables: variables,
       nodeStates: new Map(),
       waitingContext: null,
       startedAt: now,
@@ -234,7 +260,7 @@ class FlowExecutor extends EventEmitter {
         triggerNodeId,
         executionPath: JSON.stringify([triggerNodeId]),
         branchingHistory: JSON.stringify([]),
-        sessionData: JSON.stringify({}),
+        sessionData: JSON.stringify(Object.fromEntries(variables)),
         nodeStates: JSON.stringify({}),
         waitingContext: null,
         startedAt: now,
@@ -248,7 +274,26 @@ class FlowExecutor extends EventEmitter {
       });
 
       this.emit('sessionCreated', { sessionId, flowId, conversationId, contactId });
+
+      // Also persist individual variables for easier querying/updating
+      for (const [key, value] of variables.entries()) {
+        try {
+          await storage.upsertFlowSessionVariable({
+            sessionId,
+            variableKey: key,
+            variableValue: JSON.stringify(value),
+            variableType: typeof value,
+            scope: 'session',
+            createdAt: now,
+            updatedAt: now
+          });
+        } catch (varError) {
+          console.error(`Error persisting initial session variable ${key}:`, varError);
+        }
+      }
+
     } catch (error) {
+      console.error(`Error persisting flow session ${sessionId}:`, error);
     }
 
     return sessionId;
@@ -285,9 +330,9 @@ class FlowExecutor extends EventEmitter {
       if (updates.waitingContext !== undefined) dbUpdates.waitingContext = updates.waitingContext ? JSON.stringify(updates.waitingContext) : null;
 
       if (updates.aiSessionActive !== undefined ||
-          updates.aiNodeId !== undefined ||
-          updates.aiStopKeyword !== undefined ||
-          updates.aiExitOutputHandle !== undefined) {
+        updates.aiNodeId !== undefined ||
+        updates.aiStopKeyword !== undefined ||
+        updates.aiExitOutputHandle !== undefined) {
 
         const currentNodeStates = session.nodeStates || new Map();
         const aiSessionData = {
@@ -459,7 +504,7 @@ class FlowExecutor extends EventEmitter {
 
     for (const session of Array.from(this.activeSessions.values())) {
       if (session.conversationId === conversationId &&
-          (['active', 'waiting', 'paused'].includes(session.status) || session.aiSessionActive)) {
+        (['active', 'waiting', 'paused'].includes(session.status) || session.aiSessionActive)) {
         activeSessions.push(session);
       }
     }
@@ -597,7 +642,7 @@ class FlowExecutor extends EventEmitter {
 
     if ((global as any).flowAssignmentEventEmitter) {
       (global as any).flowAssignmentEventEmitter.on('flowAssignmentStatusChanged', (data: any) => {
-        
+
 
 
         this.lastAssignmentChangeTime = Date.now();
@@ -904,7 +949,7 @@ class FlowExecutor extends EventEmitter {
     contact: Contact,
     channelConnection: ChannelConnection
   ): Promise<void> {
-    
+
 
 
 
@@ -985,7 +1030,7 @@ class FlowExecutor extends EventEmitter {
 
 
         const aiSessions = activeSessions.filter(session => session.aiSessionActive);
-    
+
 
         if (aiSessions.length > 0) {
 
@@ -1068,7 +1113,7 @@ class FlowExecutor extends EventEmitter {
     channelConnection: ChannelConnection
   ): Promise<boolean> {
     try {
-   
+
 
 
       if (!this.isValidIndividualContact(contact)) {
@@ -1082,7 +1127,7 @@ class FlowExecutor extends EventEmitter {
       const sessionFlowAssigned = activeAssignments.some(assignment => assignment.flowId === session.flowId);
 
       if (!sessionFlowAssigned) {
-  
+
 
 
         await this.endAISession(session, message, conversation, contact, channelConnection);
@@ -1093,7 +1138,7 @@ class FlowExecutor extends EventEmitter {
 
 
       if (!session.aiSessionActive || !session.aiNodeId) {
-        
+
 
 
         if (session.aiSessionActive && !session.aiNodeId) {
@@ -1154,7 +1199,7 @@ class FlowExecutor extends EventEmitter {
       if (aiNode.data?.enableTaskExecution) {
         const triggeredTasks = context.getVariable('ai.triggeredTasks') as string[];
         if (triggeredTasks && triggeredTasks.length > 0) {
-          
+
 
 
           const baseFlow = await storage.getFlow(session.flowId);
@@ -1168,7 +1213,7 @@ class FlowExecutor extends EventEmitter {
             );
 
             if (taskEdges.length > 0) {
-          
+
 
 
               const flowEdges = typeof baseFlow.edges === 'string' ? JSON.parse(baseFlow.edges) : baseFlow.edges;
@@ -1309,7 +1354,7 @@ class FlowExecutor extends EventEmitter {
       const stopKeyword = nodeData.stopKeyword || '';
       const exitOutputHandle = nodeData.exitOutputHandle || 'ai-stopped';
 
- 
+
 
       if (enableSessionTakeover) {
 
@@ -1616,7 +1661,7 @@ class FlowExecutor extends EventEmitter {
     visitedNodes: Set<string> = new Set(),
     maxDepth: number = 100
   ): Promise<void> {
-    
+
 
     try {
 
@@ -1708,9 +1753,9 @@ class FlowExecutor extends EventEmitter {
       const nodeLabel = (currentNode.data && currentNode.data.label) || '';
       const currentNodeType = NodeTypeUtils.normalizeNodeType(nodeType, nodeLabel);
       const isConditionNode = nodeType === 'conditionNode' ||
-                             nodeType === 'condition' ||
-                             nodeLabel === 'Condition Node' ||
-                             currentNodeType === NodeType.CONDITION;
+        nodeType === 'condition' ||
+        nodeLabel === 'Condition Node' ||
+        currentNodeType === NodeType.CONDITION;
 
       let edgesToExecute = outgoingEdges;
 
@@ -1755,7 +1800,7 @@ class FlowExecutor extends EventEmitter {
 
           const defaultEdges = outgoingEdges.filter((edge: any) => !edge.sourceHandle || edge.sourceHandle === 'default');
           edgesToExecute = defaultEdges.length > 0 ? defaultEdges : outgoingEdges;
-          
+
         } else if (matchedKeyword) {
 
           const keywordHandleId = `keyword-${matchedKeyword.toLowerCase().replace(/\s+/g, '-')}`;
@@ -1769,7 +1814,7 @@ class FlowExecutor extends EventEmitter {
 
             const defaultEdges = outgoingEdges.filter((edge: any) => !edge.sourceHandle || edge.sourceHandle === 'default');
             edgesToExecute = defaultEdges.length > 0 ? defaultEdges : outgoingEdges;
-            
+
           }
         } else {
 
@@ -1927,7 +1972,7 @@ class FlowExecutor extends EventEmitter {
 
         const selectedButtonPayload = context.getVariable('selectedButtonPayload');
 
-  
+
 
         if (selectedButtonPayload) {
 
@@ -1961,7 +2006,7 @@ class FlowExecutor extends EventEmitter {
         }
       }
 
- 
+
 
       for (const edge of edgesToExecute) {
         const targetNode = allNodes.find((node: any) => node.id === edge.target);
@@ -1970,7 +2015,7 @@ class FlowExecutor extends EventEmitter {
           continue;
         }
 
-        
+
 
         const shouldTraverse = await this.evaluateEdgeCondition(edge, context);
 
@@ -2132,7 +2177,7 @@ class FlowExecutor extends EventEmitter {
           if (node.data?.enableTaskExecution) {
             const triggeredTasks = context.getVariable('ai.triggeredTasks') as string[];
             if (triggeredTasks && triggeredTasks.length > 0) {
-              
+
 
               break;
             }
@@ -2375,7 +2420,7 @@ class FlowExecutor extends EventEmitter {
           const currentNodeType = context.getVariable('currentNode.type');
           const currentNodeCondition = context.getVariable('currentNode.conditionType');
 
-          
+
 
           if (currentNodeType === 'trigger' && currentNodeCondition === 'any') {
 
@@ -2433,7 +2478,7 @@ class FlowExecutor extends EventEmitter {
   private evaluateQuickReplyEdge(edge: any, context: FlowExecutionContext): boolean {
     try {
       const sourceHandle = edge.sourceHandle;
-      
+
 
       if (sourceHandle === 'go-back') {
         const isGoBackSelected = context.getVariable('isGoBackSelected');
@@ -2586,6 +2631,192 @@ class FlowExecutor extends EventEmitter {
   }
 
   /**
+   * Process generic flow triggers (tags, agents, tasks, stage changes)
+   */
+  async processEventTriggers(
+    event: {
+      type: 'tag_assigned' | 'agent_assigned' | 'task_completed' | 'pipeline_stage_changed';
+      data: {
+        contactId?: number;
+        conversationId?: number;
+        companyId: number;
+        triggerData: any;
+      }
+    }
+  ): Promise<void> {
+    try {
+      if (!event.data.companyId) {
+        console.warn(`[FlowTrigger] Missing companyId for event ${event.type}`);
+        return;
+      }
+
+      // Fetch all active flows for the company
+      const allFlows = await storage.getFlowsByCompany(event.data.companyId);
+      const activeFlows = allFlows.filter(f => f.status === 'active');
+
+      if (activeFlows.length === 0) return;
+
+      const { contactId, conversationId, triggerData, companyId } = event.data;
+
+      for (const flowData of activeFlows) {
+        try {
+          const flow: Flow = { ...flowData, definition: (flowData as any).definition || null };
+          const { nodes, edges } = await this.parseFlowDefinition(flow);
+
+          const matchingTriggerNodes = nodes.filter((node: any) => {
+            if (node.type !== 'trigger' && node.type !== 'start') return false;
+
+            const nodeTriggerType = node.data?.triggerType;
+
+            // Mapping event types to node trigger configurations
+            if (event.type === 'tag_assigned') {
+              if (nodeTriggerType !== 'tag_assigned') return false;
+              // Check if specific tag is required
+              const requiredTag = node.data?.selectedTag;
+              // If node has specific tag selected, it must match.
+              if (requiredTag && requiredTag !== '' && requiredTag !== triggerData.tag) return false;
+              return true;
+            }
+
+            if (event.type === 'agent_assigned') {
+              if (nodeTriggerType !== 'agent_assigned') return false;
+              const requiredAgentId = node.data?.selectedAgentId;
+              if (requiredAgentId && requiredAgentId !== '' && String(requiredAgentId) !== String(triggerData.agentId)) return false;
+              return true;
+            }
+
+            if (event.type === 'task_completed') {
+              if (nodeTriggerType !== 'task_completed') return false;
+              return true;
+            }
+
+            if (event.type === 'pipeline_stage_changed') {
+              if (nodeTriggerType !== 'pipeline_stage_changed') return false;
+
+              const requiredStageId = node.data?.selectedPipelineStageId;
+              if (requiredStageId && requiredStageId !== '' && String(requiredStageId) !== String(triggerData.stageId)) return false;
+
+              return true;
+            }
+
+            return false;
+          });
+
+          for (const triggerNode of matchingTriggerNodes) {
+            console.log(`[FlowTrigger] Matched flow ${flow.id} for event ${event.type}`);
+
+            let targetConversationId = conversationId;
+            let targetContactId = contactId;
+
+            if (!targetContactId) {
+              console.warn(`[FlowTrigger] Skipping flow ${flow.id} - No contactId`);
+              continue;
+            }
+
+            if (!targetConversationId) {
+              // Try to find the extensive/last active conversation for this contact
+              const { conversations } = await storage.getConversations({ contactId: targetContactId, limit: 1 });
+              if (conversations.length > 0) {
+                targetConversationId = conversations[0].id;
+              } else {
+                console.warn(`[FlowTrigger] Skipping flow ${flow.id} for contact ${targetContactId} - No conversation found`);
+                continue;
+              }
+            }
+
+            // Create Session
+            const sessionId = await this.createSession(
+              flow.id,
+              targetConversationId!,
+              targetContactId!,
+              companyId,
+              triggerNode.id,
+              {
+                triggerEvent: event.type,
+                triggerData: triggerData
+              },
+              triggerNode.data
+            );
+
+            // Start Execution
+            try {
+              const sessionState = await this.loadSession(sessionId);
+
+              if (!sessionState) {
+                console.error(`[FlowTrigger] Failed to load session ${sessionId}`);
+                continue;
+              }
+
+              const conversation = await storage.getConversation(targetConversationId!);
+              const contact = await storage.getContact(targetContactId!);
+
+              if (conversation && contact) {
+                const channelConnection = await storage.getChannelConnection(conversation.channelId);
+
+                if (channelConnection) {
+                  // Create a synthetic message for the execution context
+                  const syntheticMessage = {
+                    id: 0,
+                    conversationId: conversation.id,
+                    senderId: contact.id,
+                    content: `Current Trigger: ${event.type}`,
+                    type: 'text',
+                    direction: 'inbound',
+                    status: 'read',
+                    isFromBot: false,
+                    createdAt: new Date(),
+                    sentAt: new Date(),
+                    isHistorySync: false,
+                    metadata: {
+                      triggerEvent: event.type,
+                      triggerData
+                    }
+                  } as any as Message;
+
+                  // Create Execution Context
+                  const context = new FlowExecutionContext();
+                  context.setSessionVariables(sessionState.variables, sessionState.sessionId);
+                  context.setContactVariables(contact);
+                  context.setConversationVariables(conversation);
+                  context.setMessageVariables(syntheticMessage);
+
+                  await this.executeConnectedNodesWithSession(
+                    sessionState,
+                    triggerNode,
+                    nodes,
+                    edges,
+                    syntheticMessage,
+                    conversation,
+                    contact,
+                    channelConnection,
+                    context,
+                    true,
+                    new Set(),
+                    100
+                  );
+                  console.log(`[FlowTrigger] Started execution for session ${session.sessionId}`);
+                } else {
+                  console.error(`[FlowTrigger] Failed to start execution: No channel connection found for conversation ${conversation.id}`);
+                }
+              } else {
+                console.error(`[FlowTrigger] Failed to start execution: Conversation or Contact not found`);
+              }
+            } catch (execError) {
+              console.error(`[FlowTrigger] Error starting flow execution:`, execError);
+            }
+
+          }
+
+        } catch (flowError) {
+          console.error(`[FlowTrigger] Error processing flow ${flowData.id}:`, flowError);
+        }
+      }
+    } catch (error) {
+      console.error(`[FlowTrigger] Error processing event triggers:`, error);
+    }
+  }
+
+  /**
    * Process new flow triggers with concurrency protection
    */
   private async processNewFlowTriggers(
@@ -2594,7 +2825,7 @@ class FlowExecutor extends EventEmitter {
     contact: Contact,
     channelConnection: ChannelConnection
   ): Promise<void> {
-    
+
 
 
     if (!this.isValidIndividualContact(contact)) {
@@ -2607,7 +2838,7 @@ class FlowExecutor extends EventEmitter {
     const flowAssignments = await storage.getFlowAssignments(channelConnection.id);
     const activeAssignments = flowAssignments.filter(assignment => assignment.isActive);
 
-    
+
 
     if (activeAssignments.length === 0) {
 
@@ -2829,7 +3060,7 @@ class FlowExecutor extends EventEmitter {
       const baseOptions = node.data?.options || [];
       const contextOptions = context.getVariable('poll.options') || baseOptions;
       const options = contextOptions.length > 0 ? contextOptions : baseOptions;
-      
+
       const messageContent = message.content?.toLowerCase() || '';
 
 
@@ -2902,7 +3133,7 @@ class FlowExecutor extends EventEmitter {
 
           const goBackValue = (node.data?.goBackValue || 'go_back').toLowerCase();
           const isGoBackOption = option.value && option.value.toLowerCase() === goBackValue;
-          
+
           if (isGoBackOption) {
 
             context.setVariable('isGoBackSelected', true);
@@ -3041,7 +3272,7 @@ class FlowExecutor extends EventEmitter {
 
 
 
-      const hash = encPayload.slice(-4); 
+      const hash = encPayload.slice(-4);
       let hashValue = 0;
 
 
@@ -3054,7 +3285,7 @@ class FlowExecutor extends EventEmitter {
       return selectedIndex;
     } catch (error) {
       console.error('Error in poll vote decryption:', error);
-      return 0; 
+      return 0;
     }
   }
   /**
@@ -3082,7 +3313,7 @@ class FlowExecutor extends EventEmitter {
         }
       }
       const isInteractiveResponse = messageMetadata?.messageType === 'interactive' ||
-                                   messageMetadata?.type === 'button';
+        messageMetadata?.type === 'button';
 
 
       if (isInteractiveResponse && messageMetadata?.button) {
@@ -3170,7 +3401,7 @@ class FlowExecutor extends EventEmitter {
       }
 
       const isInteractiveResponse = messageMetadata?.messageType === 'interactive' ||
-                                   messageMetadata?.type === 'list';
+        messageMetadata?.type === 'list';
 
 
       if (isInteractiveResponse && messageMetadata?.list) {
@@ -3359,7 +3590,7 @@ class FlowExecutor extends EventEmitter {
     contact: Contact,
     channelConnection: ChannelConnection
   ): Promise<void> {
-    
+
 
     try {
       const isBotDisabled = await this.isBotDisabled(conversation.id);
@@ -3400,7 +3631,7 @@ class FlowExecutor extends EventEmitter {
       }
 
       for (const triggerNode of triggerNodes) {
-        
+
 
         if (await this.matchesTriggerWithSession(triggerNode, message, conversation, contact, channelConnection)) {
 
@@ -3473,7 +3704,7 @@ class FlowExecutor extends EventEmitter {
             }
           }
 
-          
+
 
           await this.executeConnectedNodesWithSession(
             session,
@@ -3537,7 +3768,7 @@ class FlowExecutor extends EventEmitter {
     const data = triggerNode.data || {};
     const enableSessionPersistence = data.enableSessionPersistence !== false;
 
-    
+
 
     if (!this.triggerSupportsChannel(triggerNode, channelConnection.channelType)) {
 
@@ -3549,7 +3780,7 @@ class FlowExecutor extends EventEmitter {
       return this.matchesTrigger(triggerNode, message, channelConnection);
     }
 
-    
+
 
     const existingSession = await this.getActiveTriggerSession(triggerNode.id, conversation.id, contact.id);
 
@@ -3598,15 +3829,15 @@ class FlowExecutor extends EventEmitter {
     contactId: number
   ): Promise<FlowSessionState | null> {
     try {
-     
+
 
       for (const [sessionId, session] of Array.from(this.activeSessions.entries())) {
-        
+
 
         if (session.triggerNodeId === triggerNodeId &&
-            session.conversationId === conversationId &&
-            session.contactId === contactId &&
-            (session.status === 'active' || session.status === 'waiting')) {
+          session.conversationId === conversationId &&
+          session.contactId === contactId &&
+          (session.status === 'active' || session.status === 'waiting')) {
 
           if (session.expiresAt && new Date() > session.expiresAt) {
 
@@ -3622,7 +3853,7 @@ class FlowExecutor extends EventEmitter {
       const dbSessions = await storage.getActiveFlowSessionsForConversation(conversationId);
       for (const dbSession of dbSessions) {
         if (dbSession.triggerNodeId === triggerNodeId &&
-            dbSession.contactId === contactId) {
+          dbSession.contactId === contactId) {
 
           if (dbSession.expiresAt && new Date() > dbSession.expiresAt) {
             await storage.expireFlowSession(dbSession.sessionId);
@@ -3685,7 +3916,7 @@ class FlowExecutor extends EventEmitter {
     const conditionValue = data.conditionValue || data.value || '';
     const channelType = channelConnection?.channelType || 'whatsapp_unofficial';
 
-    
+
 
 
     if (!this.isConditionSupportedByChannel(conditionType, channelType)) {
@@ -3694,9 +3925,9 @@ class FlowExecutor extends EventEmitter {
 
 
     if (message.type !== 'text' &&
-        conditionType.toLowerCase() !== 'any' &&
-        conditionType.toLowerCase() !== 'media' &&
-        conditionType.toLowerCase() !== 'has_media') {
+      conditionType.toLowerCase() !== 'any' &&
+      conditionType.toLowerCase() !== 'media' &&
+      conditionType.toLowerCase() !== 'has_media') {
       return false;
     }
 
@@ -3785,9 +4016,9 @@ class FlowExecutor extends EventEmitter {
     const whatsappConditions = ['poll_response', 'button_click'];
     if (whatsappConditions.includes(condition)) {
       return channelType === 'whatsapp_unofficial' ||
-             channelType === 'whatsapp_official' ||
-             channelType === 'whatsapp_twilio' ||
-             channelType === 'whatsapp_360dialog';
+        channelType === 'whatsapp_official' ||
+        channelType === 'whatsapp_twilio' ||
+        channelType === 'whatsapp_360dialog';
     }
 
 
@@ -4036,24 +4267,24 @@ class FlowExecutor extends EventEmitter {
     const nodeType = currentNode.type || '';
     const nodeLabel = (currentNode.data && currentNode.data.label) || '';
     const isConditionNode = nodeType === 'conditionNode' ||
-                           nodeType === 'condition' ||
-                           nodeLabel === 'Condition Node';
+      nodeType === 'condition' ||
+      nodeLabel === 'Condition Node';
 
     const isQuickReplyNode = nodeType === 'quickreplyNode' ||
-                            nodeType === 'quickreply' ||
-                            nodeType === 'whatsapp_poll' ||
-                            nodeLabel === 'Quickreply Node' ||
-                            nodeLabel === 'Quick Reply Options' ||
-                            nodeLabel === 'WhatsApp Poll' ||
-                            nodeLabel === 'WhatsApp Poll Node';
+      nodeType === 'quickreply' ||
+      nodeType === 'whatsapp_poll' ||
+      nodeLabel === 'Quickreply Node' ||
+      nodeLabel === 'Quick Reply Options' ||
+      nodeLabel === 'WhatsApp Poll' ||
+      nodeLabel === 'WhatsApp Poll Node';
 
     const isWhatsAppInteractiveButtonsNode = nodeType === 'whatsapp_interactive_buttons' ||
-                                           nodeType === 'whatsappInteractiveButtons' ||
-                                           nodeLabel === 'WhatsApp Interactive Buttons';
+      nodeType === 'whatsappInteractiveButtons' ||
+      nodeLabel === 'WhatsApp Interactive Buttons';
 
     const isWhatsAppInteractiveListNode = nodeType === 'whatsapp_interactive_list' ||
-                                         nodeType === 'whatsappInteractiveList' ||
-                                         nodeLabel === 'WhatsApp Interactive List';
+      nodeType === 'whatsappInteractiveList' ||
+      nodeLabel === 'WhatsApp Interactive List';
 
     let edgesToExecute = connectedEdges;
 
@@ -4372,6 +4603,50 @@ class FlowExecutor extends EventEmitter {
         const enableKeywordTriggers = node.data?.enableKeywordTriggers;
         if (enableKeywordTriggers) {
           return { success: true, shouldContinue: false, waitForUserInput: true };
+        }
+
+        return { success: true, shouldContinue: true };
+      }
+
+      else if (
+        nodeType === 'notify_user' ||
+        nodeLabel === 'Notify User'
+      ) {
+        const recipientType = node.data?.recipientType || 'lead_owner';
+        const messageTemplate = node.data?.message || '';
+        const channel = node.data?.channel || 'auto';
+        let targetUserId: number | null = null;
+
+        if (recipientType === 'lead_owner') {
+          // For lead owner, we check the contact's assigned agent
+          // @ts-ignore
+          if (contact && contact.assignedToUserId) {
+            // @ts-ignore
+            targetUserId = contact.assignedToUserId;
+          }
+        } else if (recipientType === 'specific_user') {
+          if (node.data?.selectedUserId) {
+            targetUserId = parseInt(node.data.selectedUserId, 10);
+          }
+        }
+
+        if (targetUserId && messageTemplate) {
+          const processedMessage = this.replaceVariables(messageTemplate, message, contact);
+          await notificationService.notifyUser({
+            userId: targetUserId,
+            type: 'system_alert',
+            title: 'Flow Notification',
+            message: processedMessage,
+            channel: channel,
+            data: {
+              contactId: contact?.id,
+              conversationId: conversation?.id,
+              flowId: executionId
+            }
+          });
+          console.log(`[FlowExecutor] Sent ${channel} notification to user ${targetUserId}`);
+        } else {
+          console.warn(`[FlowExecutor] Notify User node failed: Missing target user (${targetUserId}) or message template.`);
         }
 
         return { success: true, shouldContinue: true };
@@ -4907,7 +5182,7 @@ class FlowExecutor extends EventEmitter {
         }
 
 
-        
+
 
 
         if (!mediaUrl || (!mediaUrl.startsWith('http://') && !mediaUrl.startsWith('https://'))) {
@@ -4916,13 +5191,30 @@ class FlowExecutor extends EventEmitter {
       }
 
 
+      let targetContact = contact;
+      if (data.recipient) {
+        const recipient = context.replaceVariables(data.recipient).trim();
+        if (recipient) {
+          // Create a temporary contact with the overridden phone number
+          const cleanPhone = recipient.replace(/[^\d+]/g, '');
+
+          targetContact = {
+            ...contact,
+            phone: cleanPhone,
+            identifier: cleanPhone
+          };
+
+          console.log(`[FlowExecutor] Overriding recipient for message node ${node.id}: ${cleanPhone}`);
+        }
+      }
+
       try {
         if (messageType === 'text') {
-     
+
 
           await this.sendMessageThroughChannel(
             channelConnection,
-            contact,
+            targetContact,
             content,
             conversation,
             true
@@ -4930,11 +5222,11 @@ class FlowExecutor extends EventEmitter {
 
 
         } else {
-          
+
 
           await this.sendMediaThroughChannel(
             channelConnection,
-            contact,
+            targetContact,
             mediaUrl,
             messageType as "image" | "video" | "audio" | "document",
             content,
@@ -5064,7 +5356,7 @@ class FlowExecutor extends EventEmitter {
           const whatsAppSvc: any = whatsAppService as any;
 
           if (typeof whatsAppSvc.sendPoll === 'function') {
-                        await whatsAppSvc.sendPoll(
+            await whatsAppSvc.sendPoll(
               channelConnection.id,
               channelConnection.userId,
               contact.identifier || contact.phone,
@@ -5117,7 +5409,7 @@ class FlowExecutor extends EventEmitter {
 
       const enableGoBack = data.enableGoBack !== false;
       const goBackText = data.goBackText || '← Go Back';
-      
+
       if (enableGoBack) {
         formattedMessage += `\n${goBackText}`;
       }
@@ -5189,7 +5481,7 @@ class FlowExecutor extends EventEmitter {
     channelConnection: ChannelConnection
   ): Promise<void> {
     try {
-      
+
 
       const data = node.data || {};
 
@@ -5260,7 +5552,7 @@ class FlowExecutor extends EventEmitter {
       context.setVariable('waitingForInteractiveResponse', true);
 
       try {
-        
+
 
         await this.sendWhatsAppInteractiveMessage(channelConnection, interactiveMessage, conversation);
 
@@ -5293,7 +5585,7 @@ class FlowExecutor extends EventEmitter {
     channelConnection: ChannelConnection
   ): Promise<void> {
     try {
-      
+
 
       const data = node.data || {};
 
@@ -5388,7 +5680,7 @@ class FlowExecutor extends EventEmitter {
       context.setVariable('waitingForInteractiveResponse', true);
 
       try {
-   
+
 
         await this.sendWhatsAppInteractiveMessage(channelConnection, interactiveMessage, conversation);
 
@@ -5431,7 +5723,7 @@ class FlowExecutor extends EventEmitter {
     channelConnection: ChannelConnection
   ): Promise<void> {
     try {
-      
+
 
       const data = node.data || {};
 
@@ -5502,7 +5794,7 @@ class FlowExecutor extends EventEmitter {
       context.setVariable('whatsappCTAURL.url', url);
 
       try {
-        
+
 
         await this.sendWhatsAppInteractiveMessage(channelConnection, interactiveMessage, conversation);
 
@@ -5533,7 +5825,7 @@ class FlowExecutor extends EventEmitter {
     channelConnection: ChannelConnection
   ): Promise<void> {
     try {
-      
+
 
       const data = node.data || {};
 
@@ -5571,7 +5863,7 @@ class FlowExecutor extends EventEmitter {
       context.setVariable('whatsappLocationRequest.bodyText', bodyText);
 
       try {
-    
+
 
         await this.sendWhatsAppInteractiveMessage(channelConnection, interactiveMessage, conversation);
 
@@ -6268,9 +6560,9 @@ class FlowExecutor extends EventEmitter {
 
 
       await jail.set('console', new ivm.ExternalCopy({
-        log: () => {},
-        error: () => {},
-        warn: () => {}
+        log: () => { },
+        error: () => { },
+        warn: () => { }
       }).copyInto());
 
 
@@ -6348,10 +6640,10 @@ class FlowExecutor extends EventEmitter {
         message,
         timestamp: new Date().toISOString()
       });
-      
+
 
       console.error('Code execution error:', message);
-      
+
       throw error;
     }
   }
@@ -6871,7 +7163,7 @@ class FlowExecutor extends EventEmitter {
     channelConnection: ChannelConnection
   ): Promise<void> {
     try {
-      
+
 
       const data = node.data || {};
 
@@ -6887,13 +7179,13 @@ class FlowExecutor extends EventEmitter {
 
       const flowId = context.replaceVariables(data.flowId || '');
 
-      
+
 
       if (!flowId) {
         throw new Error('Flow ID is required. Please specify an existing WhatsApp Flow ID.');
       }
 
-      
+
 
 
       await this.sendWhatsAppFlow(
@@ -6957,7 +7249,7 @@ class FlowExecutor extends EventEmitter {
         }
       };
 
-      
+
 
 
       await this.sendWhatsAppInteractiveMessage(channelConnection, interactiveMessage, conversation);
@@ -7339,8 +7631,8 @@ class FlowExecutor extends EventEmitter {
                     const savedMessage = recentMessages[0];
                     const existingMetadata = savedMessage.metadata
                       ? (typeof savedMessage.metadata === 'string'
-                         ? JSON.parse(savedMessage.metadata)
-                         : savedMessage.metadata)
+                        ? JSON.parse(savedMessage.metadata)
+                        : savedMessage.metadata)
                       : {};
                     const updatedMetadata = {
                       ...existingMetadata,
@@ -7639,27 +7931,27 @@ class FlowExecutor extends EventEmitter {
                   `/api/v1/workflows/${matchingWorkflow.id}/execute`,
                   `/webhook/${matchingWorkflow.id}`
                 ];
-              for (const endpoint of endpoints) {
-                try {
-                  const retryUrl = `${instanceUrl}${endpoint}`;
-                  response = await axios({
-                    method: 'POST',
-                    url: retryUrl,
-                    headers,
-                    data: body,
-                    timeout: 30000
-                  });
+                for (const endpoint of endpoints) {
+                  try {
+                    const retryUrl = `${instanceUrl}${endpoint}`;
+                    response = await axios({
+                      method: 'POST',
+                      url: retryUrl,
+                      headers,
+                      data: body,
+                      timeout: 30000
+                    });
 
-                  executionSuccess = true;
-                  break;
-                } catch (endpointError: any) {
+                    executionSuccess = true;
+                    break;
+                  } catch (endpointError: any) {
+                  }
+                }
+
+                if (!executionSuccess) {
+                  throw firstError;
                 }
               }
-
-              if (!executionSuccess) {
-                throw firstError;
-              }
-            }
             } else {
               throw firstError;
             }
@@ -7744,8 +8036,8 @@ class FlowExecutor extends EventEmitter {
                 const savedMessage = recentMessages[0];
                 const existingMetadata = savedMessage.metadata
                   ? (typeof savedMessage.metadata === 'string'
-                     ? JSON.parse(savedMessage.metadata)
-                     : savedMessage.metadata)
+                    ? JSON.parse(savedMessage.metadata)
+                    : savedMessage.metadata)
                   : {};
                 const updatedMetadata = {
                   ...existingMetadata,
@@ -8152,8 +8444,8 @@ class FlowExecutor extends EventEmitter {
                     const savedMessage = recentMessages[0];
                     const existingMetadata = savedMessage.metadata
                       ? (typeof savedMessage.metadata === 'string'
-                         ? JSON.parse(savedMessage.metadata)
-                         : savedMessage.metadata)
+                        ? JSON.parse(savedMessage.metadata)
+                        : savedMessage.metadata)
                       : {};
                     const updatedMetadata = {
                       ...existingMetadata,
@@ -8587,8 +8879,8 @@ class FlowExecutor extends EventEmitter {
           const savedMessage = recentMessages[0];
           const existingMetadata = savedMessage.metadata
             ? (typeof savedMessage.metadata === 'string'
-               ? JSON.parse(savedMessage.metadata)
-               : savedMessage.metadata)
+              ? JSON.parse(savedMessage.metadata)
+              : savedMessage.metadata)
             : {};
           const updatedMetadata = {
             ...existingMetadata,
@@ -8744,7 +9036,7 @@ ${eventResult.eventLink ? `\nView event: ${eventResult.eventLink}` : ''}`;
       } else {
 
         let errorMessage = 'Lo siento, no pude crear el evento del calendario. Por favor intenta de nuevo.';
-        
+
         if (eventResult.error && (eventResult.error.includes('not available') || eventResult.error.includes('conflict'))) {
           errorMessage = '⚠️ El horario solicitado ya está reservado. Por favor usa el verificador de disponibilidad para encontrar un horario abierto, o elige un horario diferente para tu cita.';
         }
@@ -9573,13 +9865,13 @@ ${eventResult.eventLink ? `\nView event: ${eventResult.eventLink}` : ''}`;
 
     const cleanedValue = value.replace(/\D/g, '');
     return value.length > 8 &&
-           cleanedValue.length >= 10 &&
-           cleanedValue.length <= 15 &&
-           (value.includes('+') ||
-            value.includes('-') ||
-            value.includes(' ') ||
-            value.includes('(') ||
-            /^\d{10,15}$/.test(cleanedValue));
+      cleanedValue.length >= 10 &&
+      cleanedValue.length <= 15 &&
+      (value.includes('+') ||
+        value.includes('-') ||
+        value.includes(' ') ||
+        value.includes('(') ||
+        /^\d{10,15}$/.test(cleanedValue));
   }
 
   /**
@@ -10158,7 +10450,7 @@ IMPORTANT: These calendar behaviors are enforced and cannot be overridden by use
 
           const clientFunctions = data.calendarFunctions || [];
 
-        
+
 
           for (const clientFunc of clientFunctions) {
             const functionName = clientFunc.functionDefinition?.name;
@@ -10962,7 +11254,7 @@ IMPORTANT: These calendar behaviors are enforced and cannot be overridden by use
 
                 attendeeEmail = attendeeEmail || contact.email || undefined;
 
-                
+
 
                 const findResult = await googleCalendarService.findAppointmentByDateTime(
                   userId,
@@ -11721,8 +12013,8 @@ IMPORTANT: These calendar behaviors are enforced and cannot be overridden by use
             const savedMessage = recentMessages[0];
             const existingMetadata = savedMessage.metadata
               ? (typeof savedMessage.metadata === 'string'
-                 ? JSON.parse(savedMessage.metadata)
-                 : savedMessage.metadata)
+                ? JSON.parse(savedMessage.metadata)
+                : savedMessage.metadata)
               : {};
             const updatedMetadata = {
               ...existingMetadata,
@@ -13050,6 +13342,59 @@ IMPORTANT: These calendar behaviors are enforced and cannot be overridden by use
     channelConnection: ChannelConnection
   ): Promise<void> {
     try {
+      const data = node.data || {};
+
+      if (data.operation === 'create_task') {
+        const title = context.replaceVariables(data.taskTitle || '');
+        const description = context.replaceVariables(data.taskDescription || '');
+        const categoryId = parseInt(data.taskCategory || '0');
+        const priority = data.taskPriority || 'medium';
+
+        let dueDate: Date | undefined;
+        const dueDateStr = context.replaceVariables(data.taskDueDate || '');
+
+        if (dueDateStr) {
+          if (dueDateStr.trim().startsWith('+')) {
+            const days = parseInt(dueDateStr.replace(/\D/g, ''));
+            if (!isNaN(days)) {
+              dueDate = new Date();
+              dueDate.setDate(dueDate.getDate() + days);
+            }
+          } else {
+            const parsed = new Date(dueDateStr);
+            if (!isNaN(parsed.getTime())) {
+              dueDate = parsed;
+            }
+          }
+        }
+
+        if (!dueDate) {
+          const defaultDate = new Date();
+          defaultDate.setDate(defaultDate.getDate() + 3);
+          dueDate = defaultDate;
+        }
+
+        const companyId = conversation.companyId || contact.companyId || channelConnection.companyId;
+
+        await storage.createContactTask({
+          contactId: contact.id,
+          title: title || 'New Task',
+          description: description,
+          categoryId: categoryId || undefined,
+          priority: priority,
+          status: 'pending',
+          dueDate: dueDate,
+          companyId: companyId,
+          assignedToUserId: conversation.assignedToUserId || undefined,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        } as any);
+
+        context.setVariable('task.created', true);
+        context.setVariable('task.title', title);
+        return;
+      }
+
       const tempMessage: Message = {
         id: 0,
         conversationId: conversation.id,
@@ -13085,8 +13430,8 @@ IMPORTANT: These calendar behaviors are enforced and cannot be overridden by use
 
       await this.executeUpdatePipelineStageNode(node, tempMessage, conversation, contact, channelConnection);
 
-      const data = node.data || {};
-      const stageId = data.stageId;
+      const nodeData = node.data || {};
+      const stageId = nodeData.stageId;
 
       context.setVariable('pipeline.lastStageId', stageId);
       context.setVariable('pipeline.lastExecution', new Date().toISOString());
@@ -13221,7 +13566,7 @@ IMPORTANT: These calendar behaviors are enforced and cannot be overridden by use
     conversation: Conversation
   ): Promise<void> {
     try {
-      
+
 
       const { sendInteractiveMessage } = await import('./channels/whatsapp-official');
 

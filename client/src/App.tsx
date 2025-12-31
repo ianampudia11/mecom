@@ -45,6 +45,7 @@ import { PlanUpdatesProvider } from "@/components/PlanUpdatesProvider";
 import { ActiveChannelProvider } from "@/contexts/ActiveChannelContext";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { AdminProtectedRoute } from "@/lib/admin-protected-route";
+import { MobileLayoutProvider } from "@/contexts/mobile-layout-context";
 import {
   SettingsRoute,
   AnalyticsRoute,
@@ -69,6 +70,7 @@ import { CustomScriptsProvider } from "@/components/CustomScriptsProvider";
 import { ManualRenewalProvider } from "@/contexts/manual-renewal-context";
 import { initializeGoogleTranslateCompatibility } from "@/utils/google-translate-compatibility";
 import { initializeEmbedContext, preserveEmbedParam } from "@/utils/embed-context";
+import { WebSocketListener } from "@/components/WebSocketListener";
 
 const LazyLoadingFallback = () => (
   <div className="flex items-center justify-center min-h-screen">
@@ -115,6 +117,14 @@ function Router() {
         <Route path="/pipeline">
           <PipelineRoute>
             <PipelineView />
+          </PipelineRoute>
+        </Route>
+
+        <Route path="/properties">
+          <PipelineRoute>
+            <React.Suspense fallback={<LazyLoadingFallback />}>
+              {React.createElement(React.lazy(() => import("@/pages/properties")))}
+            </React.Suspense>
           </PipelineRoute>
         </Route>
 
@@ -206,6 +216,11 @@ function Router() {
         <AdminProtectedRoute path="/admin/payments" component={React.lazy(() => import("@/pages/admin/payments"))} />
         <AdminProtectedRoute path="/admin/analytics" component={React.lazy(() => import("@/pages/admin/analytics"))} />
         <AdminProtectedRoute path="/admin/settings" component={React.lazy(() => import("@/pages/admin/settings"))} />
+
+        {/* Pipeline Management Routes - New Feature */}
+        <ProtectedRoute path="/settings/pipelines" component={React.lazy(() => import("@/components/settings/PipelineManager"))} />
+        <ProtectedRoute path="/settings/pipelines/:id" component={React.lazy(() => import("@/components/settings/PipelineEditor"))} />
+
         <AdminProtectedRoute path="/admin/translations" component={React.lazy(() => import("@/pages/admin/translations"))} />
         <AdminProtectedRoute path="/admin/website-builder" component={React.lazy(() => import("@/pages/admin/website-builder/index"))} />
         <AdminProtectedRoute path="/admin/website-builder/new" component={React.lazy(() => import("@/pages/admin/website-builder/new"))} />
@@ -268,23 +283,26 @@ function App() {
               <CurrencyProvider>
                 <TranslationProvider>
                   <ActiveChannelProvider>
-                    <ConversationProvider>
-                      <PlanUpdatesProvider>
-                        <ManualRenewalProvider>
-                          <TooltipProvider>
-                            <SubscriptionGuard>
-                            <div className="font-poppins">
-                              <Toaster />
-                              <FacebookSDKLoader />
-                              <Router />
-                            </div>
-                          </SubscriptionGuard>
-                        </TooltipProvider>
-                      </ManualRenewalProvider>
-                    </PlanUpdatesProvider>
-                  </ConversationProvider>
-                </ActiveChannelProvider>
-              </TranslationProvider>
+                    <MobileLayoutProvider>
+                      <ConversationProvider>
+                        <WebSocketListener />
+                        <PlanUpdatesProvider>
+                          <ManualRenewalProvider>
+                            <TooltipProvider>
+                              <SubscriptionGuard>
+                                <div className="font-poppins">
+                                  <Toaster />
+                                  <FacebookSDKLoader />
+                                  <Router />
+                                </div>
+                              </SubscriptionGuard>
+                            </TooltipProvider>
+                          </ManualRenewalProvider>
+                        </PlanUpdatesProvider>
+                      </ConversationProvider>
+                    </MobileLayoutProvider>
+                  </ActiveChannelProvider>
+                </TranslationProvider>
               </CurrencyProvider>
             </BrandingProvider>
           </AuthProvider>

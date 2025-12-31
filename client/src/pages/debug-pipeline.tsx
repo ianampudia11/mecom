@@ -93,8 +93,8 @@ export default function DebugPipeline() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">Pipeline Debug Page</h1>
-      
+      <h1 className="text-2xl font-bold mb-6">Ruta Lead Debug Page</h1>
+
       <div className="grid gap-4 mb-6">
         <Button onClick={fetchDebugData} disabled={loading}>
           {loading ? 'Loading...' : 'Fetch Debug Data'}
@@ -160,13 +160,13 @@ export default function DebugPipeline() {
                   {JSON.stringify(debugData.allCompanies, null, 2)}
                 </pre>
               </div>
-              
+
               <div>
                 <h3 className="font-semibold">Statistics:</h3>
                 <p>All stages in DB: {debugData.allStages}</p>
                 <p>Company stages: {debugData.companyStages}</p>
               </div>
-              
+
               <div>
                 <h3 className="font-semibold">Company Pipeline Stages:</h3>
                 <pre className="bg-gray-100 p-2 rounded text-sm">

@@ -14,10 +14,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { 
-  AlertTriangle, 
-  Clock, 
-  CheckCircle, 
+import {
+  AlertTriangle,
+  Clock,
+  CheckCircle,
   Loader2,
   RefreshCw,
   CreditCard
@@ -67,26 +67,26 @@ export function PlanExpirationChecker() {
 
   useEffect(() => {
 
-    
+
 
     if (!renewalStatus || isLoading) {
 
       setShowModal(false);
       return;
     }
-    
+
     if (renewalStatus.expirationStatus.renewalRequired) {
 
 
       const { expirationStatus } = renewalStatus;
-      
 
-      
+
+
       let shouldShowModal = false;
-      
 
-      if (expirationStatus.subscriptionStatus === 'active' && 
-          expirationStatus.daysUntilExpiry > 7) {
+
+      if (expirationStatus.subscriptionStatus === 'active' &&
+        expirationStatus.daysUntilExpiry > 7) {
         shouldShowModal = false;
 
       }
@@ -106,7 +106,7 @@ export function PlanExpirationChecker() {
         shouldShowModal = true;
 
       }
-      
+
 
       setShowModal(shouldShowModal);
     } else {
@@ -138,7 +138,7 @@ export function PlanExpirationChecker() {
       }
 
       const result = await res.json();
-      
+
       toast({
         title: "Success",
         description: "Subscription activated successfully!",
@@ -159,52 +159,52 @@ export function PlanExpirationChecker() {
 
   const getStatusIcon = () => {
     if (!renewalStatus) return <Loader2 className="h-6 w-6 animate-spin" />;
-    
+
     if (renewalStatus.expirationStatus.isInGracePeriod) {
       return <Clock className="h-6 w-6 text-yellow-500" />;
     }
-    
+
     if (!renewalStatus.accessAllowed) {
       return <AlertTriangle className="h-6 w-6 text-red-500" />;
     }
-    
+
     return <CheckCircle className="h-6 w-6 text-green-500" />;
   };
 
   const getStatusMessage = () => {
     if (!renewalStatus) return "Checking subscription status...";
-    
+
     const status = renewalStatus.expirationStatus;
-    
+
     if (status.isInGracePeriod) {
       return `Your subscription is in a grace period. You have ${status.gracePeriodDaysRemaining} day(s) remaining to renew.`;
     }
-    
+
     if (!renewalStatus.accessAllowed) {
       return renewalStatus.reason || "Your subscription has expired and needs to be renewed.";
     }
-    
+
     if (status.subscriptionStatus === 'trial') {
       return `You are on a trial period. ${status.daysUntilExpiry} day(s) remaining.`;
     }
-    
+
     if (status.subscriptionStatus === 'active') {
       return `Your subscription is active. ${status.daysUntilExpiry} day(s) until renewal.`;
     }
-    
+
     return "Subscription status unknown.";
   };
 
   const getUrgencyLevel = () => {
     if (!renewalStatus) return "low";
-    
+
     const status = renewalStatus.expirationStatus;
-    
+
     if (!renewalStatus.accessAllowed) return "high";
     if (status.isInGracePeriod) return status.gracePeriodDaysRemaining <= 1 ? "high" : "medium";
     if (status.daysUntilExpiry <= 3) return "high";
     if (status.daysUntilExpiry <= 7) return "medium";
-    
+
     return "low";
   };
 
@@ -235,11 +235,10 @@ export function PlanExpirationChecker() {
     <>
       {/* Status indicator in header/sidebar */}
       {renewalStatus && (
-        <div className={`flex items-center gap-2 p-2 text-sm rounded-md ${
-          urgencyLevel === "high" ? "bg-red-50 text-red-700 border border-red-200" :
-          urgencyLevel === "medium" ? "bg-yellow-50 text-yellow-700 border border-yellow-200" :
-          "bg-green-50 text-green-700 border border-green-200"
-        }`}>
+        <div className={`flex items-center gap-2 p-2 text-sm rounded-md ${urgencyLevel === "high" ? "bg-red-50 text-red-700 border border-red-200" :
+            urgencyLevel === "medium" ? "bg-yellow-50 text-yellow-700 border border-yellow-200" :
+              "bg-green-50 text-green-700 border border-green-200"
+          }`}>
           {getStatusIcon()}
           <span className="flex-1">{getStatusMessage()}</span>
           <Button variant="ghost" size="sm" onClick={() => refetch()}>
@@ -257,17 +256,16 @@ export function PlanExpirationChecker() {
               Subscription Action Required
             </DialogTitle>
             <DialogDescription>
-              Your PowerChat subscription needs attention to continue using the service.
+              Your Iawarrior tech subscription needs attention to continue using the service.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             {/* Status Alert */}
-            <Alert className={`${
-              urgencyLevel === "high" ? "border-red-200 bg-red-50" : 
-              urgencyLevel === "medium" ? "border-yellow-200 bg-yellow-50" : 
-              "border-blue-200 bg-blue-50"
-            }`}>
+            <Alert className={`${urgencyLevel === "high" ? "border-red-200 bg-red-50" :
+                urgencyLevel === "medium" ? "border-yellow-200 bg-yellow-50" :
+                  "border-blue-200 bg-blue-50"
+              }`}>
               <AlertTriangle className="h-4 w-4" />
               <AlertTitle>Action Required</AlertTitle>
               <AlertDescription>
@@ -313,7 +311,7 @@ export function PlanExpirationChecker() {
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Refresh Status
               </Button>
-              
+
               <div className="flex gap-3">
                 <Button variant="outline" onClick={() => setShowModal(false)}>
                   Close

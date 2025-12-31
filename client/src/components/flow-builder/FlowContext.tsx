@@ -3,6 +3,7 @@ import React, { createContext, ReactNode, useCallback, useContext } from 'react'
 interface FlowContextType {
   onDeleteNode: (nodeId: string) => void;
   onDuplicateNode: (nodeId: string) => void;
+  flowId?: number;
 }
 
 export const FlowContext = createContext<FlowContextType | null>(null);
@@ -19,14 +20,16 @@ interface FlowProviderProps {
   children: ReactNode;
   onDeleteNode: (nodeId: string) => void;
   onDuplicateNode: (nodeId: string) => void;
+  flowId?: number;
 }
 
-export function FlowProvider({ children, onDeleteNode, onDuplicateNode }: FlowProviderProps) {
+export function FlowProvider({ children, onDeleteNode, onDuplicateNode, flowId }: FlowProviderProps) {
   return (
     <FlowContext.Provider
       value={{
         onDeleteNode,
-        onDuplicateNode
+        onDuplicateNode,
+        flowId
       }}
     >
       {children}

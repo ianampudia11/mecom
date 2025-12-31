@@ -1,0 +1,125 @@
+[
+  {
+    "id": 25,
+    "company_id": 4,
+    "contact_id": 3,
+    "title": "Propiedad 306",
+    "stage_id": 114,
+    "stage": "lead",
+    "value": 150000,
+    "priority": "low",
+    "due_date": "2025-12-21 05:00:00",
+    "assigned_to_user_id": 3,
+    "description": "El material de ventas del proyecto \"Villasol\" define a su cliente potencial como: \"Inversionista = Comerciante, profesional y persona natural con negocio\".1 Esta segmentación es fundamental, ya que no se dirige a u",
+    "tags": [
+      "conocidos",
+      "scraped"
+    ],
+    "status": "active",
+    "last_activity_at": "2025-12-22 06:00:44.65",
+    "created_at": "2025-12-22 01:04:56.896",
+    "updated_at": "2025-12-22 06:00:44.65"
+  },
+  {
+    "id": 31,
+    "company_id": 4,
+    "contact_id": 35,
+    "title": "Protec33",
+    "stage_id": 114,
+    "stage": "lead",
+    "value": 23000,
+    "priority": "medium",
+    "due_date": "2025-12-21 05:00:00",
+    "assigned_to_user_id": 3,
+    "description": "",
+    "tags": [
+      "maritanisa",
+      "scraped",
+      "nueperu"
+    ],
+    "status": "active",
+    "last_activity_at": "2025-12-22 07:12:08.496",
+    "created_at": "2025-12-22 02:17:43.662",
+    "updated_at": "2025-12-22 07:12:08.496"
+  },
+  {
+    "id": 28,
+    "company_id": 4,
+    "contact_id": 31,
+    "title": "Propiedad 480",
+    "stage_id": 49,
+    "stage": "lead",
+    "value": 200000,
+    "priority": "high",
+    "due_date": "2025-12-21 05:00:00",
+    "assigned_to_user_id": 3,
+    "description": "El material de ventas del proyecto \"Villasol\" define a su cliente potencial como: \"Inversionista = Comerciante, profesional y persona natural con negocio\".1 Esta segmentación es fundamental, ya que no se dirige a u",
+    "tags": [
+      "whatsapp",
+      "personal"
+    ],
+    "status": "active",
+    "last_activity_at": "2025-12-22 07:12:13.492",
+    "created_at": "2025-12-22 01:24:08.681",
+    "updated_at": "2025-12-22 07:12:13.492"
+  },
+  {
+    "id": 2,
+    "company_id": 4,
+    "contact_id": 2,
+    "title": "Propiedad 402",
+    "stage_id": 25,
+    "stage": "lead",
+    "value": null,
+    "priority": "high",
+    "due_date": "2025-12-10 05:00:00",
+    "assigned_to_user_id": 3,
+    "description": "administracion bares",
+    "tags": [
+      "conocidos",
+      "scraped"
+    ],
+    "status": "active",
+    "last_activity_at": "2025-12-10 16:08:55.149",
+    "created_at": "2025-12-10 11:46:22.495",
+    "updated_at": "2025-12-10 16:08:55.149"
+  },
+  {
+    "id": 1,
+    "company_id": 4,
+    "contact_id": 4,
+    "title": "Propiedad 405",
+    "stage_id": 26,
+    "stage": "qualified",
+    "value": null,
+    "priority": "high",
+    "due_date": "2025-12-08 05:00:00",
+    "assigned_to_user_id": 3,
+    "description": "revision proyecto gol en pucallpa peru\nPerfil del Comerciante:\nEste perfil, sea de Pucallpa, Huánuco o Lima 1, opera con una mentalidad de flujos de caja y apalancamiento. Generalmente busca inversiones con retornos tangibles y una plusvalía realizable a mediano plazo. Valora la capacidad de \"apalancar\" un activo; es decir, maximizar su rentabilidad por metro cuadrado. El argumento de ventas de Villasol, \"de este salen 3 terrenos aumentando tu rentabilidad\" 1, apela directamente a esta mentalidad de subdivisión y reventa. Los comerciantes suelen poseer liquidez y buscan diversificarla activamente fuera de los riesgos de su negocio principal, considerando los bienes raíces como un \"refugio financiero estable\" 2 y una cobertura contra la inflación.3\n",
+    "tags": [
+      "maritanisa"
+    ],
+    "status": "active",
+    "last_activity_at": "2025-12-21 20:21:48.583",
+    "created_at": "2025-12-08 21:11:09.668",
+    "updated_at": "2025-12-21 20:21:48.583"
+  },
+  {
+    "id": 30,
+    "company_id": 4,
+    "contact_id": 33,
+    "title": "Terreno 36",
+    "stage_id": 45,
+    "stage": "lead",
+    "value": 90000,
+    "priority": "high",
+    "due_date": "2025-12-16 00:00:00",
+    "assigned_to_user_id": 3,
+    "description": "",
+    "tags": [],
+    "status": "active",
+    "last_activity_at": "2025-12-22 05:29:08.541",
+    "created_at": "2025-12-22 01:28:16.763",
+    "updated_at": "2025-12-22 05:29:08.515"
+  }
+]

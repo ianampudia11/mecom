@@ -1,0 +1,97 @@
+[
+  {
+    "id": 1,
+    "company_id": 1,
+    "created_by_id": 1,
+    "name": "Welcome Message",
+    "content": "Hi {{contact.name}}! Welcome to our service. How can I help you today?",
+    "category": "greeting",
+    "variables": [
+      "contact.name"
+    ],
+    "is_active": true,
+    "usage_count": 0,
+    "sort_order": 1,
+    "created_at": "2025-12-08 15:35:01.978823",
+    "updated_at": "2025-12-08 15:35:01.978823"
+  },
+  {
+    "id": 2,
+    "company_id": 1,
+    "created_by_id": 1,
+    "name": "Thank You",
+    "content": "Thank you for contacting us, {{contact.name}}. We appreciate your business!",
+    "category": "general",
+    "variables": [
+      "contact.name"
+    ],
+    "is_active": true,
+    "usage_count": 0,
+    "sort_order": 2,
+    "created_at": "2025-12-08 15:35:01.98175",
+    "updated_at": "2025-12-08 15:35:01.98175"
+  },
+  {
+    "id": 3,
+    "company_id": 1,
+    "created_by_id": 1,
+    "name": "Business Hours",
+    "content": "Our business hours are Monday-Friday 9AM-5PM. We'll get back to you during business hours.",
+    "category": "information",
+    "variables": [],
+    "is_active": true,
+    "usage_count": 0,
+    "sort_order": 3,
+    "created_at": "2025-12-08 15:35:01.983285",
+    "updated_at": "2025-12-08 15:35:01.983285"
+  },
+  {
+    "id": 4,
+    "company_id": 1,
+    "created_by_id": 1,
+    "name": "Follow Up",
+    "content": "Hi {{contact.name}}, I wanted to follow up on our conversation. Do you have any questions?",
+    "category": "follow-up",
+    "variables": [
+      "contact.name"
+    ],
+    "is_active": true,
+    "usage_count": 0,
+    "sort_order": 4,
+    "created_at": "2025-12-08 15:35:01.984679",
+    "updated_at": "2025-12-08 15:35:01.984679"
+  },
+  {
+    "id": 5,
+    "company_id": 1,
+    "created_by_id": 1,
+    "name": "Appointment Confirmation",
+    "content": "Hi {{contact.name}}, this is to confirm your appointment on {{date.today}}. Please let us know if you need to reschedule.",
+    "category": "appointment",
+    "variables": [
+      "contact.name",
+      "date.today"
+    ],
+    "is_active": true,
+    "usage_count": 0,
+    "sort_order": 5,
+    "created_at": "2025-12-08 15:35:01.985856",
+    "updated_at": "2025-12-08 15:35:01.985856"
+  },
+  {
+    "id": 6,
+    "company_id": 1,
+    "created_by_id": 1,
+    "name": "Contact Information",
+    "content": "You can reach us at {{contact.phone}} or email us at support@company.com. We're here to help!",
+    "category": "information",
+    "variables": [
+      "contact.phone"
+    ],
+    "is_active": true,
+    "usage_count": 0,
+    "sort_order": 6,
+    "created_at": "2025-12-08 15:35:01.987013",
+    "updated_at": "2025-12-08 15:35:01.987013"
+  }
+]

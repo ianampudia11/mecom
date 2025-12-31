@@ -103,7 +103,7 @@ export default function AdminSettingsPage() {
   }, []);
 
   const [brandingForm, setBrandingForm] = useState({
-    appName: 'PowerChat',
+    appName: 'Iawarrior tech',
     primaryColor: '#333235',
     secondaryColor: '#4F46E5'
   });
@@ -1028,7 +1028,7 @@ export default function AdminSettingsPage() {
   const handleRemoveCustomCurrency = (code: string) => {
 
     const needsDefaultCurrencyUpdate = generalSettingsForm.defaultCurrency === code;
-    
+
 
     const updatedForm = {
       ...generalSettingsForm,
@@ -1040,7 +1040,7 @@ export default function AdminSettingsPage() {
 
     toast({
       title: 'Custom currency removed',
-      description: needsDefaultCurrencyUpdate 
+      description: needsDefaultCurrencyUpdate
         ? `Currency ${code} has been removed. Default currency has been switched to USD.`
         : `Currency ${code} has been removed.`
     });
@@ -1059,15 +1059,15 @@ export default function AdminSettingsPage() {
 
       queryClient.invalidateQueries({ queryKey: ['/api/admin/settings'] });
       queryClient.invalidateQueries({ queryKey: ['website-enabled'] });
-      
+
 
       queryClient.removeQueries({ queryKey: ['website-enabled'] });
-      
+
 
       settingsEvents.emit(SETTINGS_EVENTS.FRONTEND_WEBSITE_TOGGLED, {
         enabled: generalSettingsForm.frontendWebsiteEnabled
       });
-      
+
       toast({
         title: 'General settings saved',
         description: 'The general settings have been saved successfully.'
@@ -1341,7 +1341,7 @@ export default function AdminSettingsPage() {
     const height = embedSettings.height || '600px';
 
     const brandingSetting = settings?.find((s: any) => s.key === 'branding');
-    const appTitle = brandingForm.appName || brandingSetting?.value?.appName || 'PowerChat Application';
+    const appTitle = brandingForm.appName || brandingSetting?.value?.appName || 'Iawarrior tech Application';
 
     const styles: React.CSSProperties = {
       border: 'none',
@@ -1379,7 +1379,7 @@ export default function AdminSettingsPage() {
     const height = embedSettings.height || '600px';
 
     const brandingSetting = settings?.find((s: any) => s.key === 'branding');
-    const appTitle = brandingForm.appName || brandingSetting?.value?.appName || 'PowerChat Application';
+    const appTitle = brandingForm.appName || brandingSetting?.value?.appName || 'Iawarrior tech Application';
 
 
     const styles = [];
@@ -1542,7 +1542,7 @@ export default function AdminSettingsPage() {
                     <Input
                       id="appName"
                       value={brandingForm.appName}
-                      onChange={(e) => setBrandingForm({...brandingForm, appName: e.target.value})}
+                      onChange={(e) => setBrandingForm({ ...brandingForm, appName: e.target.value })}
                       placeholder=""
                     />
                   </div>
@@ -1563,13 +1563,13 @@ export default function AdminSettingsPage() {
                           id="primaryColor"
                           type="color"
                           value={brandingForm.primaryColor}
-                          onChange={(e) => setBrandingForm({...brandingForm, primaryColor: e.target.value})}
+                          onChange={(e) => setBrandingForm({ ...brandingForm, primaryColor: e.target.value })}
                           className="w-12 sm:w-16 h-8 sm:h-10 p-1 border rounded cursor-pointer flex-shrink-0"
                         />
                         <Input
                           type="text"
                           value={brandingForm.primaryColor}
-                          onChange={(e) => setBrandingForm({...brandingForm, primaryColor: e.target.value})}
+                          onChange={(e) => setBrandingForm({ ...brandingForm, primaryColor: e.target.value })}
                           placeholder="#333235"
                           className="flex-1 min-w-0"
                         />
@@ -1591,13 +1591,13 @@ export default function AdminSettingsPage() {
                           id="secondaryColor"
                           type="color"
                           value={brandingForm.secondaryColor}
-                          onChange={(e) => setBrandingForm({...brandingForm, secondaryColor: e.target.value})}
+                          onChange={(e) => setBrandingForm({ ...brandingForm, secondaryColor: e.target.value })}
                           className="w-12 sm:w-16 h-8 sm:h-10 p-1 border rounded cursor-pointer flex-shrink-0"
                         />
                         <Input
                           type="text"
                           value={brandingForm.secondaryColor}
-                          onChange={(e) => setBrandingForm({...brandingForm, secondaryColor: e.target.value})}
+                          onChange={(e) => setBrandingForm({ ...brandingForm, secondaryColor: e.target.value })}
                           placeholder="#4F46E5"
                           className="flex-1 min-w-0"
                         />
@@ -2214,7 +2214,7 @@ export default function AdminSettingsPage() {
                     <Switch
                       id="stripe-enabled"
                       checked={stripeForm.enabled}
-                      onCheckedChange={(checked) => setStripeForm({...stripeForm, enabled: checked})}
+                      onCheckedChange={(checked) => setStripeForm({ ...stripeForm, enabled: checked })}
                     />
                     <Label htmlFor="stripe-enabled">Enable Stripe Payments</Label>
                   </div>
@@ -2224,7 +2224,7 @@ export default function AdminSettingsPage() {
                     <Input
                       id="publishableKey"
                       value={stripeForm.publishableKey}
-                      onChange={(e) => setStripeForm({...stripeForm, publishableKey: e.target.value})}
+                      onChange={(e) => setStripeForm({ ...stripeForm, publishableKey: e.target.value })}
                       placeholder="pk_test_..."
                       disabled={!stripeForm.enabled}
                     />
@@ -2236,7 +2236,7 @@ export default function AdminSettingsPage() {
                       id="secretKey"
                       type="password"
                       value={stripeForm.secretKey}
-                      onChange={(e) => setStripeForm({...stripeForm, secretKey: e.target.value})}
+                      onChange={(e) => setStripeForm({ ...stripeForm, secretKey: e.target.value })}
                       placeholder="sk_test_..."
                       disabled={!stripeForm.enabled}
                     />
@@ -2247,7 +2247,7 @@ export default function AdminSettingsPage() {
                     <Input
                       id="webhookSecret"
                       value={stripeForm.webhookSecret}
-                      onChange={(e) => setStripeForm({...stripeForm, webhookSecret: e.target.value})}
+                      onChange={(e) => setStripeForm({ ...stripeForm, webhookSecret: e.target.value })}
                       placeholder="whsec_..."
                       disabled={!stripeForm.enabled}
                     />
@@ -2257,7 +2257,7 @@ export default function AdminSettingsPage() {
                     <Switch
                       id="stripe-test-mode"
                       checked={stripeForm.testMode}
-                      onCheckedChange={(checked) => setStripeForm({...stripeForm, testMode: checked})}
+                      onCheckedChange={(checked) => setStripeForm({ ...stripeForm, testMode: checked })}
                       disabled={!stripeForm.enabled}
                     />
                     <Label htmlFor="stripe-test-mode">Test Mode</Label>
@@ -2306,7 +2306,7 @@ export default function AdminSettingsPage() {
                     <Switch
                       id="mercadopago-enabled"
                       checked={mercadoPagoForm.enabled}
-                      onCheckedChange={(checked) => setMercadoPagoForm({...mercadoPagoForm, enabled: checked})}
+                      onCheckedChange={(checked) => setMercadoPagoForm({ ...mercadoPagoForm, enabled: checked })}
                     />
                     <Label htmlFor="mercadopago-enabled">Enable Mercado Pago Payments</Label>
                   </div>
@@ -2316,7 +2316,7 @@ export default function AdminSettingsPage() {
                     <Input
                       id="mercadopago-clientId"
                       value={mercadoPagoForm.clientId}
-                      onChange={(e) => setMercadoPagoForm({...mercadoPagoForm, clientId: e.target.value})}
+                      onChange={(e) => setMercadoPagoForm({ ...mercadoPagoForm, clientId: e.target.value })}
                       placeholder="2740017016616699"
                       disabled={!mercadoPagoForm.enabled}
                     />
@@ -2328,7 +2328,7 @@ export default function AdminSettingsPage() {
                       id="mercadopago-clientSecret"
                       type="password"
                       value={mercadoPagoForm.clientSecret}
-                      onChange={(e) => setMercadoPagoForm({...mercadoPagoForm, clientSecret: e.target.value})}
+                      onChange={(e) => setMercadoPagoForm({ ...mercadoPagoForm, clientSecret: e.target.value })}
                       placeholder="9JUknDFhkXkuyEBuEnvWiXrpVFnYdtLc"
                       disabled={!mercadoPagoForm.enabled}
                     />
@@ -2340,7 +2340,7 @@ export default function AdminSettingsPage() {
                       id="mercadopago-accessToken"
                       type="password"
                       value={mercadoPagoForm.accessToken}
-                      onChange={(e) => setMercadoPagoForm({...mercadoPagoForm, accessToken: e.target.value})}
+                      onChange={(e) => setMercadoPagoForm({ ...mercadoPagoForm, accessToken: e.target.value })}
                       placeholder="APP_USR-2740017016616699-021517-c5d115a0e393d32ec81f16ec2dc15e7e-221745631"
                       disabled={!mercadoPagoForm.enabled}
                     />
@@ -2354,7 +2354,7 @@ export default function AdminSettingsPage() {
                     <Switch
                       id="mercadopago-test-mode"
                       checked={mercadoPagoForm.testMode}
-                      onCheckedChange={(checked) => setMercadoPagoForm({...mercadoPagoForm, testMode: checked})}
+                      onCheckedChange={(checked) => setMercadoPagoForm({ ...mercadoPagoForm, testMode: checked })}
                       disabled={!mercadoPagoForm.enabled}
                     />
                     <Label htmlFor="mercadopago-test-mode">Test Mode</Label>
@@ -2403,7 +2403,7 @@ export default function AdminSettingsPage() {
                     <Switch
                       id="paypal-enabled"
                       checked={paypalForm.enabled}
-                      onCheckedChange={(checked) => setPaypalForm({...paypalForm, enabled: checked})}
+                      onCheckedChange={(checked) => setPaypalForm({ ...paypalForm, enabled: checked })}
                     />
                     <Label htmlFor="paypal-enabled">Enable PayPal Payments</Label>
                   </div>
@@ -2413,7 +2413,7 @@ export default function AdminSettingsPage() {
                     <Input
                       id="clientId"
                       value={paypalForm.clientId}
-                      onChange={(e) => setPaypalForm({...paypalForm, clientId: e.target.value})}
+                      onChange={(e) => setPaypalForm({ ...paypalForm, clientId: e.target.value })}
                       placeholder="Your PayPal Client ID"
                       disabled={!paypalForm.enabled}
                     />
@@ -2425,7 +2425,7 @@ export default function AdminSettingsPage() {
                       id="clientSecret"
                       type="password"
                       value={paypalForm.clientSecret}
-                      onChange={(e) => setPaypalForm({...paypalForm, clientSecret: e.target.value})}
+                      onChange={(e) => setPaypalForm({ ...paypalForm, clientSecret: e.target.value })}
                       placeholder="Your PayPal Client Secret"
                       disabled={!paypalForm.enabled}
                     />
@@ -2435,7 +2435,7 @@ export default function AdminSettingsPage() {
                     <Switch
                       id="paypal-test-mode"
                       checked={paypalForm.testMode}
-                      onCheckedChange={(checked) => setPaypalForm({...paypalForm, testMode: checked})}
+                      onCheckedChange={(checked) => setPaypalForm({ ...paypalForm, testMode: checked })}
                       disabled={!paypalForm.enabled}
                     />
                     <Label htmlFor="paypal-test-mode">Sandbox Mode</Label>
@@ -2484,7 +2484,7 @@ export default function AdminSettingsPage() {
                     <Switch
                       id="moyasar-enabled"
                       checked={moyasarForm.enabled}
-                      onCheckedChange={(checked) => setMoyasarForm({...moyasarForm, enabled: checked})}
+                      onCheckedChange={(checked) => setMoyasarForm({ ...moyasarForm, enabled: checked })}
                     />
                     <Label htmlFor="moyasar-enabled">Enable Moyasar Payments</Label>
                   </div>
@@ -2494,7 +2494,7 @@ export default function AdminSettingsPage() {
                     <Input
                       id="publishableKey"
                       value={moyasarForm.publishableKey}
-                      onChange={(e) => setMoyasarForm({...moyasarForm, publishableKey: e.target.value})}
+                      onChange={(e) => setMoyasarForm({ ...moyasarForm, publishableKey: e.target.value })}
                       placeholder="Your Moyasar Publishable Key"
                       disabled={!moyasarForm.enabled}
                     />
@@ -2506,7 +2506,7 @@ export default function AdminSettingsPage() {
                       id="secretKey"
                       type="password"
                       value={moyasarForm.secretKey}
-                      onChange={(e) => setMoyasarForm({...moyasarForm, secretKey: e.target.value})}
+                      onChange={(e) => setMoyasarForm({ ...moyasarForm, secretKey: e.target.value })}
                       placeholder="Your Moyasar Secret Key"
                       disabled={!moyasarForm.enabled}
                     />
@@ -2516,7 +2516,7 @@ export default function AdminSettingsPage() {
                     <Switch
                       id="moyasar-test-mode"
                       checked={moyasarForm.testMode}
-                      onCheckedChange={(checked) => setMoyasarForm({...moyasarForm, testMode: checked})}
+                      onCheckedChange={(checked) => setMoyasarForm({ ...moyasarForm, testMode: checked })}
                       disabled={!moyasarForm.enabled}
                     />
                     <Label htmlFor="moyasar-test-mode">Test Mode</Label>
@@ -2565,7 +2565,7 @@ export default function AdminSettingsPage() {
                     <Switch
                       id="mpesa-enabled"
                       checked={mpesaForm.enabled}
-                      onCheckedChange={(checked) => setMpesaForm({...mpesaForm, enabled: checked})}
+                      onCheckedChange={(checked) => setMpesaForm({ ...mpesaForm, enabled: checked })}
                     />
                     <Label htmlFor="mpesa-enabled">Enable MPESA Payments</Label>
                   </div>
@@ -2575,7 +2575,7 @@ export default function AdminSettingsPage() {
                     <Input
                       id="consumerKey"
                       value={mpesaForm.consumerKey}
-                      onChange={(e) => setMpesaForm({...mpesaForm, consumerKey: e.target.value})}
+                      onChange={(e) => setMpesaForm({ ...mpesaForm, consumerKey: e.target.value })}
                       placeholder="Your MPESA Consumer Key"
                       disabled={!mpesaForm.enabled}
                     />
@@ -2588,7 +2588,7 @@ export default function AdminSettingsPage() {
                         id="consumerSecret"
                         type={mpesaForm as any && (mpesaForm as any)._showConsumerSecret ? 'text' : 'password'}
                         value={mpesaForm.consumerSecret}
-                        onChange={(e) => setMpesaForm({...mpesaForm, consumerSecret: e.target.value})}
+                        onChange={(e) => setMpesaForm({ ...mpesaForm, consumerSecret: e.target.value })}
                         placeholder="Your MPESA Consumer Secret"
                         disabled={!mpesaForm.enabled}
                       />
@@ -2612,7 +2612,7 @@ export default function AdminSettingsPage() {
                     <Input
                       id="businessShortcode"
                       value={mpesaForm.businessShortcode}
-                      onChange={(e) => setMpesaForm({...mpesaForm, businessShortcode: e.target.value})}
+                      onChange={(e) => setMpesaForm({ ...mpesaForm, businessShortcode: e.target.value })}
                       placeholder="Your MPESA Business Shortcode"
                       disabled={!mpesaForm.enabled}
                     />
@@ -2622,7 +2622,7 @@ export default function AdminSettingsPage() {
                     <Label htmlFor="shortcodeType">Shortcode Type</Label>
                     <Select
                       value={mpesaForm.shortcodeType}
-                      onValueChange={(value) => setMpesaForm({...mpesaForm, shortcodeType: value as any})}
+                      onValueChange={(value) => setMpesaForm({ ...mpesaForm, shortcodeType: value as any })}
                       disabled={!mpesaForm.enabled}
                     >
                       <SelectTrigger id="shortcodeType">
@@ -2642,7 +2642,7 @@ export default function AdminSettingsPage() {
                         id="passkey"
                         type={(mpesaForm as any)._showPasskey ? 'text' : 'password'}
                         value={mpesaForm.passkey}
-                        onChange={(e) => setMpesaForm({...mpesaForm, passkey: e.target.value})}
+                        onChange={(e) => setMpesaForm({ ...mpesaForm, passkey: e.target.value })}
                         placeholder="Your MPESA Passkey"
                         disabled={!mpesaForm.enabled}
                       />
@@ -2666,7 +2666,7 @@ export default function AdminSettingsPage() {
                     <Input
                       id="callbackUrl"
                       value={mpesaForm.callbackUrl}
-                      onChange={(e) => setMpesaForm({...mpesaForm, callbackUrl: e.target.value})}
+                      onChange={(e) => setMpesaForm({ ...mpesaForm, callbackUrl: e.target.value })}
                       placeholder="https://your-domain.com/api/webhooks/mpesa"
                       disabled={!mpesaForm.enabled}
                     />
@@ -2679,7 +2679,7 @@ export default function AdminSettingsPage() {
                     <Switch
                       id="mpesa-test-mode"
                       checked={mpesaForm.testMode}
-                      onCheckedChange={(checked) => setMpesaForm({...mpesaForm, testMode: checked})}
+                      onCheckedChange={(checked) => setMpesaForm({ ...mpesaForm, testMode: checked })}
                       disabled={!mpesaForm.enabled}
                     />
                     <Label htmlFor="mpesa-test-mode">Test Mode (Sandbox)</Label>
@@ -2728,7 +2728,7 @@ export default function AdminSettingsPage() {
                     <Switch
                       id="bank-transfer-enabled"
                       checked={bankTransferForm.enabled}
-                      onCheckedChange={(checked) => setBankTransferForm({...bankTransferForm, enabled: checked})}
+                      onCheckedChange={(checked) => setBankTransferForm({ ...bankTransferForm, enabled: checked })}
                     />
                     <Label htmlFor="bank-transfer-enabled">Enable Bank Transfer</Label>
                   </div>
@@ -2738,7 +2738,7 @@ export default function AdminSettingsPage() {
                     <Input
                       id="accountName"
                       value={bankTransferForm.accountName}
-                      onChange={(e) => setBankTransferForm({...bankTransferForm, accountName: e.target.value})}
+                      onChange={(e) => setBankTransferForm({ ...bankTransferForm, accountName: e.target.value })}
                       placeholder={t('admin.settings.company_name_placeholder', 'Company Name')}
                       disabled={!bankTransferForm.enabled}
                     />
@@ -2749,7 +2749,7 @@ export default function AdminSettingsPage() {
                     <Input
                       id="accountNumber"
                       value={bankTransferForm.accountNumber}
-                      onChange={(e) => setBankTransferForm({...bankTransferForm, accountNumber: e.target.value})}
+                      onChange={(e) => setBankTransferForm({ ...bankTransferForm, accountNumber: e.target.value })}
                       placeholder="123456789"
                       disabled={!bankTransferForm.enabled}
                     />
@@ -2760,7 +2760,7 @@ export default function AdminSettingsPage() {
                     <Input
                       id="bankName"
                       value={bankTransferForm.bankName}
-                      onChange={(e) => setBankTransferForm({...bankTransferForm, bankName: e.target.value})}
+                      onChange={(e) => setBankTransferForm({ ...bankTransferForm, bankName: e.target.value })}
                       placeholder="Bank of Example"
                       disabled={!bankTransferForm.enabled}
                     />
@@ -2772,7 +2772,7 @@ export default function AdminSettingsPage() {
                       <Input
                         id="routingNumber"
                         value={bankTransferForm.routingNumber}
-                        onChange={(e) => setBankTransferForm({...bankTransferForm, routingNumber: e.target.value})}
+                        onChange={(e) => setBankTransferForm({ ...bankTransferForm, routingNumber: e.target.value })}
                         placeholder="Optional"
                         disabled={!bankTransferForm.enabled}
                       />
@@ -2783,7 +2783,7 @@ export default function AdminSettingsPage() {
                       <Input
                         id="swiftCode"
                         value={bankTransferForm.swiftCode}
-                        onChange={(e) => setBankTransferForm({...bankTransferForm, swiftCode: e.target.value})}
+                        onChange={(e) => setBankTransferForm({ ...bankTransferForm, swiftCode: e.target.value })}
                         placeholder="Optional"
                         disabled={!bankTransferForm.enabled}
                       />
@@ -2795,7 +2795,7 @@ export default function AdminSettingsPage() {
                     <Input
                       id="instructions"
                       value={bankTransferForm.instructions}
-                      onChange={(e) => setBankTransferForm({...bankTransferForm, instructions: e.target.value})}
+                      onChange={(e) => setBankTransferForm({ ...bankTransferForm, instructions: e.target.value })}
                       placeholder="Include payment reference in transfer details"
                       disabled={!bankTransferForm.enabled}
                     />
@@ -2830,7 +2830,7 @@ export default function AdminSettingsPage() {
                   <Switch
                     id="smtp-enabled"
                     checked={smtpForm.enabled}
-                    onCheckedChange={(checked) => setSmtpForm({...smtpForm, enabled: checked})}
+                    onCheckedChange={(checked) => setSmtpForm({ ...smtpForm, enabled: checked })}
                   />
                   <Label htmlFor="smtp-enabled">Enable SMTP Email</Label>
                 </div>
@@ -2844,7 +2844,7 @@ export default function AdminSettingsPage() {
                     <Input
                       id="smtp-host"
                       value={smtpForm.host}
-                      onChange={(e) => setSmtpForm({...smtpForm, host: e.target.value})}
+                      onChange={(e) => setSmtpForm({ ...smtpForm, host: e.target.value })}
                       placeholder="smtp.example.com"
                       disabled={!smtpForm.enabled}
                     />
@@ -2855,7 +2855,7 @@ export default function AdminSettingsPage() {
                     <Input
                       id="smtp-username"
                       value={smtpForm.username}
-                      onChange={(e) => setSmtpForm({...smtpForm, username: e.target.value})}
+                      onChange={(e) => setSmtpForm({ ...smtpForm, username: e.target.value })}
                       placeholder="username@example.com"
                       disabled={!smtpForm.enabled}
                     />
@@ -2879,7 +2879,7 @@ export default function AdminSettingsPage() {
                           suggestedSecurity = 'none';
                         }
 
-                        setSmtpForm({...smtpForm, port, security: suggestedSecurity});
+                        setSmtpForm({ ...smtpForm, port, security: suggestedSecurity });
                       }}
                       placeholder="465"
                       disabled={!smtpForm.enabled}
@@ -2895,7 +2895,7 @@ export default function AdminSettingsPage() {
                       id="smtp-password"
                       type="password"
                       value={smtpForm.password}
-                      onChange={(e) => setSmtpForm({...smtpForm, password: e.target.value})}
+                      onChange={(e) => setSmtpForm({ ...smtpForm, password: e.target.value })}
                       placeholder={storedSmtpPassword ? "Leave empty to keep current password" : "Enter password"}
                       disabled={!smtpForm.enabled}
                     />
@@ -2908,7 +2908,7 @@ export default function AdminSettingsPage() {
                     <Label htmlFor="smtp-security">Security</Label>
                     <Select
                       value={smtpForm.security}
-                      onValueChange={(value) => setSmtpForm({...smtpForm, security: value})}
+                      onValueChange={(value) => setSmtpForm({ ...smtpForm, security: value })}
                       disabled={!smtpForm.enabled}
                     >
                       <SelectTrigger id="smtp-security">
@@ -2927,7 +2927,7 @@ export default function AdminSettingsPage() {
                       id="smtp-from-email"
                       type="email"
                       value={smtpForm.fromEmail}
-                      onChange={(e) => setSmtpForm({...smtpForm, fromEmail: e.target.value})}
+                      onChange={(e) => setSmtpForm({ ...smtpForm, fromEmail: e.target.value })}
                       placeholder="noreply@example.com"
                       disabled={!smtpForm.enabled}
                     />
@@ -2938,8 +2938,8 @@ export default function AdminSettingsPage() {
                     <Input
                       id="smtp-from-name"
                       value={smtpForm.fromName}
-                      onChange={(e) => setSmtpForm({...smtpForm, fromName: e.target.value})}
-                      placeholder="PowerChat Support"
+                      onChange={(e) => setSmtpForm({ ...smtpForm, fromName: e.target.value })}
+                      placeholder="Iawarrior tech Support"
                       disabled={!smtpForm.enabled}
                     />
                   </div>
@@ -2950,7 +2950,7 @@ export default function AdminSettingsPage() {
                       id="smtp-test-email"
                       type="email"
                       value={smtpForm.testEmail}
-                      onChange={(e) => setSmtpForm({...smtpForm, testEmail: e.target.value})}
+                      onChange={(e) => setSmtpForm({ ...smtpForm, testEmail: e.target.value })}
                       placeholder="test@example.com"
                       disabled={!smtpForm.enabled}
                     />
@@ -3002,7 +3002,7 @@ export default function AdminSettingsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="defaultCurrency">Default Currency</Label>
-                    
+
                     {/* Custom Currency Management Section */}
                     <div className="mb-3 space-y-2">
                       <Dialog open={showCustomCurrencyDialog} onOpenChange={setShowCustomCurrencyDialog}>
@@ -3026,7 +3026,7 @@ export default function AdminSettingsPage() {
                                 id="currency-code"
                                 placeholder="USD"
                                 value={customCurrencyForm.code}
-                                onChange={(e) => setCustomCurrencyForm({...customCurrencyForm, code: e.target.value.toUpperCase()})}
+                                onChange={(e) => setCustomCurrencyForm({ ...customCurrencyForm, code: e.target.value.toUpperCase() })}
                                 maxLength={3}
                               />
                               <p className="text-xs text-muted-foreground">
@@ -3039,7 +3039,7 @@ export default function AdminSettingsPage() {
                                 id="currency-name"
                                 placeholder="US Dollar"
                                 value={customCurrencyForm.name}
-                                onChange={(e) => setCustomCurrencyForm({...customCurrencyForm, name: e.target.value})}
+                                onChange={(e) => setCustomCurrencyForm({ ...customCurrencyForm, name: e.target.value })}
                               />
                             </div>
                             <div className="space-y-2">
@@ -3048,7 +3048,7 @@ export default function AdminSettingsPage() {
                                 id="currency-symbol"
                                 placeholder="$"
                                 value={customCurrencyForm.symbol}
-                                onChange={(e) => setCustomCurrencyForm({...customCurrencyForm, symbol: e.target.value})}
+                                onChange={(e) => setCustomCurrencyForm({ ...customCurrencyForm, symbol: e.target.value })}
                               />
                             </div>
                           </div>
@@ -3093,7 +3093,7 @@ export default function AdminSettingsPage() {
 
                     <Select
                       value={generalSettingsForm.defaultCurrency}
-                      onValueChange={(value) => setGeneralSettingsForm({...generalSettingsForm, defaultCurrency: value})}
+                      onValueChange={(value) => setGeneralSettingsForm({ ...generalSettingsForm, defaultCurrency: value })}
                     >
                       <SelectTrigger id="defaultCurrency">
                         <SelectValue placeholder="Select currency" />
@@ -3122,7 +3122,7 @@ export default function AdminSettingsPage() {
                     <Label htmlFor="dateFormat">Date Format</Label>
                     <Select
                       value={generalSettingsForm.dateFormat}
-                      onValueChange={(value) => setGeneralSettingsForm({...generalSettingsForm, dateFormat: value})}
+                      onValueChange={(value) => setGeneralSettingsForm({ ...generalSettingsForm, dateFormat: value })}
                     >
                       <SelectTrigger id="dateFormat">
                         <SelectValue placeholder="Select date format" />
@@ -3139,7 +3139,7 @@ export default function AdminSettingsPage() {
                     <Label htmlFor="timeFormat">Time Format</Label>
                     <Select
                       value={generalSettingsForm.timeFormat}
-                      onValueChange={(value) => setGeneralSettingsForm({...generalSettingsForm, timeFormat: value})}
+                      onValueChange={(value) => setGeneralSettingsForm({ ...generalSettingsForm, timeFormat: value })}
                     >
                       <SelectTrigger id="timeFormat">
                         <SelectValue placeholder="Select time format" />
@@ -3171,7 +3171,7 @@ export default function AdminSettingsPage() {
                         type="text"
                         placeholder="100% or 800px"
                         value={embedSettings.width}
-                        onChange={(e) => setEmbedSettings({...embedSettings, width: e.target.value})}
+                        onChange={(e) => setEmbedSettings({ ...embedSettings, width: e.target.value })}
                       />
                     </div>
                     <div className="space-y-2">
@@ -3181,7 +3181,7 @@ export default function AdminSettingsPage() {
                         type="text"
                         placeholder="600px or 100vh"
                         value={embedSettings.height}
-                        onChange={(e) => setEmbedSettings({...embedSettings, height: e.target.value})}
+                        onChange={(e) => setEmbedSettings({ ...embedSettings, height: e.target.value })}
                       />
                     </div>
                   </div>
@@ -3194,7 +3194,7 @@ export default function AdminSettingsPage() {
                         type="text"
                         placeholder="8px"
                         value={embedSettings.borderRadius}
-                        onChange={(e) => setEmbedSettings({...embedSettings, borderRadius: e.target.value})}
+                        onChange={(e) => setEmbedSettings({ ...embedSettings, borderRadius: e.target.value })}
                       />
                     </div>
                     <div className="space-y-4">
@@ -3203,7 +3203,7 @@ export default function AdminSettingsPage() {
                           type="checkbox"
                           id="showHeader"
                           checked={embedSettings.showHeader}
-                          onChange={(e) => setEmbedSettings({...embedSettings, showHeader: e.target.checked})}
+                          onChange={(e) => setEmbedSettings({ ...embedSettings, showHeader: e.target.checked })}
                           className="rounded"
                         />
                         <Label htmlFor="showHeader">Show Header</Label>
@@ -3213,7 +3213,7 @@ export default function AdminSettingsPage() {
                           type="checkbox"
                           id="allowFullscreen"
                           checked={embedSettings.allowFullscreen}
-                          onChange={(e) => setEmbedSettings({...embedSettings, allowFullscreen: e.target.checked})}
+                          onChange={(e) => setEmbedSettings({ ...embedSettings, allowFullscreen: e.target.checked })}
                           className="rounded"
                         />
                         <Label htmlFor="allowFullscreen">Allow Fullscreen</Label>
@@ -3223,7 +3223,7 @@ export default function AdminSettingsPage() {
                           type="checkbox"
                           id="boxShadow"
                           checked={embedSettings.boxShadow}
-                          onChange={(e) => setEmbedSettings({...embedSettings, boxShadow: e.target.checked})}
+                          onChange={(e) => setEmbedSettings({ ...embedSettings, boxShadow: e.target.checked })}
                           className="rounded"
                         />
                         <Label htmlFor="boxShadow">Box Shadow</Label>
@@ -3285,7 +3285,7 @@ export default function AdminSettingsPage() {
                           />
                         </div>
                         <p className="text-xs text-muted-foreground">
-                          Copy this HTML code and paste it into your website where you want PowerChat to appear.
+                          Copy this HTML code and paste it into your website where you want Iawarrior tech to appear.
                         </p>
                       </div>
 
@@ -3406,7 +3406,7 @@ export default function AdminSettingsPage() {
                       id="frontend-website"
                       checked={generalSettingsForm.frontendWebsiteEnabled}
                       onCheckedChange={(checked) =>
-                        setGeneralSettingsForm({...generalSettingsForm, frontendWebsiteEnabled: checked})
+                        setGeneralSettingsForm({ ...generalSettingsForm, frontendWebsiteEnabled: checked })
                       }
                     />
                   </div>
@@ -3462,7 +3462,7 @@ export default function AdminSettingsPage() {
                       id="plan-renewal-enabled"
                       checked={generalSettingsForm.planRenewalEnabled}
                       onCheckedChange={(checked) =>
-                        setGeneralSettingsForm({...generalSettingsForm, planRenewalEnabled: checked})
+                        setGeneralSettingsForm({ ...generalSettingsForm, planRenewalEnabled: checked })
                       }
                     />
                   </div>
@@ -3503,7 +3503,7 @@ export default function AdminSettingsPage() {
                       id="help-support-url"
                       type="url"
                       value={generalSettingsForm.helpSupportUrl}
-                      onChange={(e) => setGeneralSettingsForm({...generalSettingsForm, helpSupportUrl: e.target.value})}
+                      onChange={(e) => setGeneralSettingsForm({ ...generalSettingsForm, helpSupportUrl: e.target.value })}
                       placeholder="https://docs.yourdomain.com"
                     />
                     <p className="text-xs text-muted-foreground">
@@ -3541,7 +3541,7 @@ export default function AdminSettingsPage() {
                   <Switch
                     id="registration-enabled"
                     checked={registrationSettings.enabled}
-                    onCheckedChange={(checked) => setRegistrationSettings({...registrationSettings, enabled: checked})}
+                    onCheckedChange={(checked) => setRegistrationSettings({ ...registrationSettings, enabled: checked })}
                   />
                   <Label htmlFor="registration-enabled" className="text-sm font-medium">
                     {t('admin.settings.enable_company_registration', 'Enable Company Registration')}
@@ -3557,7 +3557,7 @@ export default function AdminSettingsPage() {
                   <Switch
                     id="registration-approval"
                     checked={registrationSettings.requireApproval}
-                    onCheckedChange={(checked) => setRegistrationSettings({...registrationSettings, requireApproval: checked})}
+                    onCheckedChange={(checked) => setRegistrationSettings({ ...registrationSettings, requireApproval: checked })}
                     disabled={!registrationSettings.enabled}
                   />
                   <Label htmlFor="registration-approval" className="text-sm font-medium">
@@ -3574,7 +3574,7 @@ export default function AdminSettingsPage() {
                   <Label htmlFor="default-plan">Default Plan for New Companies</Label>
                   <Select
                     value={registrationSettings.defaultPlan}
-                    onValueChange={(value) => setRegistrationSettings({...registrationSettings, defaultPlan: value})}
+                    onValueChange={(value) => setRegistrationSettings({ ...registrationSettings, defaultPlan: value })}
                     disabled={!registrationSettings.enabled || isLoadingPlans}
                   >
                     <SelectTrigger>
@@ -3768,7 +3768,7 @@ export default function AdminSettingsPage() {
                   Custom Scripts
                 </CardTitle>
                 <CardDescription>
-                  Inject custom HTML and JavaScript code globally across your PowerChat application.
+                  Inject custom HTML and JavaScript code globally across your Iawarrior tech application.
                   This feature allows you to integrate third-party services like translation tools, analytics, or other widgets.
                 </CardDescription>
               </CardHeader>

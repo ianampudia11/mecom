@@ -12,7 +12,22 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { ColoredTag } from '@/components/ui/colored-tag';
 import { Separator } from '@/components/ui/separator';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+} from '@/components/ui/command';
 import {
   Select,
   SelectContent,
@@ -42,10 +57,14 @@ import {
   Undo2,
   Upload,
   Download,
-  FileText
+  FileText,
+  Check,
+  Tag as TagIcon
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from '@/hooks/use-translation';
+import { useQuery } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
 import type { SegmentFilterCriteria } from '../../../../shared/schema';
 
 interface CreateSegmentModalProps {
@@ -100,8 +119,22 @@ export function CreateSegmentModal({ isOpen, onClose, onSegmentCreated }: Create
   const [csvColumnMapping, setCsvColumnMapping] = useState<Record<string, string>>({});
   const [csvImportStep, setCsvImportStep] = useState<'upload' | 'mapping' | 'preview' | 'importing' | 'results'>('upload');
   const [csvImportResults, setCsvImportResults] = useState<any>(null);
+  const [showTagDropdown, setShowTagDropdown] = useState(false);
   const { toast } = useToast();
   const { t } = useTranslation();
+
+  // Fetch available tags
+  const { data: availableTags = [] } = useQuery({
+    queryKey: ['/api/contacts/tags'],
+    queryFn: async () => {
+      const res = await fetch('/api/contacts/tags');
+      if (!res.ok) return [];
+      const data = await res.json();
+      return Array.isArray(data) ? data : [];
+    },
+    staleTime: 60000,
+    enabled: isOpen
+  });
 
   useEffect(() => {
     if (isOpen) {
@@ -523,42 +556,102 @@ export function CreateSegmentModal({ isOpen, onClose, onSegmentCreated }: Create
             <div>
               <Label>{t('segments.create.contact_tags_label', 'Contact Tags')}</Label>
               <div className="space-y-2">
-                <div className="flex gap-2">
-                  <Input
-                    value={newTag}
-                    onChange={(e) => setNewTag(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder={t('segments.create.tag_placeholder', 'Enter tag name')}
-                    className="flex-1"
-                  />
-                  <Button
-                    type="button"
-                    onClick={handleAddTag}
-                    disabled={!newTag.trim()}
-                    size="sm"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
+                <div className="flex gap-2 items-center">
+                  <Popover open={showTagDropdown} onOpenChange={setShowTagDropdown}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={showTagDropdown}
+                        className="justify-between h-10 flex-1"
+                      >
+                        {t('segments.create.tag_placeholder', 'Select tags...')}
+                        <Plus className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[300px] p-0" align="start">
+                      <Command>
+                        <CommandInput
+                          placeholder={t('segments.create.tag_search', 'Search tags...')}
+                          value={newTag}
+                          onValueChange={setNewTag}
+                        />
+                        <CommandList>
+                          <CommandEmpty>
+                            {newTag && (
+                              <div
+                                className="p-2 text-xs cursor-pointer hover:bg-accent flex items-center gap-2"
+                                onClick={() => {
+                                  handleAddTag();
+                                  setShowTagDropdown(false);
+                                }}
+                              >
+                                <Plus className="h-3 w-3" />
+                                Create "{newTag}"
+                              </div>
+                            )}
+                          </CommandEmpty>
+
+                          {(criteria.tags?.length ?? 0) > 0 && (
+                            <CommandGroup heading="Selected">
+                              {(criteria.tags ?? []).map((tag) => (
+                                <CommandItem
+                                  key={tag}
+                                  value={tag}
+                                  onSelect={() => {
+                                    handleRemoveTag(tag);
+                                  }}
+                                  className="bg-accent/50"
+                                >
+                                  <Check className="mr-2 h-4 w-4" />
+                                  <ColoredTag name={tag} size="sm" />
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          )}
+
+                          {availableTags.filter((tag: string) =>
+                            !(criteria.tags ?? []).includes(tag) &&
+                            tag.toLowerCase().includes(newTag.toLowerCase())
+                          ).length > 0 && (
+                              <>
+                                <CommandSeparator />
+                                <CommandGroup heading="Available">
+                                  {availableTags
+                                    .filter((tag: string) => !(criteria.tags ?? []).includes(tag))
+                                    .filter((tag: string) => tag.toLowerCase().includes(newTag.toLowerCase()))
+                                    .map((tag: string) => (
+                                      <CommandItem
+                                        key={tag}
+                                        value={tag}
+                                        onSelect={() => {
+                                          const newTags = [...(criteria.tags ?? []), tag];
+                                          setCriteria(prev => ({ ...prev, tags: newTags }));
+                                          setNewTag('');
+                                        }}
+                                      >
+                                        <TagIcon className="mr-2 h-3.5 w-3.5 opacity-70" />
+                                        {tag}
+                                      </CommandItem>
+                                    ))}
+                                </CommandGroup>
+                              </>
+                            )}
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                 </div>
 
                 {(criteria.tags?.length ?? 0) > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {(criteria.tags ?? []).map((tag, index) => (
-                      <Badge key={index} variant="secondary" className="flex items-center gap-1">
-                        <Tag className="w-3 h-3" />
-                        {tag}
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleRemoveTag(tag);
-                          }}
-                          className="ml-1 hover:text-destructive"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </Badge>
+                      <ColoredTag
+                        key={index}
+                        name={tag}
+                        onRemove={() => handleRemoveTag(tag)}
+                        size="md"
+                      />
                     ))}
                   </div>
                 )}
@@ -646,9 +739,7 @@ export function CreateSegmentModal({ isOpen, onClose, onSegmentCreated }: Create
                           {contact.tags && contact.tags.length > 0 ? (
                             <div className="flex flex-wrap gap-1">
                               {contact.tags.slice(0, 2).map((tag, index) => (
-                                <Badge key={index} variant="outline" className="text-xs">
-                                  {tag}
-                                </Badge>
+                                <ColoredTag key={index} name={tag} size="sm" />
                               ))}
                               {contact.tags.length > 2 && (
                                 <Badge variant="outline" className="text-xs">

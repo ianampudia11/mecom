@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { Handle, Position } from 'reactflow';
 import { useReactFlow } from 'reactflow';
 import { Trash2, Copy, Network, Settings, Plus, X, Play, CheckCircle, XCircle, Loader2, ChevronDown, ChevronUp, RotateCcw, Eye, EyeOff } from 'lucide-react';
-import { useFlowContext } from '../../pages/flow-builder';
+import { useFlowContext } from './FlowContext';
 import { Button } from "@/components/ui/button";
 import {
   Select,

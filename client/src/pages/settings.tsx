@@ -85,6 +85,7 @@ import { EditWebChatConnectionForm } from '@/components/settings/EditWebChatConn
 import ConnectionControl from '@/components/whatsapp/ConnectionControl';
 import CompanyAiCredentialsTab from '@/components/settings/CompanyAiCredentialsTab';
 import AiUsageAnalytics from '@/components/settings/AiUsageAnalytics';
+import { TagManagement } from '@/components/settings/TagManagement';
 
 interface User {
   id: number;
@@ -327,7 +328,7 @@ export default function Settings() {
   const [isLoadingProxies, setIsLoadingProxies] = useState(false);
   const [isDeletingProxy, setIsDeletingProxy] = useState<number | null>(null);
   const [isTestingProxyId, setIsTestingProxyId] = useState<number | null>(null);
-  
+
 
   const [proxyFormData, setProxyFormData] = useState({
     name: '',
@@ -353,10 +354,10 @@ export default function Settings() {
 
   const memoizedWhatsAppQR = useMemo(() => {
     if (!qrCode) return null;
-    
+
     return (
-      <QRCodeSVG 
-        value={qrCode} 
+      <QRCodeSVG
+        value={qrCode}
         size={256}
         className="w-full max-w-[180px] sm:max-w-[220px] md:max-w-[256px]"
         style={{ maxWidth: '100%', height: 'auto' }}
@@ -392,7 +393,7 @@ export default function Settings() {
 
 
   const activeConnectionIdRef = useRef<number | null>(null);
-  
+
   useEffect(() => {
     activeConnectionIdRef.current = activeConnectionId;
   }, [activeConnectionId]);
@@ -410,16 +411,16 @@ export default function Settings() {
     const handleWebSocketMessage = (event: MessageEvent) => {
       try {
         const data = JSON.parse(event.data);
-        
+
 
         const currentActiveConnectionId = activeConnectionIdRef.current;
 
         if (data.type === 'whatsappQrCode' && currentActiveConnectionId && data.connectionId === currentActiveConnectionId) {
           setQrCode(data.qrCode);
           setConnectionStatus('qr_code');
-          setAwaitingManualQr(false);setQrGenerationInProgress(false);
+          setAwaitingManualQr(false); setQrGenerationInProgress(false);
           setQrRetryCount(0);
-          
+
 
           setQrGenerationTimeout(prev => {
             if (prev) clearTimeout(prev);
@@ -547,7 +548,7 @@ export default function Settings() {
         setQrGenerationInProgress(false);
         setSelectedProxyId(null); // Reset proxy selection
         setShowQrModal(true);
-        
+
 
       } else if (channelType === 'WhatsApp Business API') {
         setShowBusinessApiModal(true);
@@ -591,7 +592,7 @@ export default function Settings() {
 
   const generateQRCode = async (isManual: boolean = false, connectionId?: number) => {
     let targetConnectionId = connectionId || activeConnectionId;
-    
+
 
     if (!targetConnectionId) {
       try {
@@ -628,7 +629,7 @@ export default function Settings() {
 
       const currentConnection = channelConnections.find(c => c.id === targetConnectionId);
       const currentProxyId = (currentConnection as any)?.proxyServerId;
-      
+
       if (currentProxyId !== selectedProxyId) {
         try {
           const response = await fetch(`/api/channel-connections/${targetConnectionId}/proxy`, {
@@ -644,7 +645,7 @@ export default function Settings() {
           if (!response.ok) {
             throw new Error('Failed to update proxy selection');
           }
-          
+
 
           queryClient.invalidateQueries({ queryKey: ['/api/channel-connections'] });
         } catch (error: any) {
@@ -680,7 +681,7 @@ export default function Settings() {
 
         setQrGenerationInProgress(false);
         setAwaitingManualQr(false);
-        
+
         if (connectionStatus === 'connecting') {
           setConnectionStatus('error');
           toast({
@@ -718,7 +719,7 @@ export default function Settings() {
     } catch (error: any) {
       console.error('Error connecting to WhatsApp:', error);
       setConnectionStatus('error');
-      setAwaitingManualQr(false);setQrGenerationInProgress(false);
+      setAwaitingManualQr(false); setQrGenerationInProgress(false);
 
 
       setQrGenerationTimeout(prev => {
@@ -845,26 +846,26 @@ export default function Settings() {
     try {
 
       const connection = channelConnections.find(c => c.id === connectionId);
-      
+
 
       setActiveConnectionId(connectionId);
       setConnectionStatus(''); // Reset to allow proxy selection
       setQrCode(null);
       setAwaitingManualQr(false);
       setQrGenerationInProgress(false);
-      
+
 
       if (connection && (connection as any).proxyServerId) {
         setSelectedProxyId((connection as any).proxyServerId);
       } else {
         setSelectedProxyId(null);
       }
-      
+
       setShowQrModal(true);
-      
 
 
-      
+
+
     } catch (error) {
       console.error('Error opening reconnect modal:', error);
 
@@ -1134,7 +1135,7 @@ export default function Settings() {
       setIsTestingProxyId(proxyId);
       const res = await apiRequest('POST', `/api/whatsapp-proxy-servers/${proxyId}/test`);
       const result = await res.json().catch(() => null);
-      
+
       if (res.ok && result && result.success) {
         toast({ title: 'Proxy Test Successful', description: result.message || 'Proxy connection is working.' });
         const updatedRes = await apiRequest('GET', '/api/whatsapp-proxy-servers');
@@ -1196,7 +1197,7 @@ export default function Settings() {
         title: "Error",
         description: error.message || "Failed to rename channel",
         variant: "destructive"
-});
+      });
     }
   };
 
@@ -1223,9 +1224,10 @@ export default function Settings() {
       default:
         return { icon: 'ri-message-3-line', color: '#333235', name: 'Chat' };
     }
-  };  const handleQrModalClose = async () => {    setQrGenerationInProgress(false);
+  }; const handleQrModalClose = async () => {
+    setQrGenerationInProgress(false);
     setQrRetryCount(0);
-    
+
 
     if (qrGenerationTimeout) {
       clearTimeout(qrGenerationTimeout);
@@ -1479,7 +1481,7 @@ export default function Settings() {
                 if (prev) clearTimeout(prev);
                 return null;
               });
-              setAwaitingManualQr(false);setQrGenerationInProgress(false);
+              setAwaitingManualQr(false); setQrGenerationInProgress(false);
               setQrRetryCount(0);
             }
             setShowQrModal(open);
@@ -1502,7 +1504,7 @@ export default function Settings() {
                   <Label htmlFor="proxySelector" className="text-sm font-medium mb-2 block">
                     Proxy Server (optional)
                   </Label>
-                  <select 
+                  <select
                     id="proxySelector"
                     className="border rounded h-10 px-2 w-full"
                     value={selectedProxyId || ''}
@@ -1535,7 +1537,7 @@ export default function Settings() {
                     </p>
                   </div>
                 )}
-                
+
                 {connectionStatus === 'connecting' && (
                   <div className="text-center py-8">
                     <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
@@ -1597,9 +1599,9 @@ export default function Settings() {
               <DialogFooter className="flex-col sm:flex-row gap-2">
                 <Button variant="outline" onClick={() => {
                   setShowQrModal(false);
-                  setAwaitingManualQr(false);setQrGenerationInProgress(false);
+                  setAwaitingManualQr(false); setQrGenerationInProgress(false);
                   setQrRetryCount(0);
-                  
+
 
                   if (qrGenerationTimeout) {
                     clearTimeout(qrGenerationTimeout);
@@ -1613,7 +1615,7 @@ export default function Settings() {
                   {connectionStatus === 'connected' ? t('common.close', 'Close') : t('common.cancel', 'Cancel')}
                 </Button>
                 {!connectionStatus && (
-                  <Button 
+                  <Button
                     onClick={handleManualConnect}
                     disabled={qrGenerationInProgress}
                     className="gap-2 bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
@@ -1623,7 +1625,7 @@ export default function Settings() {
                   </Button>
                 )}
                 {connectionStatus === 'qr_code' && (
-                  <Button 
+                  <Button
                     onClick={handleManualConnect}
                     disabled={qrGenerationInProgress}
                     className="gap-2 bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
@@ -1633,7 +1635,7 @@ export default function Settings() {
                   </Button>
                 )}
                 {connectionStatus === 'error' && (
-                  <Button 
+                  <Button
                     onClick={handleManualConnect}
                     className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground"
                   >
@@ -1642,7 +1644,7 @@ export default function Settings() {
                   </Button>
                 )}
                 {connectionStatus === 'connecting' && (
-                  <Button 
+                  <Button
                     onClick={handleManualConnect}
                     disabled={qrGenerationInProgress}
                     className="gap-2 bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
@@ -1669,29 +1671,29 @@ export default function Settings() {
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="proxyName">Name *</Label>
-                  <Input 
-                    id="proxyName" 
-                    value={proxyFormData.name} 
-                    onChange={(e) => setProxyFormData({...proxyFormData, name: e.target.value})}
+                  <Input
+                    id="proxyName"
+                    value={proxyFormData.name}
+                    onChange={(e) => setProxyFormData({ ...proxyFormData, name: e.target.value })}
                     placeholder="e.g., US Proxy, EU Proxy"
                   />
                 </div>
                 <div className="flex items-center gap-2">
-                  <input 
-                    type="checkbox" 
-                    id="proxyEnabled" 
-                    checked={proxyFormData.enabled} 
-                    onChange={(e) => setProxyFormData({...proxyFormData, enabled: e.target.checked})}
+                  <input
+                    type="checkbox"
+                    id="proxyEnabled"
+                    checked={proxyFormData.enabled}
+                    onChange={(e) => setProxyFormData({ ...proxyFormData, enabled: e.target.checked })}
                   />
                   <Label htmlFor="proxyEnabled">Enabled</Label>
                 </div>
                 <div>
                   <Label htmlFor="proxyType">Type *</Label>
-                  <select 
-                    id="proxyType" 
+                  <select
+                    id="proxyType"
                     className="border rounded h-10 px-2 w-full"
                     value={proxyFormData.type}
-                    onChange={(e) => setProxyFormData({...proxyFormData, type: e.target.value as any})}
+                    onChange={(e) => setProxyFormData({ ...proxyFormData, type: e.target.value as any })}
                   >
                     <option value="http">HTTP</option>
                     <option value="https">HTTPS</option>
@@ -1701,47 +1703,47 @@ export default function Settings() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="proxyHost">Host *</Label>
-                    <Input 
-                      id="proxyHost" 
+                    <Input
+                      id="proxyHost"
                       value={proxyFormData.host}
-                      onChange={(e) => setProxyFormData({...proxyFormData, host: e.target.value})}
+                      onChange={(e) => setProxyFormData({ ...proxyFormData, host: e.target.value })}
                       placeholder="proxy.example.com"
                     />
                   </div>
                   <div>
                     <Label htmlFor="proxyPort">Port *</Label>
-                    <Input 
-                      id="proxyPort" 
+                    <Input
+                      id="proxyPort"
                       type="number"
                       value={proxyFormData.port}
-                      onChange={(e) => setProxyFormData({...proxyFormData, port: e.target.value})}
+                      onChange={(e) => setProxyFormData({ ...proxyFormData, port: e.target.value })}
                       placeholder="8080"
                     />
                   </div>
                 </div>
                 <div>
                   <Label htmlFor="proxyUsername">Username (optional)</Label>
-                  <Input 
-                    id="proxyUsername" 
+                  <Input
+                    id="proxyUsername"
                     value={proxyFormData.username}
-                    onChange={(e) => setProxyFormData({...proxyFormData, username: e.target.value})}
+                    onChange={(e) => setProxyFormData({ ...proxyFormData, username: e.target.value })}
                   />
                 </div>
                 <div>
                   <Label htmlFor="proxyPassword">Password (optional)</Label>
-                  <Input 
-                    id="proxyPassword" 
+                  <Input
+                    id="proxyPassword"
                     type="password"
                     value={proxyFormData.password}
-                    onChange={(e) => setProxyFormData({...proxyFormData, password: e.target.value})}
+                    onChange={(e) => setProxyFormData({ ...proxyFormData, password: e.target.value })}
                   />
                 </div>
                 <div>
                   <Label htmlFor="proxyDescription">Description (optional)</Label>
-                  <Input 
-                    id="proxyDescription" 
+                  <Input
+                    id="proxyDescription"
                     value={proxyFormData.description}
-                    onChange={(e) => setProxyFormData({...proxyFormData, description: e.target.value})}
+                    onChange={(e) => setProxyFormData({ ...proxyFormData, description: e.target.value })}
                     placeholder="Notes about this proxy"
                   />
                 </div>
@@ -1818,7 +1820,7 @@ export default function Settings() {
           )}
 
           {/* Instagram Connection Modal */}
-      <InstagramConnectionForm
+          <InstagramConnectionForm
             isOpen={showInstagramModal}
             onClose={() => setShowInstagramModal(false)}
             onSuccess={handleConnectionSuccess}
@@ -1988,7 +1990,7 @@ export default function Settings() {
             />
           )}
 
-      
+
 
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <div className="mb-6">
@@ -2030,6 +2032,10 @@ export default function Settings() {
                   <TabsTrigger value="ai-usage" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3 flex-shrink-0">
                     <span className="hidden sm:inline">{t('settings.tabs.ai_usage', 'AI Usage')}</span>
                     <span className="sm:hidden">{t('settings.tabs.usage', 'Usage')}</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="tags" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3 flex-shrink-0">
+                    <span className="hidden sm:inline">Tags</span>
+                    <span className="sm:hidden">Tags</span>
                   </TabsTrigger>
                   {currentUser?.isSuperAdmin && (
                     <TabsTrigger value="platform" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3 flex-shrink-0">
@@ -2403,7 +2409,7 @@ export default function Settings() {
                           </Button>
                         </div>
 
-                
+
                         {/* <div className="border border-gray-200 rounded-lg p-3 sm:p-4 flex flex-col items-center hover:bg-gray-50 cursor-pointer transition-colors" onClick={() => handleConnectChannel('WhatsApp Business API (360Dialog)')}>
                           <i className="ri-whatsapp-line text-2xl sm:text-3xl mb-2" style={{ color: '#25D366' }}></i>
                           <h4 className="font-medium text-sm sm:text-base text-center">WhatsApp Business API (360Dialog)</h4>
@@ -2418,7 +2424,7 @@ export default function Settings() {
                             Non-official connection
                           </p>
                         </div>
-                        
+
                         <div className="border border-gray-200 rounded-lg p-3 sm:p-4 flex flex-col items-center hover:bg-gray-50 cursor-pointer transition-colors" onClick={() => handleConnectChannel('Messenger')}>
                           <i className="ri-messenger-line text-2xl sm:text-3xl mb-2" style={{ color: '#1877F2' }}></i>
                           <h4 className="font-medium text-sm sm:text-base text-center">Facebook Messenger</h4>
@@ -2454,15 +2460,15 @@ export default function Settings() {
                           <h4 className="font-medium text-sm sm:text-base text-center">WebChat</h4>
                           <p className="text-xs text-gray-500 text-center mt-1">Chat widget for your website</p>
                         </div>
-                        
-                          <div
-                            className="border border-gray-200 rounded-lg p-3 sm:p-4 flex flex-col items-center hover:bg-gray-50 cursor-pointer transition-colors"
-                            onClick={() => handleConnectChannel('Twilio SMS')}
-                          >
-                            <TwilioIcon className="h-6 w-6 sm:h-6 sm:w-6 mb-2" style={{ color: '#F22F46' }} />
-                            <h4 className="font-medium text-sm sm:text-base text-center">Twilio SMS</h4>
-                            <p className="text-xs text-gray-500 text-center mt-1">Programmable Messaging (SMS/MMS)</p>
-                          </div>
+
+                        <div
+                          className="border border-gray-200 rounded-lg p-3 sm:p-4 flex flex-col items-center hover:bg-gray-50 cursor-pointer transition-colors"
+                          onClick={() => handleConnectChannel('Twilio SMS')}
+                        >
+                          <TwilioIcon className="h-6 w-6 sm:h-6 sm:w-6 mb-2" style={{ color: '#F22F46' }} />
+                          <h4 className="font-medium text-sm sm:text-base text-center">Twilio SMS</h4>
+                          <p className="text-xs text-gray-500 text-center mt-1">Programmable Messaging (SMS/MMS)</p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -2530,9 +2536,9 @@ export default function Settings() {
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
+                              <Button
+                                variant="outline"
+                                size="sm"
                                 onClick={() => testProxy(proxy.id)}
                                 disabled={isTestingProxyId === proxy.id}
                               >
@@ -2545,9 +2551,9 @@ export default function Settings() {
                               <Button variant="outline" size="sm" onClick={() => openEditProxyModal(proxy)}>
                                 <Edit className="h-4 w-4" />
                               </Button>
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
+                              <Button
+                                variant="outline"
+                                size="sm"
                                 onClick={() => deleteProxy(proxy.id)}
                                 disabled={isDeletingProxy === proxy.id}
                               >
@@ -2689,10 +2695,10 @@ export default function Settings() {
                                       </td>
                                       <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                                         <span className={`px-2 py-1 text-xs rounded-full ${transaction.status === 'completed'
-                                            ? 'bg-green-100 text-green-800'
-                                            : transaction.status === 'pending'
-                                              ? 'bg-yellow-100 text-yellow-800'
-                                              : 'bg-red-100 text-red-800'
+                                          ? 'bg-green-100 text-green-800'
+                                          : transaction.status === 'pending'
+                                            ? 'bg-yellow-100 text-yellow-800'
+                                            : 'bg-red-100 text-red-800'
                                           }`}>
                                           {transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}
                                         </span>
@@ -2749,6 +2755,10 @@ export default function Settings() {
 
             <TabsContent value="ai-usage">
               <AiUsageAnalytics />
+            </TabsContent>
+
+            <TabsContent value="tags">
+              <TagManagement />
             </TabsContent>
 
             {currentUser?.isSuperAdmin && (

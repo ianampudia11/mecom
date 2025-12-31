@@ -18,7 +18,7 @@ interface RecentEmoji {
   count: number;
 }
 
-const RECENT_EMOJIS_KEY = 'powerchat_recent_emojis';
+const RECENT_EMOJIS_KEY = 'iawarrior_recent_emojis';
 const MAX_RECENT_EMOJIS = 24;
 
 export default function EmojiPickerComponent({
@@ -267,7 +267,7 @@ export default function EmojiPickerComponent({
     <>
       {/* Backdrop for mobile */}
       <div className="fixed inset-0 z-40 bg-black bg-opacity-25 md:hidden" onClick={onClose} />
-      
+
       {/* Emoji Picker */}
       <div
         ref={pickerRef}

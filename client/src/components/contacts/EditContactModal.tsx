@@ -74,7 +74,7 @@ export default function EditContactModal({ contact, isOpen, onClose }: EditConta
         const error = await response.json();
         throw new Error(error.message || t('contacts.edit.update_failed', 'Failed to update contact'));
       }
-      
+
       return response.json();
     },
     onSuccess: () => {
@@ -84,6 +84,10 @@ export default function EditContactModal({ contact, isOpen, onClose }: EditConta
       });
 
       queryClient.invalidateQueries({ queryKey: ['/api/contacts'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/conversations'] });
+      if (contact?.id) {
+        queryClient.invalidateQueries({ queryKey: ['/api/contacts', contact.id] });
+      }
       queryClient.invalidateQueries({ queryKey: ['/api/contacts/tags'] });
 
       onClose();
@@ -112,11 +116,11 @@ export default function EditContactModal({ contact, isOpen, onClose }: EditConta
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     const tagsArray = formData.tags
       ? formData.tags.split(',').map(tag => tag.trim()).filter(Boolean)
       : [];
-      
+
     updateContactMutation.mutate({
       ...formData,
       tags: tagsArray
@@ -132,7 +136,7 @@ export default function EditContactModal({ contact, isOpen, onClose }: EditConta
             {t('contacts.edit.description', 'Make changes to the contact information below.')}
           </DialogDescription>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -157,7 +161,7 @@ export default function EditContactModal({ contact, isOpen, onClose }: EditConta
               />
             </div>
           </div>
-          
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="phone">{t('contacts.edit.phone_label', 'Phone')}</Label>
@@ -179,7 +183,7 @@ export default function EditContactModal({ contact, isOpen, onClose }: EditConta
               />
             </div>
           </div>
-          
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="identifierType">{t('contacts.edit.channel_label', 'Channel')}</Label>
@@ -210,7 +214,7 @@ export default function EditContactModal({ contact, isOpen, onClose }: EditConta
               />
             </div>
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="tags">{t('contacts.edit.tags_label', 'Tags (comma separated)')}</Label>
             <Input
@@ -232,7 +236,7 @@ export default function EditContactModal({ contact, isOpen, onClose }: EditConta
               rows={3}
             />
           </div>
-          
+
           <DialogFooter>
             <Button
               type="button"

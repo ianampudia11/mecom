@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
@@ -25,6 +26,7 @@ interface EnhancedVariablePickerProps {
   className?: string;
   flowId?: number;
   disabled?: boolean;
+  multiline?: boolean;
 }
 
 const getCategoryIconComponent = (category: FlowVariable['category']) => {
@@ -38,18 +40,19 @@ const getCategoryIconComponent = (category: FlowVariable['category']) => {
   }
 };
 
-export function EnhancedVariablePicker({ 
-  value, 
-  onChange, 
-  placeholder, 
-  className, 
+export function EnhancedVariablePicker({
+  value,
+  onChange,
+  placeholder,
+  className,
   flowId,
-  disabled = false 
+  disabled = false,
+  multiline = false
 }: EnhancedVariablePickerProps) {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [cursorPosition, setCursorPosition] = useState(0);
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const inputRef = React.useRef<HTMLInputElement | HTMLTextAreaElement>(null);
 
   const {
     variables,
@@ -74,13 +77,13 @@ export function EnhancedVariablePicker({
     return acc;
   }, {} as Record<string, FlowVariable[]>);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     onChange(e.target.value);
     setCursorPosition(e.target.selectionStart || 0);
   };
 
-  const handleInputSelect = (e: React.SyntheticEvent<HTMLInputElement>) => {
-    const target = e.target as HTMLInputElement;
+  const handleInputSelect = (e: React.SyntheticEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const target = e.target as HTMLInputElement | HTMLTextAreaElement;
     setCursorPosition(target.selectionStart || 0);
   };
 
@@ -108,24 +111,38 @@ export function EnhancedVariablePicker({
   };
 
   return (
-    <div className="flex gap-2">
-      <Input
-        ref={inputRef}
-        value={value}
-        onChange={handleInputChange}
-        onSelect={handleInputSelect}
-        onKeyUp={handleInputSelect}
-        onClick={handleInputSelect}
-        placeholder={placeholder}
-        className={cn("font-mono text-xs", className)}
-        disabled={disabled}
-      />
+    <div className={cn("flex gap-2", multiline ? "items-start" : "items-center")}>
+      {multiline ? (
+        <Textarea
+          ref={inputRef as React.RefObject<HTMLTextAreaElement>}
+          value={value}
+          onChange={handleInputChange}
+          onSelect={handleInputSelect}
+          onKeyUp={handleInputSelect}
+          onClick={handleInputSelect}
+          placeholder={placeholder}
+          className={cn("font-mono text-xs min-h-[80px] resize-y", className)}
+          disabled={disabled}
+        />
+      ) : (
+        <Input
+          ref={inputRef as React.RefObject<HTMLInputElement>}
+          value={value}
+          onChange={handleInputChange}
+          onSelect={handleInputSelect}
+          onKeyUp={handleInputSelect}
+          onClick={handleInputSelect}
+          placeholder={placeholder}
+          className={cn("font-mono text-xs", className)}
+          disabled={disabled}
+        />
+      )}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             size="sm"
-            className="h-8 px-2 flex items-center gap-1"
+            className="h-8 px-2 flex items-center gap-1 shrink-0"
             title="Insert variable"
             disabled={disabled}
           >

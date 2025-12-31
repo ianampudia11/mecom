@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { formatDistanceToNow } from 'date-fns';
-import { MoreHorizontal, User, Clock, Calendar, Tag } from 'lucide-react';
+import { MoreHorizontal, User, Clock, Calendar, Tag, AlertCircle, ArrowUp, ArrowRight, ArrowDown, CheckCircle2, MessageSquare, Home, MessageCircle } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import HighlightedText from '@/components/ui/highlighted-text';
 import { Deal } from '@shared/schema';
@@ -30,25 +30,39 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ContactAvatar } from '@/components/contacts/ContactAvatar';
+import { ColoredTag } from '@/components/ui/colored-tag';
 import EditDealModal from './EditDealModal';
 import DealDetailsModal from './DealDetailsModal';
 import ContactDetailsModal from './ContactDetailsModal';
 
+// Extend Deal type to include the fields we added in the backend
+interface ExtendedDeal extends Deal {
+  contact?: {
+    name: string | null;
+    phone: string | null;
+    email: string | null;
+  };
+  propertyCount?: number;
+}
+
 interface DealCardProps {
-  deal: Deal;
+  deal: ExtendedDeal;
   isSelected?: boolean;
   onSelect?: (deal: Deal, selected: boolean) => void;
   showSelectionMode?: boolean;
   searchTerm?: string;
+  pipelineId?: number;
 }
 
-export default function DealCard({ 
-  deal, 
-  isSelected = false, 
-  onSelect, 
+export default function DealCard({
+  deal,
+  isSelected = false,
+  onSelect,
   showSelectionMode = false,
-  searchTerm = ''
+  searchTerm = '',
+  pipelineId
 }: DealCardProps) {
+
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -57,12 +71,15 @@ export default function DealCard({
   const [isDealDetailsModalOpen, setIsDealDetailsModalOpen] = useState(false);
   const [isContactDetailsModalOpen, setIsContactDetailsModalOpen] = useState(false);
 
-  const { data: contact } = useQuery({
+  // Use embedded contact or fetch if missing (fallback for legacy/other views)
+  const { data: fetchedContact } = useQuery({
     queryKey: ['/api/contacts', deal.contactId],
     queryFn: () => apiRequest('GET', `/api/contacts/${deal.contactId}`)
       .then(res => res.json()),
-    enabled: !!deal.contactId,
+    enabled: !!deal.contactId && !deal.contact, // Only fetch if we don't have it
   });
+
+  const contact = deal.contact || fetchedContact;
 
   const { data: teamMembers = [] } = useQuery({
     queryKey: ['/api/team-members'],
@@ -71,6 +88,53 @@ export default function DealCard({
   });
 
   const assignedUser = teamMembers.find((member: any) => member.id === deal.assignedToUserId);
+
+  // Fetch tag colors
+  const { data: tagStats = [] } = useQuery({
+    queryKey: ['/api/tags/stats'],
+    queryFn: () => apiRequest('GET', '/api/tags/stats')
+      .then(res => res.json()),
+  });
+
+  // Create a map of tag colors
+  const tagColorsMap = new Map(
+    tagStats.map((tagStat: any) => [tagStat.tag, tagStat.color])
+  );
+
+  // Fetch checklists for checklist progress
+  const { data: checklists = [] } = useQuery({
+    queryKey: [`/api/deals/${deal.id}/checklists`],
+    queryFn: () => apiRequest('GET', `/api/deals/${deal.id}/checklists`)
+      .then(res => res.json()),
+    enabled: !!deal.id,
+  });
+
+  // Calculate checklist progress
+  // Fetch linked properties if count > 0
+  const { data: linkedProperties = [] } = useQuery({
+    queryKey: ['/api/deals', deal.id, 'properties'],
+    queryFn: () => apiRequest('GET', `/api/deals/${deal.id}/properties`).then(res => res.json()),
+    enabled: !!deal.id && (deal.propertyCount || 0) > 0,
+  });
+
+  const getChecklistProgress = () => {
+    const allItems = checklists.flatMap((checklist: any) => checklist.items || []);
+    if (allItems.length === 0) return { completed: 0, total: 0 };
+    const completed = allItems.filter((item: any) => item.isCompleted).length;
+    return { completed, total: allItems.length };
+  };
+
+  const checklistProgress = getChecklistProgress();
+
+  // Fetch comments for comment count
+  const { data: comments = [] } = useQuery({
+    queryKey: [`/api/deals/${deal.id}/comments`],
+    queryFn: () => apiRequest('GET', `/api/deals/${deal.id}/comments`)
+      .then(res => res.json()),
+    enabled: !!deal.id,
+  });
+
+  const commentCount = comments.length;
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -110,39 +174,73 @@ export default function DealCard({
     setIsContactDetailsModalOpen(true);
   };
 
-  const handleContactClick = () => {
-    if (!contact?.id || !contact?.identifierType) return;
+  const handleContactClick = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (!contact?.id) return;
 
-    localStorage.setItem('selectedContactId', contact.id.toString());
-    localStorage.setItem('selectedChannelType', contact.identifierType);
-
-    setLocation('/');
-
-    toast({
-      title: "Redirecting to inbox",
-      description: `Opening conversation with ${contact.name}`,
-    });
+    // Redirect to inbox logic
+    if (contact.identifierType) {
+      localStorage.setItem('selectedContactId', contact.id.toString());
+      localStorage.setItem('selectedChannelType', contact.identifierType);
+      setLocation('/');
+      toast({ title: "Redirecting...", description: `Opening chat with ${contact.name}` });
+    } else {
+      // Fallback if no identifier (e.g. manually created contact without channel)
+      setIsContactDetailsModalOpen(true);
+    }
   };
 
   const handleCardClick = () => {
     if (showSelectionMode && onSelect) {
       onSelect(deal, !isSelected);
     }
+    // Removed default "View Details" on card click as per user request to avoid accidental modal opening.
+    // Use the "View" button (eye icon) explicitly for details.
   };
 
-  const priorityColors = {
-    low: 'bg-blue-500',
-    medium: 'bg-yellow-500',
-    high: 'bg-red-500',
+  const priorityConfig = {
+    low: {
+      color: 'bg-blue-100 text-blue-700 border-blue-300',
+      icon: ArrowDown,
+      label: 'Baja'
+    },
+    medium: {
+      color: 'bg-yellow-100 text-yellow-700 border-yellow-300',
+      icon: ArrowRight,
+      label: 'Media'
+    },
+    high: {
+      color: 'bg-red-100 text-red-700 border-red-300',
+      icon: ArrowUp,
+      label: 'Alta'
+    },
   };
 
-  const priorityColor = priorityColors[deal.priority as keyof typeof priorityColors] || 'bg-gray-500';
+  const priority = priorityConfig[deal.priority as keyof typeof priorityConfig] || priorityConfig.medium;
+  const PriorityIcon = priority.icon;
+
+  const getDueDateStatus = () => {
+    if (!deal.dueDate) return null;
+    const now = new Date();
+    const dueDate = new Date(deal.dueDate);
+    const diffTime = dueDate.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) {
+      return { status: 'overdue', color: 'text-red-600 bg-red-50 border-red-200', label: 'Vencida' };
+    } else if (diffDays <= 3) {
+      return { status: 'soon', color: 'text-orange-600 bg-orange-50 border-orange-200', label: 'Próxima' };
+    } else if (diffDays <= 7) {
+      return { status: 'upcoming', color: 'text-blue-600 bg-blue-50 border-blue-200', label: 'Esta semana' };
+    }
+    return { status: 'normal', color: 'text-gray-600 bg-gray-50 border-gray-200', label: 'Programada' };
+  };
+
+  const dueDateStatus = getDueDateStatus();
 
   return (
-    <div 
-      className={`bg-card border rounded-lg shadow-sm hover:shadow-md transition-all duration-200 cursor-grab group relative hover:border-blue-300 mb-3 ${
-        isSelected ? 'ring-2 ring-blue-500 border-blue-500' : ''
-      }`}
+    <div
+      className={`bg-card border rounded-lg shadow-sm hover:shadow-md transition-all duration-200 cursor-grab group relative hover:border-blue-300 mb-3 flex flex-col ${isSelected ? 'ring-2 ring-blue-500 border-blue-500' : ''}`}
       onClick={handleCardClick}
     >
       {/* Selection Checkbox */}
@@ -156,258 +254,149 @@ export default function DealCard({
           />
         </div>
       )}
+
       {/* Quick Actions Overlay */}
-      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1 z-10">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="secondary"
-                size="icon"
-                className="h-7 w-7 bg-white/90 hover:bg-white border shadow-sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleEditDeal();
-                }}
-              >
-                <i className="ri-edit-line text-xs" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="top">
-              <p>Quick Edit</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="secondary"
-                size="icon"
-                className="h-7 w-7 bg-white/90 hover:bg-white border shadow-sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleViewDetails();
-                }}
-              >
-                <i className="ri-eye-line text-xs" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="top">
-              <p>View Details</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-
+      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1 z-30">
+        {/* Actions kept same but maybe reduced for cleaner UI */}
+        <Button variant="secondary" size="icon" className="h-7 w-7 bg-white/90 hover:bg-white border shadow-sm" onClick={(e) => { e.stopPropagation(); handleEditDeal(); }}><i className="ri-edit-line text-xs" /></Button>
+        <Button variant="secondary" size="icon" className="h-7 w-7 bg-white/90 hover:bg-white border shadow-sm" onClick={(e) => { e.stopPropagation(); handleViewDetails(); }}><i className="ri-eye-line text-xs" /></Button>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="secondary"
-              size="icon"
-              className="h-7 w-7 bg-white/90 hover:bg-white border shadow-sm"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <MoreHorizontal className="h-3.5 w-3.5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuLabel>More Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={handleViewContact}>
-              <i className="ri-user-line mr-2 h-4 w-4" />
-              View Contact
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleContactClick}>
-              <i className="ri-message-3-line mr-2 h-4 w-4" />
-              Open Chat
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              onClick={() => setIsDeleteDialogOpen(true)} 
-              className="text-destructive focus:text-destructive"
-            >
-              <i className="ri-delete-bin-line mr-2 h-4 w-4" />
-              Delete Deal
-            </DropdownMenuItem>
+          <DropdownMenuTrigger asChild><Button variant="secondary" size="icon" className="h-7 w-7 bg-white/90 hover:bg-white border shadow-sm" onClick={(e) => e.stopPropagation()}><MoreHorizontal className="h-3.5 w-3.5" /></Button></DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={handleViewContact}>View Contact</DropdownMenuItem>
+            <DropdownMenuItem onClick={(e) => handleContactClick(e)}>Message Contact</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setIsDeleteDialogOpen(true)} className="text-destructive">Delete Deal</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
 
-      {/* Header Section */}
-      <div className="p-3 pb-2">
-        <div className="flex justify-between items-start gap-2 mb-2">
-          <div className="flex-1 min-w-0 pr-8">
-            <h3 className="font-medium text-sm leading-tight truncate text-gray-900 group-hover:text-blue-600 transition-colors">
-              <HighlightedText 
-                text={deal.title} 
-                searchTerm={searchTerm}
-              />
-            </h3>
-            {deal.value && (
-              <div className="text-lg font-semibold text-green-600 mt-1">
-                ${new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(deal.value)}
-              </div>
-            )}
+      {/* NEW HEADER: Contact & Priority */}
+      <div className="p-3 pb-2 flex justify-between items-start gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <div onClick={handleContactClick} className="cursor-pointer">
+            <ContactAvatar contact={contact || { name: 'Unknown' }} size="sm" className="h-8 w-8" />
           </div>
-          
-          <div className="flex items-center gap-1.5 flex-shrink-0">
-            {/* Priority Indicator */}
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className={`h-3 w-3 rounded-full border-2 border-white shadow-sm ${priorityColor}`} />
-                </TooltipTrigger>
-                <TooltipContent side="top">
-                  <p className="capitalize">{deal.priority} priority</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+          <div className="flex flex-col min-w-0">
+            <div className="flex items-center gap-1.5 group/name">
+              <span
+                className="font-semibold text-sm text-gray-900 truncate hover:text-blue-600 cursor-pointer"
+                onClick={handleContactClick}
+              >
+                <HighlightedText text={contact?.name || 'Unknown Contact'} searchTerm={searchTerm} />
+              </span>
+              <div
+                onClick={handleContactClick}
+                className="cursor-pointer p-0.5 rounded-full hover:bg-green-50 transition-colors"
+                title="Open Chat"
+              >
+                <MessageCircle className="h-3.5 w-3.5 text-green-600" />
+              </div>
+            </div>
+            {/* Identifier Icon if available in future, or small label */}
           </div>
         </div>
+        <div className="flex items-center gap-1 shrink-0">
+          {assignedUser && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-[10px] border border-white ring-1 ring-gray-200 font-bold text-gray-600">
+                    {(assignedUser.fullName || assignedUser.username).charAt(0).toUpperCase()}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>{assignedUser.fullName}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
 
-        {/* Description */}
-        {deal.description && (
-          <p className="text-xs text-gray-600 line-clamp-2 mb-2 leading-relaxed">
-            <HighlightedText 
-              text={deal.description} 
-              searchTerm={searchTerm}
-            />
-          </p>
+          {/* Priority Badge */}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className={`p-1 rounded-md border ${priority.color}`}>
+                  <PriorityIcon className="h-3 w-3" />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent><p>{priority.label}</p></TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      </div>
+
+      {/* BODY: Deal Title (Interest) & Description */}
+      <div className="px-3 pb-2 -mt-1">
+        {deal.title && (
+          <div className="text-sm font-medium text-gray-700 leading-tight mb-1 flex items-center gap-1">
+            <span className="truncate block w-full"><HighlightedText text={deal.title} searchTerm={searchTerm} /></span>
+          </div>
         )}
 
-        {/* Assigned User */}
-        {assignedUser && (
-          <div className="flex items-center gap-2 mb-2">
-            <div className="flex items-center gap-1.5 text-xs text-gray-700 bg-gray-50 px-2 py-1 rounded-md">
-              <User className="h-3 w-3" />
-              <span className="font-medium">
-                {assignedUser.fullName || assignedUser.username}
-              </span>
-            </div>
+        {/* Linked Properties Names */}
+        {linkedProperties && linkedProperties.length > 0 && (
+          <div className="text-xs text-blue-600 mb-1.5 flex flex-col gap-0.5">
+            {linkedProperties.slice(0, 3).map((prop: any) => (
+              <div key={prop.id} className="flex items-center gap-1 truncate hover:underline cursor-pointer">
+                <Home className="h-3 w-3 shrink-0 opacity-70" />
+                <span className="truncate max-w-full">{prop.title || prop.name}</span>
+              </div>
+            ))}
+            {linkedProperties.length > 3 && (
+              <span className="text-[10px] pl-4 text-gray-500">+ {linkedProperties.length - 3} más</span>
+            )}
+          </div>
+        )}
+
+        {deal.value && (
+          <div className="text-sm font-semibold text-green-700/90 mb-1">
+            ${new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(deal.value)}
           </div>
         )}
       </div>
 
-      {/* Contact Section */}
-      {contact && (
-        <div 
-          className="px-3 py-2 border-t border-gray-100 hover:bg-gray-50/50 cursor-pointer transition-colors"
-          onClick={handleContactClick}
-          title={`Open conversation with ${contact.name}`}
-        >
-          <div className="flex items-center gap-2">
-            <ContactAvatar contact={contact} size="sm" />
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-medium text-gray-900 truncate">
-                  <HighlightedText 
-                    text={contact.name} 
-                    searchTerm={searchTerm}
-                  />
-                </span>
-                {contact.identifierType && (
-                  <div className="flex-shrink-0">
-                    {contact.identifierType === 'whatsapp' && <i className="ri-whatsapp-line text-green-500 text-xs" />}
-                    {contact.identifierType === 'whatsapp_unofficial' && <i className="ri-whatsapp-line text-green-500 text-xs" />}
-                    {contact.identifierType === 'messenger' && <i className="ri-messenger-line text-blue-500 text-xs" />}
-                    {contact.identifierType === 'instagram' && <i className="ri-instagram-line text-pink-500 text-xs" />}
-                  </div>
-                )}
-              </div>
+      {/* FOOTER: Meta info & Properties */}
+      <div className="mt-auto px-3 py-2 border-t border-gray-100 bg-gray-50/50 flex items-center justify-between gap-2 text-xs">
+        <div className="flex items-center gap-2">
+          {/* Due Date */}
+          {deal.dueDate && (
+            <div className={`flex items-center gap-1 ${dueDateStatus?.color} px-1.5 py-0.5 rounded border whitespace-nowrap`}>
+              <Calendar className="h-3 w-3" />
+              <span>{new Date(deal.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Footer Section */}
-      <div className="px-3 py-2 border-t border-gray-100 bg-gray-50/30">
-        <div className="flex items-center justify-between text-xs text-gray-500">
-          {/* Left side - Assignment */}
-          <div className="flex items-center gap-3">
-            {assignedUser && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex items-center gap-1">
-                      <User className="h-3 w-3" />
-                      <span className="truncate max-w-16">
-                        {assignedUser.fullName?.split(' ')[0] || assignedUser.username}
-                      </span>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">
-                    <p>Assigned to: {assignedUser.fullName || assignedUser.username}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
-
-            {deal.dueDate && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
-                      <span>{new Date(deal.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">
-                    <p>Due: {new Date(deal.dueDate).toLocaleDateString()}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
-          </div>
-
-          {/* Right side - Activity */}
-          {deal.lastActivityAt && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    <span>{formatDistanceToNow(new Date(deal.lastActivityAt), { addSuffix: true })}</span>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="bottom">
-                  <p>Last activity: {new Date(deal.lastActivityAt).toLocaleString()}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
           )}
+
+          {/* PROPERTY COUNT BADGE */}
+          {deal.propertyCount && deal.propertyCount > 0 ? (
+            <div className="flex items-center gap-1 bg-indigo-50 text-indigo-700 border border-indigo-200 px-1.5 py-0.5 rounded">
+              <Home className="h-3 w-3" />
+              <span className="font-medium">{deal.propertyCount}</span>
+            </div>
+          ) : null}
         </div>
 
-        {/* Tags */}
+        {/* Tags moved to footer - Limited to 2 and using ... for overflow */}
         {deal.tags && deal.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-2">
-            {deal.tags.slice(0, 3).map((tag, index) => (
-              <Badge 
-                key={index} 
-                variant="secondary" 
-                className="text-xs px-1.5 py-0.5 h-auto font-normal bg-blue-50 text-blue-700 border-blue-200"
-              >
-                {tag}
-              </Badge>
+          <div className="flex flex-nowrap items-center gap-1 mr-auto overflow-hidden">
+            {deal.tags.slice(0, 2).map((tag, index) => (
+              <div key={index} className="shrink-0">
+                <ColoredTag name={tag} color={(tagColorsMap.get(tag) as string | null) || undefined} size="sm" />
+              </div>
             ))}
-            {deal.tags.length > 3 && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Badge 
-                      variant="outline" 
-                      className="text-xs px-1.5 py-0.5 h-auto font-normal text-gray-500"
-                    >
-                      +{deal.tags.length - 3}
-                    </Badge>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">
-                    <p>{deal.tags.slice(3).join(', ')}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+            {deal.tags.length > 2 && (
+              <Badge variant="outline" className="text-[10px] px-1 h-5 flex items-center bg-gray-100 text-gray-500 shrink-0">
+                ...
+              </Badge>
             )}
           </div>
         )}
+
+        <div className="flex items-center gap-2 text-gray-500 shrink-0">
+          {commentCount > 0 && <span className="flex items-center gap-0.5"><MessageSquare className="h-3 w-3" />{commentCount}</span>}
+          {checklistProgress.total > 0 && (
+            <span className={`flex items-center gap-0.5 ${checklistProgress.completed === checklistProgress.total ? 'text-green-600' : ''}`}>
+              <CheckCircle2 className="h-3 w-3" /> {checklistProgress.completed}/{checklistProgress.total}
+            </span>
+          )}
+        </div>
       </div>
 
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
@@ -431,6 +420,7 @@ export default function DealCard({
         deal={deal}
         isOpen={isEditDealModalOpen}
         onClose={() => setIsEditDealModalOpen(false)}
+        pipelineId={pipelineId}
       />
 
       <DealDetailsModal

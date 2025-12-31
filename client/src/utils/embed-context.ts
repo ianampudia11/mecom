@@ -2,7 +2,7 @@
  * Utility functions for managing embed context across the application
  */
 
-const EMBED_STORAGE_KEY = 'powerchat_embed_context';
+const EMBED_STORAGE_KEY = 'iawarrior_embed_context';
 const EMBED_PARAM = 'embed';
 
 /**
@@ -36,7 +36,7 @@ export function isEmbeddedContext(): boolean {
 export function initializeEmbedContext(): void {
   const urlParams = new URLSearchParams(window.location.search);
   const hasEmbedParam = urlParams.get(EMBED_PARAM) === 'true';
-  
+
   let isInIframe = false;
   try {
     isInIframe = window.self !== window.top;
@@ -48,10 +48,10 @@ export function initializeEmbedContext(): void {
   if (hasEmbedParam || isInIframe) {
     sessionStorage.setItem(EMBED_STORAGE_KEY, 'true');
     document.body.classList.add('embedded-context');
-    
+
 
     document.cookie = `${EMBED_STORAGE_KEY}=true; path=/; max-age=${24 * 60 * 60}; SameSite=Lax`;
-    
+
 
     if (!hasEmbedParam && isInIframe) {
       const newUrl = preserveEmbedParam(window.location.href);
@@ -59,7 +59,7 @@ export function initializeEmbedContext(): void {
         window.history.replaceState({}, '', newUrl);
       }
     }
-    
+
 
     if (isInIframe && window.parent !== window) {
       try {

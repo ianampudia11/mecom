@@ -1,0 +1,40 @@
+[
+  {
+    "id": 1,
+    "company_id": 1,
+    "title": "Privacy Policy",
+    "slug": "privacy-policy",
+    "content": "<h1>Privacy Policy</h1><p>This is a template privacy policy page. Please customize this content to match your company's privacy practices.</p><p>Last updated: December  08, 2025</p>",
+    "meta_title": "Privacy Policy",
+    "meta_description": "Our privacy policy explains how we collect, use, and protect your personal information.",
+    "meta_keywords": null,
+    "is_published": false,
+    "is_featured": false,
+    "template": "legal",
+    "custom_css": null,
+    "custom_js": null,
+    "author_id": null,
+    "published_at": null,
+    "created_at": "2025-12-08 15:35:03.841935",
+    "updated_at": "2025-12-08 15:35:03.841935"
+  },
+  {
+    "id": 2,
+    "company_id": 1,
+    "title": "Terms of Service",
+    "slug": "terms-of-service",
+    "content": "<h1>Terms of Service</h1><p>This is a template terms of service page. Please customize this content to match your company's terms and conditions.</p><p>Last updated: December  08, 2025</p>",
+    "meta_title": "Terms of Service",
+    "meta_description": "Our terms of service outline the rules and regulations for using our services.",
+    "meta_keywords": null,
+    "is_published": false,
+    "is_featured": false,
+    "template": "legal",
+    "custom_css": null,
+    "custom_js": null,
+    "author_id": null,
+    "published_at": null,
+    "created_at": "2025-12-08 15:35:03.844917",
+    "updated_at": "2025-12-08 15:35:03.844917"
+  }
+]

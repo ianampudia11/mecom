@@ -1,0 +1,1788 @@
+[
+  {
+    "id": 1,
+    "company_id": 4,
+    "contact_id": 2,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: Ian Ampudia Guerrero",
+    "old_values": null,
+    "new_values": {
+      "name": "Ian Ampudia Guerrero",
+      "email": null,
+      "phone": "+51965001709",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.735309+00"
+  },
+  {
+    "id": 2,
+    "company_id": 4,
+    "contact_id": 5,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: 51965001716",
+    "old_values": null,
+    "new_values": {
+      "name": "51965001716",
+      "email": null,
+      "phone": "+51965001716",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.767695+00"
+  },
+  {
+    "id": 3,
+    "company_id": 4,
+    "contact_id": 6,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: 51965001717",
+    "old_values": null,
+    "new_values": {
+      "name": "51965001717",
+      "email": null,
+      "phone": "+51965001717",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.77096+00"
+  },
+  {
+    "id": 4,
+    "company_id": 4,
+    "contact_id": 8,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: 51965001724",
+    "old_values": null,
+    "new_values": {
+      "name": "51965001724",
+      "email": null,
+      "phone": "+51965001724",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.781635+00"
+  },
+  {
+    "id": 5,
+    "company_id": 4,
+    "contact_id": 7,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: 51965001731",
+    "old_values": null,
+    "new_values": {
+      "name": "51965001731",
+      "email": null,
+      "phone": "+51965001731",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.782591+00"
+  },
+  {
+    "id": 6,
+    "company_id": 4,
+    "contact_id": 9,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: 51965001719",
+    "old_values": null,
+    "new_values": {
+      "name": "51965001719",
+      "email": null,
+      "phone": "+51965001719",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.784897+00"
+  },
+  {
+    "id": 7,
+    "company_id": 4,
+    "contact_id": 10,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: 51965001732",
+    "old_values": null,
+    "new_values": {
+      "name": "51965001732",
+      "email": null,
+      "phone": "+51965001732",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.79363+00"
+  },
+  {
+    "id": 8,
+    "company_id": 4,
+    "contact_id": 11,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: 51965001733",
+    "old_values": null,
+    "new_values": {
+      "name": "51965001733",
+      "email": null,
+      "phone": "+51965001733",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.821219+00"
+  },
+  {
+    "id": 9,
+    "company_id": 4,
+    "contact_id": 12,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: 51965001738",
+    "old_values": null,
+    "new_values": {
+      "name": "51965001738",
+      "email": null,
+      "phone": "+51965001738",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.82252+00"
+  },
+  {
+    "id": 10,
+    "company_id": 4,
+    "contact_id": 13,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: 51965001744",
+    "old_values": null,
+    "new_values": {
+      "name": "51965001744",
+      "email": null,
+      "phone": "+51965001744",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.837246+00"
+  },
+  {
+    "id": 11,
+    "company_id": 4,
+    "contact_id": 14,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: 51965001745",
+    "old_values": null,
+    "new_values": {
+      "name": "51965001745",
+      "email": null,
+      "phone": "+51965001745",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.838852+00"
+  },
+  {
+    "id": 12,
+    "company_id": 4,
+    "contact_id": 15,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: 51965001750",
+    "old_values": null,
+    "new_values": {
+      "name": "51965001750",
+      "email": null,
+      "phone": "+51965001750",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.840145+00"
+  },
+  {
+    "id": 13,
+    "company_id": 4,
+    "contact_id": 16,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: 51965001756",
+    "old_values": null,
+    "new_values": {
+      "name": "51965001756",
+      "email": null,
+      "phone": "+51965001756",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.848718+00"
+  },
+  {
+    "id": 14,
+    "company_id": 4,
+    "contact_id": 17,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: 51965001760",
+    "old_values": null,
+    "new_values": {
+      "name": "51965001760",
+      "email": null,
+      "phone": "+51965001760",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.872121+00"
+  },
+  {
+    "id": 15,
+    "company_id": 4,
+    "contact_id": 18,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: 51965001762",
+    "old_values": null,
+    "new_values": {
+      "name": "51965001762",
+      "email": null,
+      "phone": "+51965001762",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.876268+00"
+  },
+  {
+    "id": 16,
+    "company_id": 4,
+    "contact_id": 19,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: 51965001764",
+    "old_values": null,
+    "new_values": {
+      "name": "51965001764",
+      "email": null,
+      "phone": "+51965001764",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.889502+00"
+  },
+  {
+    "id": 17,
+    "company_id": 4,
+    "contact_id": 20,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: 51965001765",
+    "old_values": null,
+    "new_values": {
+      "name": "51965001765",
+      "email": null,
+      "phone": "+51965001765",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.891207+00"
+  },
+  {
+    "id": 18,
+    "company_id": 4,
+    "contact_id": 21,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: 51965001770",
+    "old_values": null,
+    "new_values": {
+      "name": "51965001770",
+      "email": null,
+      "phone": "+51965001770",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.894241+00"
+  },
+  {
+    "id": 19,
+    "company_id": 4,
+    "contact_id": 22,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: 51965001771",
+    "old_values": null,
+    "new_values": {
+      "name": "51965001771",
+      "email": null,
+      "phone": "+51965001771",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.895937+00"
+  },
+  {
+    "id": 20,
+    "company_id": 4,
+    "contact_id": 23,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: 51965001772",
+    "old_values": null,
+    "new_values": {
+      "name": "51965001772",
+      "email": null,
+      "phone": "+51965001772",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.920751+00"
+  },
+  {
+    "id": 21,
+    "company_id": 4,
+    "contact_id": 24,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: 51965001773",
+    "old_values": null,
+    "new_values": {
+      "name": "51965001773",
+      "email": null,
+      "phone": "+51965001773",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.922753+00"
+  },
+  {
+    "id": 22,
+    "company_id": 4,
+    "contact_id": 25,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: 51965001777",
+    "old_values": null,
+    "new_values": {
+      "name": "51965001777",
+      "email": null,
+      "phone": "+51965001777",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.935551+00"
+  },
+  {
+    "id": 23,
+    "company_id": 4,
+    "contact_id": 26,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: 51965001787",
+    "old_values": null,
+    "new_values": {
+      "name": "51965001787",
+      "email": null,
+      "phone": "+51965001787",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.937903+00"
+  },
+  {
+    "id": 24,
+    "company_id": 4,
+    "contact_id": 27,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: 51965001790",
+    "old_values": null,
+    "new_values": {
+      "name": "51965001790",
+      "email": null,
+      "phone": "+51965001790",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.942121+00"
+  },
+  {
+    "id": 25,
+    "company_id": 4,
+    "contact_id": 28,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: 51965001792",
+    "old_values": null,
+    "new_values": {
+      "name": "51965001792",
+      "email": null,
+      "phone": "+51965001792",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.943386+00"
+  },
+  {
+    "id": 26,
+    "company_id": 4,
+    "contact_id": 29,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: 51965001802",
+    "old_values": null,
+    "new_values": {
+      "name": "51965001802",
+      "email": null,
+      "phone": "+51965001802",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.958628+00"
+  },
+  {
+    "id": 27,
+    "company_id": 4,
+    "contact_id": 30,
+    "user_id": 3,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: 51965001806",
+    "old_values": null,
+    "new_values": {
+      "name": "51965001806",
+      "email": null,
+      "phone": "+51965001806",
+      "company": null
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:10:39.959521+00"
+  },
+  {
+    "id": 28,
+    "company_id": 4,
+    "contact_id": 3,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": null
+    },
+    "new_values": {
+      "tags": [
+        "whatsapp"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:48:17.187+00"
+  },
+  {
+    "id": 29,
+    "company_id": 4,
+    "contact_id": 3,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "whatsapp"
+      ]
+    },
+    "new_values": {
+      "tags": [
+        "whatsapp",
+        "Nuevo"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 17:48:32.254427+00"
+  },
+  {
+    "id": 30,
+    "company_id": 4,
+    "contact_id": 3,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "whatsapp",
+        "Nuevo"
+      ]
+    },
+    "new_values": {
+      "tags": [
+        "Nuevo"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 19:33:11.531771+00"
+  },
+  {
+    "id": 31,
+    "company_id": 4,
+    "contact_id": 3,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "Nuevo"
+      ]
+    },
+    "new_values": {
+      "tags": []
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 19:33:12.59425+00"
+  },
+  {
+    "id": 32,
+    "company_id": 4,
+    "contact_id": 3,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": []
+    },
+    "new_values": {
+      "tags": [
+        "conocidos"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 19:33:26.47139+00"
+  },
+  {
+    "id": 33,
+    "company_id": 4,
+    "contact_id": 2,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": null
+    },
+    "new_values": {
+      "tags": [
+        "conocidos"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 19:33:49.793501+00"
+  },
+  {
+    "id": 34,
+    "company_id": 4,
+    "contact_id": 4,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": null
+    },
+    "new_values": {
+      "tags": [
+        "conocidos"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 19:33:57.14906+00"
+  },
+  {
+    "id": 35,
+    "company_id": 4,
+    "contact_id": 4,
+    "user_id": 3,
+    "action_type": "document_uploaded",
+    "action_category": "document",
+    "description": "Document uploaded: WhatsApp Image 2025-12-03 at 6.07.29 PM.jpeg",
+    "old_values": null,
+    "new_values": {
+      "category": "general",
+      "fileSize": 116717,
+      "filename": "WhatsApp Image 2025-12-03 at 6.07.29 PM.jpeg",
+      "description": "Fliyers"
+    },
+    "metadata": {
+      "mimeType": "image/jpeg",
+      "documentId": 1
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 21:05:42.022284+00"
+  },
+  {
+    "id": 36,
+    "company_id": 4,
+    "contact_id": 4,
+    "user_id": 3,
+    "action_type": "document_uploaded",
+    "action_category": "document",
+    "description": "Document uploaded: WhatsApp Image 2025-12-04 at 7.58.47 PM.jpeg",
+    "old_values": null,
+    "new_values": {
+      "category": "address_proof",
+      "fileSize": 328467,
+      "filename": "WhatsApp Image 2025-12-04 at 7.58.47 PM.jpeg",
+      "description": "saas"
+    },
+    "metadata": {
+      "mimeType": "image/jpeg",
+      "documentId": 2
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 21:07:04.060627+00"
+  },
+  {
+    "id": 37,
+    "company_id": 4,
+    "contact_id": 4,
+    "user_id": 3,
+    "action_type": "document_uploaded",
+    "action_category": "document",
+    "description": "Document uploaded: ubi.png",
+    "old_values": null,
+    "new_values": {
+      "category": "identity",
+      "fileSize": 2464752,
+      "filename": "ubi.png",
+      "description": "rer"
+    },
+    "metadata": {
+      "mimeType": "image/png",
+      "documentId": 3
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-08 21:07:22.972093+00"
+  },
+  {
+    "id": 38,
+    "company_id": 4,
+    "contact_id": 4,
+    "user_id": 3,
+    "action_type": "task_created",
+    "action_category": "task_management",
+    "description": "Created task: Mares",
+    "old_values": null,
+    "new_values": {
+      "tags": [],
+      "title": "Mares",
+      "status": "not_started",
+      "dueDate": "2025-12-08T00:00:00.000Z",
+      "category": "balli",
+      "priority": "medium",
+      "companyId": 4,
+      "contactId": 4,
+      "createdBy": 3,
+      "assignedTo": "pendex",
+      "description": "saltos",
+      "backgroundColor": "#ffffff"
+    },
+    "metadata": {
+      "taskId": 1
+    },
+    "ip_address": null,
+    "user_agent": null,
+    "created_at": "2025-12-08 21:08:30.195514+00"
+  },
+  {
+    "id": 39,
+    "company_id": 4,
+    "contact_id": 4,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "conocidos"
+      ]
+    },
+    "new_values": {
+      "tags": [
+        "conocidos",
+        "dantios"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-09 11:57:21.433709+00"
+  },
+  {
+    "id": 40,
+    "company_id": 4,
+    "contact_id": 4,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "conocidos",
+        "dantios"
+      ]
+    },
+    "new_values": {
+      "tags": [
+        "dantios"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-09 11:57:26.220758+00"
+  },
+  {
+    "id": 41,
+    "company_id": 4,
+    "contact_id": 4,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "dantios"
+      ]
+    },
+    "new_values": {
+      "tags": [
+        "dantios",
+        "mari"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-09 12:14:28.83776+00"
+  },
+  {
+    "id": 42,
+    "company_id": 4,
+    "contact_id": 2,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "conocidos"
+      ]
+    },
+    "new_values": {
+      "tags": [
+        "conocidos",
+        "maritan"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-09 12:17:29.597049+00"
+  },
+  {
+    "id": 43,
+    "company_id": 4,
+    "contact_id": 2,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "conocidos",
+        "maritan"
+      ]
+    },
+    "new_values": {
+      "tags": [
+        "conocidos",
+        "maritan",
+        "personal"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "created_at": "2025-12-09 12:17:42.245477+00"
+  },
+  {
+    "id": 44,
+    "company_id": 5,
+    "contact_id": 36,
+    "user_id": 8,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: jazmin michi",
+    "old_values": null,
+    "new_values": {
+      "name": "jazmin michi",
+      "email": "jazmin michi",
+      "phone": "",
+      "company": ""
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-21 23:03:17.687898+00"
+  },
+  {
+    "id": 45,
+    "company_id": 5,
+    "contact_id": 37,
+    "user_id": 9,
+    "action_type": "created",
+    "action_category": "contact",
+    "description": "Contact created: JAZ",
+    "old_values": null,
+    "new_values": {
+      "name": "JAZ",
+      "email": "jaz@jaz.com",
+      "phone": "+51907037074",
+      "company": ""
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-21 23:12:50.230045+00"
+  },
+  {
+    "id": 46,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: name, email, company, notes, tags changed",
+    "old_values": {
+      "name": "51918288463",
+      "tags": null,
+      "email": null,
+      "notes": null,
+      "company": null
+    },
+    "new_values": {
+      "name": "Max Bit",
+      "tags": [],
+      "email": "",
+      "notes": "",
+      "company": ""
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 01:29:48.71121+00"
+  },
+  {
+    "id": 47,
+    "company_id": 4,
+    "contact_id": 33,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: name, email, company, notes, tags changed",
+    "old_values": {
+      "name": "51902127500",
+      "tags": null,
+      "email": null,
+      "notes": null,
+      "company": null
+    },
+    "new_values": {
+      "name": "Negocios digitales",
+      "tags": [],
+      "email": "",
+      "notes": "",
+      "company": ""
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 01:31:21.241642+00"
+  },
+  {
+    "id": 48,
+    "company_id": 4,
+    "contact_id": 33,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": []
+    },
+    "new_values": {
+      "tags": [
+        "maritanisa"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 01:32:31.53147+00"
+  },
+  {
+    "id": 49,
+    "company_id": 4,
+    "contact_id": 33,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "maritanisa"
+      ]
+    },
+    "new_values": {
+      "tags": []
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 01:33:33.635093+00"
+  },
+  {
+    "id": 50,
+    "company_id": 4,
+    "contact_id": 33,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": []
+    },
+    "new_values": {
+      "tags": [
+        "maritanisa"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 02:01:26.723216+00"
+  },
+  {
+    "id": 51,
+    "company_id": 4,
+    "contact_id": 33,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "maritanisa"
+      ]
+    },
+    "new_values": {
+      "tags": [
+        "maritanisa",
+        "personal"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 02:02:50.212914+00"
+  },
+  {
+    "id": 52,
+    "company_id": 4,
+    "contact_id": 33,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "maritanisa",
+        "personal"
+      ]
+    },
+    "new_values": {
+      "tags": [
+        "personal"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 02:03:08.007066+00"
+  },
+  {
+    "id": 53,
+    "company_id": 4,
+    "contact_id": 33,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "personal"
+      ]
+    },
+    "new_values": {
+      "tags": []
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 02:03:09.25356+00"
+  },
+  {
+    "id": 54,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": []
+    },
+    "new_values": {
+      "tags": [
+        "whatsapp"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 02:20:06.019194+00"
+  },
+  {
+    "id": 55,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "whatsapp"
+      ]
+    },
+    "new_values": {
+      "tags": []
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 02:20:34.143798+00"
+  },
+  {
+    "id": 56,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": []
+    },
+    "new_values": {
+      "tags": [
+        "scraped"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 02:20:44.980864+00"
+  },
+  {
+    "id": 57,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "scraped"
+      ]
+    },
+    "new_values": {
+      "tags": [
+        "scraped",
+        "conocidos"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 02:21:19.974238+00"
+  },
+  {
+    "id": 58,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "scraped",
+        "conocidos"
+      ]
+    },
+    "new_values": {
+      "tags": [
+        "conocidos"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 02:23:11.19916+00"
+  },
+  {
+    "id": 59,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "conocidos"
+      ]
+    },
+    "new_values": {
+      "tags": []
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 02:23:12.60356+00"
+  },
+  {
+    "id": 60,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": []
+    },
+    "new_values": {
+      "tags": [
+        "conocidos"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 02:23:14.771712+00"
+  },
+  {
+    "id": 61,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "conocidos"
+      ]
+    },
+    "new_values": {
+      "tags": [
+        "conocidos",
+        "whatsapp"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 02:23:15.860337+00"
+  },
+  {
+    "id": 62,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "conocidos",
+        "whatsapp"
+      ]
+    },
+    "new_values": {
+      "tags": [
+        "conocidos",
+        "whatsapp",
+        "personal"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 03:03:25.50166+00"
+  },
+  {
+    "id": 63,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "conocidos",
+        "whatsapp",
+        "personal"
+      ]
+    },
+    "new_values": {
+      "tags": [
+        "whatsapp",
+        "personal"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 03:04:15.475479+00"
+  },
+  {
+    "id": 64,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "whatsapp",
+        "personal"
+      ]
+    },
+    "new_values": {
+      "tags": [
+        "personal"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 03:06:16.933539+00"
+  },
+  {
+    "id": 65,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "personal"
+      ]
+    },
+    "new_values": {
+      "tags": []
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 03:06:17.405982+00"
+  },
+  {
+    "id": 66,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "scraped"
+      ]
+    },
+    "new_values": {
+      "tags": [
+        "scraped",
+        "conocidos"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 04:10:36.237664+00"
+  },
+  {
+    "id": 67,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "scraped",
+        "conocidos"
+      ]
+    },
+    "new_values": {
+      "tags": [
+        "conocidos"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 04:12:56.953625+00"
+  },
+  {
+    "id": 68,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "conocidos"
+      ]
+    },
+    "new_values": {
+      "tags": []
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 04:12:58.365134+00"
+  },
+  {
+    "id": 69,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": []
+    },
+    "new_values": {
+      "tags": [
+        "maritanisa"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 04:13:42.13089+00"
+  },
+  {
+    "id": 70,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "maritanisa"
+      ]
+    },
+    "new_values": {
+      "tags": []
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 04:52:41.740095+00"
+  },
+  {
+    "id": 71,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "maritanisa"
+      ]
+    },
+    "new_values": {
+      "tags": []
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 04:53:24.640581+00"
+  },
+  {
+    "id": 72,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "maritanisa",
+        "whatsapp"
+      ]
+    },
+    "new_values": {
+      "tags": [
+        "maritanisa"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 04:54:22.576523+00"
+  },
+  {
+    "id": 73,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "maritanisa",
+        "scraped"
+      ]
+    },
+    "new_values": {
+      "tags": [
+        "maritanisa",
+        "scraped",
+        "personal"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 04:54:41.85725+00"
+  },
+  {
+    "id": 74,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "maritanisa",
+        "scraped",
+        "personal"
+      ]
+    },
+    "new_values": {
+      "tags": [
+        "scraped",
+        "personal"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 04:54:50.374195+00"
+  },
+  {
+    "id": 75,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "scraped"
+      ]
+    },
+    "new_values": {
+      "tags": []
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 04:55:18.07536+00"
+  },
+  {
+    "id": 76,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": []
+    },
+    "new_values": {
+      "tags": [
+        "personal"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 04:55:49.09813+00"
+  },
+  {
+    "id": 77,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "personal"
+      ]
+    },
+    "new_values": {
+      "tags": [
+        "personal",
+        "maritanisa"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 04:56:10.627922+00"
+  },
+  {
+    "id": 78,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "personal",
+        "maritanisa"
+      ]
+    },
+    "new_values": {
+      "tags": [
+        "maritanisa"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 04:56:16.734025+00"
+  },
+  {
+    "id": 79,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "maritanisa",
+        "whatsapp",
+        "conocidos"
+      ]
+    },
+    "new_values": {
+      "tags": [
+        "maritanisa",
+        "whatsapp"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 04:56:38.435709+00"
+  },
+  {
+    "id": 80,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "maritanisa",
+        "whatsapp"
+      ]
+    },
+    "new_values": {
+      "tags": [
+        "maritanisa"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 04:56:39.166362+00"
+  },
+  {
+    "id": 81,
+    "company_id": 4,
+    "contact_id": 35,
+    "user_id": 3,
+    "action_type": "updated",
+    "action_category": "contact",
+    "description": "Contact updated: tags changed",
+    "old_values": {
+      "tags": [
+        "maritanisa"
+      ]
+    },
+    "new_values": {
+      "tags": [
+        "maritanisa",
+        "personal"
+      ]
+    },
+    "metadata": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "created_at": "2025-12-22 04:56:53.853405+00"
+  }
+]

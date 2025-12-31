@@ -7,6 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ContactAvatar } from '@/components/contacts/ContactAvatar';
+import { ColoredTag } from '@/components/ui/colored-tag';
 import {
   User,
   Calendar,
@@ -17,8 +18,16 @@ import {
   AlertCircle,
   Phone,
   Mail,
-  Building
+  Building,
+  CheckSquare,
+  MessageSquare,
+  Paperclip
 } from 'lucide-react';
+import DealChecklist from './DealChecklist';
+import DealComments from './DealComments';
+import DealAttachments from './DealAttachments';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import PropertyInterests from '@/components/properties/PropertyInterests';
 
 interface DealDetailsModalProps {
   deal: Deal | null;
@@ -258,10 +267,8 @@ export default function DealDetailsModal({ deal, isOpen, onClose }: DealDetailsM
                     Tags
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {deal.tags.map((tag, index) => (
-                      <Badge key={index} variant="secondary">
-                        {tag}
-                      </Badge>
+                    {deal.tags.map((tag: string, index: number) => (
+                      <ColoredTag key={index} name={tag} size="md" />
                     ))}
                   </div>
                 </div>
@@ -289,6 +296,54 @@ export default function DealDetailsModal({ deal, isOpen, onClose }: DealDetailsM
                 </div>
               </>
             )}
+
+            {/* Tabs Section */}
+            <Tabs defaultValue="checklists" className="w-full">
+              <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent gap-6">
+                <TabsTrigger
+                  value="checklists"
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 py-2"
+                >
+                  Checklists
+                </TabsTrigger>
+                <TabsTrigger
+                  value="properties"
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 py-2"
+                >
+                  Propiedades
+                </TabsTrigger>
+                <TabsTrigger
+                  value="comments"
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 py-2"
+                >
+                  Comentarios
+                </TabsTrigger>
+                <TabsTrigger
+                  value="attachments"
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 py-2"
+                >
+                  Archivos
+                </TabsTrigger>
+              </TabsList>
+
+              <div className="mt-4">
+                <TabsContent value="checklists">
+                  <DealChecklist dealId={deal.id} />
+                </TabsContent>
+
+                <TabsContent value="properties">
+                  <PropertyInterests dealId={deal.id} />
+                </TabsContent>
+
+                <TabsContent value="comments">
+                  <DealComments dealId={deal.id} />
+                </TabsContent>
+
+                <TabsContent value="attachments">
+                  <DealAttachments dealId={deal.id} />
+                </TabsContent>
+              </div>
+            </Tabs>
 
             <Separator />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-muted-foreground">

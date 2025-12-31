@@ -1,3 +1,4 @@
+import { TaskChecklist } from '@/components/tasks/TaskChecklist';
 import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -351,7 +352,8 @@ export default function Contacts() {
     dueDate: '',
     assignedTo: '',
     category: '',
-    tags: [] as string[]
+    tags: [] as string[],
+    checklist: [] as { id: string; text: string; completed: boolean }[]
   });
 
 
@@ -609,10 +611,10 @@ export default function Contacts() {
       setDebouncedSearch(searchTerm);
       setCurrentPage(1);
     }, 300);
-    
+
     return () => clearTimeout(timer);
   }, [searchTerm]);
-  
+
 
 
   const { data: availableTags = [], refetch: refetchTags } = useQuery({
@@ -834,7 +836,7 @@ export default function Contacts() {
     },
     refetchOnWindowFocus: false
   });
-  
+
 
   const rawContacts: Contact[] = Array.isArray(data?.contacts) ? data.contacts : [];
 
@@ -909,10 +911,10 @@ export default function Contacts() {
 
       const existing = acc[existingIndex];
       if (new Date(contact.createdAt) > new Date(existing.createdAt)) {
-        
+
         acc[existingIndex] = contact;
       } else {
-        
+
       }
     }
 
@@ -945,7 +947,7 @@ export default function Contacts() {
   const archivedContactsCount = archivedCountData || 0;
 
 
-  
+
   const deleteContactMutation = useMutation({
     mutationFn: async (contactId: number) => {
       const response = await apiRequest('DELETE', `/api/contacts/${contactId}`);
@@ -1450,7 +1452,7 @@ export default function Contacts() {
 
     bulkDeleteContactsMutation.mutate(validContactIds);
   };
-  
+
   const handleDeleteContact = (id: number) => {
     setDeleteContactId(id);
     setIsDeleteDialogOpen(true);
@@ -1465,14 +1467,14 @@ export default function Contacts() {
     setIsEditModalOpen(false);
     setSelectedContact(null);
   };
-  
+
   const confirmDelete = () => {
     if (deleteContactId) {
       deleteContactMutation.mutate(deleteContactId);
     }
     setIsDeleteDialogOpen(false);
   };
-  
+
   const formatLastContact = (date: string) => {
     if (!date) return 'Never';
     return formatDistanceToNow(new Date(date), { addSuffix: true });
@@ -1531,7 +1533,8 @@ export default function Contacts() {
         dueDate: '',
         assignedTo: '',
         category: '',
-        tags: []
+        tags: [],
+        checklist: []
       });
     },
     onError: (error: Error) => {
@@ -1678,9 +1681,9 @@ export default function Contacts() {
   const handleScheduleAppointment = (contact: Contact) => {
 
     const isConnected = selectedProvider === 'google' ? isGoogleCalendarConnected :
-                       selectedProvider === 'zoho' ? isZohoCalendarConnected : isCalendlyCalendarConnected;
+      selectedProvider === 'zoho' ? isZohoCalendarConnected : isCalendlyCalendarConnected;
     const providerName = selectedProvider === 'google' ? 'Google Calendar' :
-                        selectedProvider === 'zoho' ? 'Zoho Calendar' : 'Calendly';
+      selectedProvider === 'zoho' ? 'Zoho Calendar' : 'Calendly';
 
     if (!isConnected) {
       toast({
@@ -1741,7 +1744,7 @@ export default function Contacts() {
       description: t('contacts.opening_conversation_with', 'Opening conversation with {{name}}', { name: contact.name }),
     });
   };
-  
+
   const handleMessageClick = (contact: Contact) => {
     handleChannelClick(contact);
   };
@@ -1753,14 +1756,14 @@ export default function Contacts() {
     dateFilter !== 'all' ? 1 : 0,
     tagsFilter.length
   ].reduce((a, b) => a + b, 0);
-  
+
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-gray-50">
       <Header />
-      
+
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        
+
         <div className="flex-1 flex overflow-hidden">
           {/* Left Panel - Contacts List */}
           <div className="w-96 bg-white border-r border-gray-200 flex flex-col">
@@ -1773,11 +1776,10 @@ export default function Contacts() {
                     setArchivedFilter('all');
                     setCurrentPage(1);
                   }}
-                  className={`text-sm font-medium pb-2 border-b-2 transition-colors ${
-                    activeTab === 'all'
-                      ? 'text-blue-600 border-blue-600'
-                      : 'text-gray-500 border-transparent hover:text-gray-700'
-                  }`}
+                  className={`text-sm font-medium pb-2 border-b-2 transition-colors ${activeTab === 'all'
+                    ? 'text-blue-600 border-blue-600'
+                    : 'text-gray-500 border-transparent hover:text-gray-700'
+                    }`}
                 >
                   All
                 </button>
@@ -1787,11 +1789,10 @@ export default function Contacts() {
                     setArchivedFilter('active');
                     setCurrentPage(1);
                   }}
-                  className={`text-sm font-medium pb-2 border-b-2 transition-colors ${
-                    activeTab === 'contacts'
-                      ? 'text-blue-600 border-blue-600'
-                      : 'text-gray-500 border-transparent hover:text-gray-700'
-                  }`}
+                  className={`text-sm font-medium pb-2 border-b-2 transition-colors ${activeTab === 'contacts'
+                    ? 'text-blue-600 border-blue-600'
+                    : 'text-gray-500 border-transparent hover:text-gray-700'
+                    }`}
                 >
                   Contacts <span className="ml-1 text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full">{totalContacts}</span>
                 </button>
@@ -1802,11 +1803,10 @@ export default function Contacts() {
                     setArchivedFilter('archived');
                     setCurrentPage(1);
                   }}
-                  className={`text-sm font-medium pb-2 border-b-2 transition-colors ${
-                    activeTab === 'archives'
-                      ? 'text-blue-600 border-blue-600'
-                      : 'text-gray-500 border-transparent hover:text-gray-700'
-                  }`}
+                  className={`text-sm font-medium pb-2 border-b-2 transition-colors ${activeTab === 'archives'
+                    ? 'text-blue-600 border-blue-600'
+                    : 'text-gray-500 border-transparent hover:text-gray-700'
+                    }`}
                 >
                   <Archive className="h-4 w-4 inline mr-1" />
                   Archives <span className="ml-1 text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full">{archivedContactsCount}</span>
@@ -1852,11 +1852,10 @@ export default function Contacts() {
                 onClick={() => setIsFilterDialogOpen(true)}
                 variant="outline"
                 size="sm"
-                className={`flex items-center gap-1 relative ${
-                  activeFiltersCount > 0
-                    ? 'bg-blue-50 border-blue-300 text-blue-700'
-                    : ''
-                }`}
+                className={`flex items-center gap-1 relative ${activeFiltersCount > 0
+                  ? 'bg-blue-50 border-blue-300 text-blue-700'
+                  : ''
+                  }`}
                 title={`Filters${activeFiltersCount > 0 ? ` (${activeFiltersCount} active)` : ''}`}
               >
                 <Filter className="h-4 w-4" />
@@ -2001,15 +2000,13 @@ export default function Contacts() {
                     const contactId = typeof contact.id === 'string' ? parseInt(contact.id, 10) : contact.id;
                     const isSelected = selectedContacts.has(contactId);
                     const isDetailSelected = selectedContactForDetail?.id === contact.id;
-                    
+
                     return (
                       <div
                         key={contact.id}
-                        className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
-                          isDetailSelected ? 'bg-blue-50 border-r-2 border-blue-500' : ''
-                        } ${isSelected ? 'bg-blue-25' : ''} ${
-                          (contact as any).isArchived ? 'opacity-60 bg-gray-50' : ''
-                        }`}
+                        className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${isDetailSelected ? 'bg-blue-50 border-r-2 border-blue-500' : ''
+                          } ${isSelected ? 'bg-blue-25' : ''} ${(contact as any).isArchived ? 'opacity-60 bg-gray-50' : ''
+                          }`}
                         onClick={() => setSelectedContactForDetail(contact)}
                       >
                         <div className="flex items-start space-x-3">
@@ -2025,19 +2022,17 @@ export default function Contacts() {
                               alt={contact.name}
                               className="w-10 h-10 rounded-full ml-4"
                             />
-                            <span className={`absolute bottom-0 right-0 block h-3 w-3 rounded-full border-2 border-white ${
-                              contact.isActive ? 'bg-green-400' : 'bg-gray-300'
-                            }`}></span>
+                            <span className={`absolute bottom-0 right-0 block h-3 w-3 rounded-full border-2 border-white ${contact.isActive ? 'bg-green-400' : 'bg-gray-300'
+                              }`}></span>
                           </div>
-                          
+
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center space-x-2">
                               <span className="text-xs font-medium text-gray-900 uppercase tracking-wide">
                                 {contact.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
                               </span>
-                              <h3 className={`text-sm font-medium truncate ${
-                                (contact as any).isArchived ? 'text-gray-500' : 'text-gray-900'
-                              }`}>
+                              <h3 className={`text-sm font-medium truncate ${(contact as any).isArchived ? 'text-gray-500' : 'text-gray-900'
+                                }`}>
                                 {contact.name}
                               </h3>
                               {(contact as any).isArchived && (
@@ -2046,7 +2041,7 @@ export default function Contacts() {
                                 </Badge>
                               )}
                             </div>
-                            
+
                             <div className="mt-1 flex items-center space-x-2">
                               <div className="flex items-center space-x-1">
                                 {contact.identifierType === 'whatsapp' && (
@@ -2063,13 +2058,13 @@ export default function Contacts() {
                                 </span>
                               </div>
                             </div>
-                            
+
                             {contact.company && (
                               <p className="mt-1 text-xs text-gray-500 truncate">
                                 {contact.company}
                               </p>
                             )}
-                            
+
                             {contact.tags && contact.tags.length > 0 && (
                               <div className="mt-2 flex flex-wrap gap-1">
                                 {contact.tags.slice(0, 2).map((tag, idx) => (
@@ -2091,11 +2086,11 @@ export default function Contacts() {
                   })}
                 </div>
               )}
-              
+
               {/* Pagination */}
               {totalPages > 1 && (
                 <div className="p-4 border-t border-gray-200">
-                  <Pagination 
+                  <Pagination
                     currentPage={currentPage}
                     totalPages={totalPages}
                     onPageChange={setCurrentPage}
@@ -2256,39 +2251,36 @@ export default function Contacts() {
                       variant="full"
                     />
                   </div>
-                 
+
 
                   {/* Navigation Tabs */}
                   <div className="border-t border-gray-200 pt-6">
                     <div className="flex space-x-8 border-b border-gray-200">
-                      <button 
+                      <button
                         onClick={() => setContactDetailTab('dossier')}
-                        className={`pb-2 text-sm font-medium border-b-2 transition-colors ${
-                          contactDetailTab === 'dossier'
-                            ? 'text-blue-600 border-blue-600'
-                            : 'text-gray-500 border-transparent hover:text-gray-700'
-                        }`}
+                        className={`pb-2 text-sm font-medium border-b-2 transition-colors ${contactDetailTab === 'dossier'
+                          ? 'text-blue-600 border-blue-600'
+                          : 'text-gray-500 border-transparent hover:text-gray-700'
+                          }`}
                       >
                         File
                       </button>
                       <button
                         onClick={() => setContactDetailTab('historique')}
-                        className={`pb-2 text-sm font-medium border-b-2 transition-colors ${
-                          contactDetailTab === 'historique'
-                            ? 'text-blue-600 border-blue-600'
-                            : 'text-gray-500 border-transparent hover:text-gray-700'
-                        }`}
+                        className={`pb-2 text-sm font-medium border-b-2 transition-colors ${contactDetailTab === 'historique'
+                          ? 'text-blue-600 border-blue-600'
+                          : 'text-gray-500 border-transparent hover:text-gray-700'
+                          }`}
                       >
                         History
                       </button>
 
                       <button
                         onClick={() => setContactDetailTab('tasks')}
-                        className={`pb-2 text-sm font-medium border-b-2 transition-colors ${
-                          contactDetailTab === 'tasks'
-                            ? 'text-blue-600 border-blue-600'
-                            : 'text-gray-500 border-transparent hover:text-gray-700'
-                        }`}
+                        className={`pb-2 text-sm font-medium border-b-2 transition-colors ${contactDetailTab === 'tasks'
+                          ? 'text-blue-600 border-blue-600'
+                          : 'text-gray-500 border-transparent hover:text-gray-700'
+                          }`}
                       >
                         Tasks
                       </button>
@@ -2651,9 +2643,8 @@ export default function Contacts() {
                                 };
 
                                 return (
-                                  <Card key={task.id} className={`p-4 transition-colors ${
-                                    isSelected ? 'bg-blue-50 border-blue-200' : ''
-                                  } ${isOverdue ? 'border-l-4 border-l-red-500' : ''}`}>
+                                  <Card key={task.id} className={`p-4 transition-colors ${isSelected ? 'bg-blue-50 border-blue-200' : ''
+                                    } ${isOverdue ? 'border-l-4 border-l-red-500' : ''}`}>
                                     <div className="flex items-start space-x-3">
                                       <Checkbox
                                         checked={isSelected}
@@ -2729,7 +2720,8 @@ export default function Contacts() {
                                                   dueDate: task.dueDate ? task.dueDate.split('T')[0] : '',
                                                   assignedTo: task.assignedTo || '',
                                                   category: task.category || '',
-                                                  tags: task.tags || []
+                                                  tags: task.tags || [],
+                                                  checklist: task.checklist || []
                                                 });
                                                 setIsEditTaskModalOpen(true);
                                               }}
@@ -2825,7 +2817,7 @@ export default function Contacts() {
       </div>
 
 
-      
+
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -2878,7 +2870,7 @@ export default function Contacts() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      
+
       <EditContactModal
         contact={selectedContact}
         isOpen={isEditModalOpen}
@@ -2994,13 +2986,12 @@ export default function Contacts() {
                     onChange={(e) => setAddContactForm(prev => ({ ...prev, phone: e.target.value }))}
                     placeholder={t('contacts.add.phone_placeholder', '+1234567890')}
                     disabled={isSubmittingContact}
-                    className={`pl-10 focus:ring-2 focus:ring-primary-500 ${
-                      addContactForm.phone && !validatePhoneNumber(addContactForm.phone).isValid
-                        ? 'border-red-500 focus:border-red-500'
-                        : addContactForm.phone && checkForDuplicatePhone(addContactForm.phone, contacts || []).isDuplicate
+                    className={`pl-10 focus:ring-2 focus:ring-primary-500 ${addContactForm.phone && !validatePhoneNumber(addContactForm.phone).isValid
+                      ? 'border-red-500 focus:border-red-500'
+                      : addContactForm.phone && checkForDuplicatePhone(addContactForm.phone, contacts || []).isDuplicate
                         ? 'border-yellow-500 focus:border-yellow-500'
                         : ''
-                    }`}
+                      }`}
                   />
                   <i className="ri-phone-line absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                   {addContactForm.phone && (
@@ -3873,6 +3864,14 @@ export default function Contacts() {
             </div>
           </div>
 
+          <div>
+            <Label>Checklist</Label>
+            <TaskChecklist
+              items={taskForm.checklist}
+              onChange={(items) => setTaskForm(prev => ({ ...prev, checklist: items }))}
+            />
+          </div>
+
           <DialogFooter>
             <Button
               variant="outline"
@@ -4024,6 +4023,14 @@ export default function Contacts() {
             </div>
           </div>
 
+          <div>
+            <Label>Checklist</Label>
+            <TaskChecklist
+              items={taskForm.checklist}
+              onChange={(items) => setTaskForm(prev => ({ ...prev, checklist: items }))}
+            />
+          </div>
+
           <DialogFooter>
             <Button
               variant="outline"
@@ -4083,233 +4090,232 @@ export default function Contacts() {
         <DialogPortal>
           <DialogOverlay className="fixed inset-0 z-[9999] bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
           <DialogContent className="sm:max-w-[600px] fixed left-[50%] top-[50%] z-[9999] translate-x-[-50%] translate-y-[-50%]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center space-x-2">
-              <span>Schedule New Appointment</span>
-              <div className="flex items-center space-x-1 text-sm font-normal">
-                <span className="text-gray-500">via</span>
-                <div className="flex items-center space-x-1 px-2 py-1 bg-gray-100 rounded-md">
-                  <div
-                    className={`w-2 h-2 rounded-full ${
-                      selectedProvider === 'google' ? 'bg-blue-500' :
-                      selectedProvider === 'zoho' ? 'bg-orange-500' : 'bg-purple-500'
-                    }`}
-                  />
-                  <span className="text-xs font-medium">
-                    {selectedProvider === 'google' ? 'Google Calendar' :
-                     selectedProvider === 'zoho' ? 'Zoho Calendar' : 'Calendly'}
-                  </span>
+            <DialogHeader>
+              <DialogTitle className="flex items-center space-x-2">
+                <span>Schedule New Appointment</span>
+                <div className="flex items-center space-x-1 text-sm font-normal">
+                  <span className="text-gray-500">via</span>
+                  <div className="flex items-center space-x-1 px-2 py-1 bg-gray-100 rounded-md">
+                    <div
+                      className={`w-2 h-2 rounded-full ${selectedProvider === 'google' ? 'bg-blue-500' :
+                        selectedProvider === 'zoho' ? 'bg-orange-500' : 'bg-purple-500'
+                        }`}
+                    />
+                    <span className="text-xs font-medium">
+                      {selectedProvider === 'google' ? 'Google Calendar' :
+                        selectedProvider === 'zoho' ? 'Zoho Calendar' : 'Calendly'}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </DialogTitle>
-            <DialogDescription>
-              Create a new appointment on your calendar.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="mb-4">
-            <Label className="text-sm font-medium">Calendar Provider</Label>
-            <Select value={selectedProvider} onValueChange={(value: 'google' | 'zoho' | 'calendly') => setSelectedProvider(value)}>
-              <SelectTrigger className="w-full mt-1">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="google">
-                  <div className="flex items-center">
-                    <div className="w-2 h-2 rounded-full bg-blue-500 mr-2"></div>
-                    Google Calendar
-                    {isGoogleCalendarConnected && <span className="ml-2 text-green-600 text-xs">✓ Connected</span>}
-                  </div>
-                </SelectItem>
-                <SelectItem value="zoho">
-                  <div className="flex items-center">
-                    <div className="w-2 h-2 rounded-full bg-orange-500 mr-2"></div>
-                    Zoho Calendar
-                    {isZohoCalendarConnected && <span className="ml-2 text-green-600 text-xs">✓ Connected</span>}
-                  </div>
-                </SelectItem>
-                <SelectItem value="calendly">
-                  <div className="flex items-center">
-                    <div className="w-2 h-2 rounded-full bg-purple-500 mr-2"></div>
-                    Calendly
-                    {isCalendlyCalendarConnected && <span className="ml-2 text-green-600 text-xs">✓ Connected</span>}
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="summary" className="text-right">
-                Title*
-              </Label>
-              <Input
-                id="summary"
-                value={eventForm.summary}
-                onChange={(e) => setEventForm({...eventForm, summary: e.target.value})}
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="description" className="text-right">
-                Description
-              </Label>
-              <Textarea
-                id="description"
-                value={eventForm.description}
-                onChange={(e) => setEventForm({...eventForm, description: e.target.value})}
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="location" className="text-right">
-                Location
-              </Label>
-              <Input
-                id="location"
-                value={eventForm.location}
-                onChange={(e) => setEventForm({...eventForm, location: e.target.value})}
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="colorId" className="text-right">
-                Category
-              </Label>
-              <Select
-                value={eventForm.colorId}
-                onValueChange={(value) => setEventForm({...eventForm, colorId: value})}
-              >
-                <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Select category" />
+              </DialogTitle>
+              <DialogDescription>
+                Create a new appointment on your calendar.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="mb-4">
+              <Label className="text-sm font-medium">Calendar Provider</Label>
+              <Select value={selectedProvider} onValueChange={(value: 'google' | 'zoho' | 'calendly') => setSelectedProvider(value)}>
+                <SelectTrigger className="w-full mt-1">
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1">
+                  <SelectItem value="google">
                     <div className="flex items-center">
-                      <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
-                      <span>Blue</span>
+                      <div className="w-2 h-2 rounded-full bg-blue-500 mr-2"></div>
+                      Google Calendar
+                      {isGoogleCalendarConnected && <span className="ml-2 text-green-600 text-xs">✓ Connected</span>}
                     </div>
                   </SelectItem>
-                  <SelectItem value="2">
+                  <SelectItem value="zoho">
                     <div className="flex items-center">
-                      <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-                      <span>Green</span>
+                      <div className="w-2 h-2 rounded-full bg-orange-500 mr-2"></div>
+                      Zoho Calendar
+                      {isZohoCalendarConnected && <span className="ml-2 text-green-600 text-xs">✓ Connected</span>}
                     </div>
                   </SelectItem>
-                  <SelectItem value="3">
+                  <SelectItem value="calendly">
                     <div className="flex items-center">
-                      <div className="w-3 h-3 rounded-full bg-purple-500 mr-2"></div>
-                      <span>Purple</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="4">
-                    <div className="flex items-center">
-                      <div className="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
-                      <span>Red</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="5">
-                    <div className="flex items-center">
-                      <div className="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
-                      <span>Yellow</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="6">
-                    <div className="flex items-center">
-                      <div className="w-3 h-3 rounded-full bg-orange-500 mr-2"></div>
-                      <span>Orange</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="7">
-                    <div className="flex items-center">
-                      <div className="w-3 h-3 rounded-full bg-cyan-500 mr-2"></div>
-                      <span>Turquoise</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="8">
-                    <div className="flex items-center">
-                      <div className="w-3 h-3 rounded-full bg-gray-500 mr-2"></div>
-                      <span>Gray</span>
+                      <div className="w-2 h-2 rounded-full bg-purple-500 mr-2"></div>
+                      Calendly
+                      {isCalendlyCalendarConnected && <span className="ml-2 text-green-600 text-xs">✓ Connected</span>}
                     </div>
                   </SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="startDateTime" className="text-right">
-                Start Time*
-              </Label>
-              <Input
-                id="startDateTime"
-                type="datetime-local"
-                value={eventForm.startDateTime.slice(0, 16)}
-                onChange={(e) => setEventForm({...eventForm, startDateTime: e.target.value})}
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="endDateTime" className="text-right">
-                End Time*
-              </Label>
-              <Input
-                id="endDateTime"
-                type="datetime-local"
-                value={eventForm.endDateTime.slice(0, 16)}
-                onChange={(e) => setEventForm({...eventForm, endDateTime: e.target.value})}
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-start gap-4">
-              <Label htmlFor="attendees" className="text-right pt-2">
-                Attendees
-              </Label>
-              <div className="col-span-3 space-y-2">
-                <div className="flex space-x-2">
-                  <Input
-                    id="attendees"
-                    placeholder="Enter email address"
-                    value={eventForm.attendeeInput}
-                    onChange={(e) => setEventForm({...eventForm, attendeeInput: e.target.value})}
-                    className="flex-1"
-                  />
-                  <Button type="button" className="btn-brand-primary" onClick={handleAddAttendee}>Add</Button>
-                </div>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {eventForm.attendees.map(email => (
-                    <Badge key={email} variant="secondary" className="gap-1">
-                      {email}
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveAttendee(email)}
-                        className="ml-1 text-blue-600 hover:text-blue-800"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </Badge>
-                  ))}
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="summary" className="text-right">
+                  Title*
+                </Label>
+                <Input
+                  id="summary"
+                  value={eventForm.summary}
+                  onChange={(e) => setEventForm({ ...eventForm, summary: e.target.value })}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="description" className="text-right">
+                  Description
+                </Label>
+                <Textarea
+                  id="description"
+                  value={eventForm.description}
+                  onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="location" className="text-right">
+                  Location
+                </Label>
+                <Input
+                  id="location"
+                  value={eventForm.location}
+                  onChange={(e) => setEventForm({ ...eventForm, location: e.target.value })}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="colorId" className="text-right">
+                  Category
+                </Label>
+                <Select
+                  value={eventForm.colorId}
+                  onValueChange={(value) => setEventForm({ ...eventForm, colorId: value })}
+                >
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
+                        <span>Blue</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="2">
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+                        <span>Green</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="3">
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 rounded-full bg-purple-500 mr-2"></div>
+                        <span>Purple</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="4">
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+                        <span>Red</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="5">
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
+                        <span>Yellow</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="6">
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 rounded-full bg-orange-500 mr-2"></div>
+                        <span>Orange</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="7">
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 rounded-full bg-cyan-500 mr-2"></div>
+                        <span>Turquoise</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="8">
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 rounded-full bg-gray-500 mr-2"></div>
+                        <span>Gray</span>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="startDateTime" className="text-right">
+                  Start Time*
+                </Label>
+                <Input
+                  id="startDateTime"
+                  type="datetime-local"
+                  value={eventForm.startDateTime.slice(0, 16)}
+                  onChange={(e) => setEventForm({ ...eventForm, startDateTime: e.target.value })}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="endDateTime" className="text-right">
+                  End Time*
+                </Label>
+                <Input
+                  id="endDateTime"
+                  type="datetime-local"
+                  value={eventForm.endDateTime.slice(0, 16)}
+                  onChange={(e) => setEventForm({ ...eventForm, endDateTime: e.target.value })}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-start gap-4">
+                <Label htmlFor="attendees" className="text-right pt-2">
+                  Attendees
+                </Label>
+                <div className="col-span-3 space-y-2">
+                  <div className="flex space-x-2">
+                    <Input
+                      id="attendees"
+                      placeholder="Enter email address"
+                      value={eventForm.attendeeInput}
+                      onChange={(e) => setEventForm({ ...eventForm, attendeeInput: e.target.value })}
+                      className="flex-1"
+                    />
+                    <Button type="button" className="btn-brand-primary" onClick={handleAddAttendee}>Add</Button>
+                  </div>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {eventForm.attendees.map(email => (
+                      <Badge key={email} variant="secondary" className="gap-1">
+                        {email}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveAttendee(email)}
+                          className="ml-1 text-blue-600 hover:text-blue-800"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" className="btn-brand-primary" onClick={() => setIsAppointmentModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              onClick={handleCreateEvent}
-              disabled={createEventMutation.isPending}
-            >
-              {createEventMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating...
-                </>
-              ) : 'Create Appointment'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
+            <DialogFooter>
+              <Button type="button" variant="outline" className="btn-brand-primary" onClick={() => setIsAppointmentModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={handleCreateEvent}
+                disabled={createEventMutation.isPending}
+              >
+                {createEventMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating...
+                  </>
+                ) : 'Create Appointment'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
         </DialogPortal>
-      </Dialog>
-    </div>
+      </Dialog >
+    </div >
   );
 }

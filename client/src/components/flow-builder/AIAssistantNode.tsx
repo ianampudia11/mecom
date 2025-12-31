@@ -7,7 +7,7 @@ import { useOpenRouterModels, type ProcessedModel } from '@/services/openrouter'
 import { Trash2, Copy, Info, Settings, RefreshCw, Plus, ChevronDown, ChevronRight, GripVertical, Eye, EyeOff, Clock, Calendar as CalendarIcon, CheckCircle, AlertCircle, AlertTriangle, LogOut, ExternalLink, FileText, Upload, Folder, Key, Building, Shield, BookOpen, Search, Target } from 'lucide-react';
 import BotIcon from '@/components/ui/bot-icon';
 import { OpenAIIcon } from '@/components/ui/openai-icon';
-import { useFlowContext } from '../../pages/flow-builder';
+import { useFlowContext } from './FlowContext';
 import { useTranslation } from '@/hooks/use-translation';
 
 import { Button } from "@/components/ui/button";

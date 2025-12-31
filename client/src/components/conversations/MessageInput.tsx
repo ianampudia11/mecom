@@ -624,7 +624,7 @@ export default function MessageInput({ conversationId, conversation, contact }: 
     }
 
     setSelectedFile(file);
-    // setIsMediaModalOpen(true);
+    setIsMediaModalOpen(true);
 
     if (fileInputRef.current) {
       fileInputRef.current.value = '';

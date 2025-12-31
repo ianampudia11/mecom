@@ -31,7 +31,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { queryClient, apiRequest } from '@/lib/queryClient';
-import { Loader2, User, Mail, Key, Check, Save, Upload, Calendar, Globe, Bell, BellOff } from 'lucide-react';
+import { Loader2, User, Mail, Key, Check, Save, Upload, Calendar, Globe, Bell, BellOff, Smartphone } from 'lucide-react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -55,6 +55,8 @@ interface UserProfile {
   companyId?: number;
   isSuperAdmin?: boolean;
   languagePreference?: string;
+  mobilePhone?: string;
+  notificationPreferences?: any;
   createdAt?: string;
   updatedAt?: string;
   company?: {
@@ -85,10 +87,12 @@ const profileFormSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   username: z.string().min(3, "Username must be at least 3 characters"),
   languagePreference: z.string().optional(),
+  mobilePhone: z.string().optional(),
 });
 
 const notificationFormSchema = z.object({
   emailNotifications: z.boolean(),
+  whatsappNotifications: z.boolean().optional(),
   pushNotifications: z.boolean(),
   marketingEmails: z.boolean(),
   securityAlerts: z.boolean(),
@@ -206,6 +210,7 @@ export default function ProfilePage() {
       email: "",
       username: "",
       languagePreference: "",
+      mobilePhone: "",
     },
   });
 
@@ -222,6 +227,7 @@ export default function ProfilePage() {
     resolver: zodResolver(notificationFormSchema),
     defaultValues: {
       emailNotifications: true,
+      whatsappNotifications: false,
       pushNotifications: false,
       marketingEmails: false,
       securityAlerts: true,
@@ -389,7 +395,20 @@ export default function ProfilePage() {
         email: user.email,
         username: user.username,
         languagePreference: user.languagePreference || currentLanguage?.code || 'en',
+        mobilePhone: user.mobilePhone || "",
       });
+
+      if (user.notificationPreferences) {
+        // @ts-ignore
+        const prefs = user.notificationPreferences;
+        notificationForm.reset({
+          emailNotifications: prefs.email !== false,
+          whatsappNotifications: prefs.whatsapp === true,
+          pushNotifications: false,
+          marketingEmails: false,
+          securityAlerts: true
+        });
+      }
 
       if (user.company) {
         companyForm.reset({
@@ -525,7 +544,7 @@ export default function ProfilePage() {
             <div className="flex items-center mb-6">
               <h1 className="text-2xl ">Account Settings</h1>
             </div>
-            
+
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="mb-6">
                 <TabsTrigger value="account">Account</TabsTrigger>
@@ -533,7 +552,7 @@ export default function ProfilePage() {
                 <TabsTrigger value="security">Security</TabsTrigger>
                 <TabsTrigger value="notifications">Notifications</TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="account">
                 <Card>
                   <CardHeader>
@@ -613,9 +632,9 @@ export default function ProfilePage() {
                       onChange={handleFileChange}
                       className="hidden"
                     />
-                    
+
                     <Separator className="my-6" />
-                    
+
                     <Form {...profileForm}>
                       <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-6">
                         <FormField
@@ -646,6 +665,25 @@ export default function ProfilePage() {
                                   <Input className="pl-9" placeholder="your.email@example.com" {...field} />
                                 </div>
                               </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={profileForm.control}
+                          name="mobilePhone"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>WhatsApp Number</FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <Smartphone className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                  <Input className="pl-9" placeholder="1234567890" {...field} />
+                                </div>
+                              </FormControl>
+                              <FormDescription>
+                                Used for internal system notifications. Enter digits only, including country code (e.g., 521...).
+                              </FormDescription>
                               <FormMessage />
                             </FormItem>
                           )}
@@ -697,8 +735,8 @@ export default function ProfilePage() {
                             </FormItem>
                           )}
                         />
-                        <Button 
-                          type="submit" 
+                        <Button
+                          type="submit"
                           className="w-full md:w-auto btn-brand-primary"
                           disabled={updateProfileMutation.isPending}
                         >
@@ -971,11 +1009,11 @@ export default function ProfilePage() {
                               <FormControl>
                                 <div className="relative">
                                   <Key className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                  <Input 
-                                    className="pl-9" 
-                                    type="password" 
-                                    placeholder="••••••••" 
-                                    {...field} 
+                                  <Input
+                                    className="pl-9"
+                                    type="password"
+                                    placeholder="••••••••"
+                                    {...field}
                                   />
                                 </div>
                               </FormControl>
@@ -991,10 +1029,10 @@ export default function ProfilePage() {
                               <FormItem>
                                 <FormLabel>New Password</FormLabel>
                                 <FormControl>
-                                  <Input 
-                                    type="password" 
-                                    placeholder="••••••••" 
-                                    {...field} 
+                                  <Input
+                                    type="password"
+                                    placeholder="••••••••"
+                                    {...field}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -1008,10 +1046,10 @@ export default function ProfilePage() {
                               <FormItem>
                                 <FormLabel>Confirm New Password</FormLabel>
                                 <FormControl>
-                                  <Input 
-                                    type="password" 
-                                    placeholder="••••••••" 
-                                    {...field} 
+                                  <Input
+                                    type="password"
+                                    placeholder="••••••••"
+                                    {...field}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -1019,8 +1057,8 @@ export default function ProfilePage() {
                             )}
                           />
                         </div>
-                        <Button 
-                          type="submit" 
+                        <Button
+                          type="submit"
                           className="w-full md:w-auto"
                           disabled={changePasswordMutation.isPending}
                         >
@@ -1041,7 +1079,7 @@ export default function ProfilePage() {
                   </CardContent>
                 </Card>
               </TabsContent>
-              
+
               <TabsContent value="notifications">
                 <Card>
                   <CardHeader>
@@ -1065,6 +1103,29 @@ export default function ProfilePage() {
                                 </FormLabel>
                                 <FormDescription>
                                   Receive email notifications for important updates and messages.
+                                </FormDescription>
+                              </div>
+                              <FormControl>
+                                <Switch
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={notificationForm.control}
+                          name="whatsappNotifications"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                              <div className="space-y-0.5">
+                                <FormLabel className="text-base flex items-center gap-2">
+                                  <Smartphone className="h-4 w-4" />
+                                  WhatsApp Notifications
+                                </FormLabel>
+                                <FormDescription>
+                                  Receive internal system alerts via WhatsApp (requires mobile number).
                                 </FormDescription>
                               </div>
                               <FormControl>

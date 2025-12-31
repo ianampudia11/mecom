@@ -1,0 +1,3601 @@
+[
+  {
+    "id": 1,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "create",
+    "content": "Deal \"DATAS\" created",
+    "metadata": {
+      "createdBy": 3
+    },
+    "created_at": "2025-12-08 21:11:09.676"
+  },
+  {
+    "id": 2,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Qualified stage",
+    "metadata": {
+      "newStageId": 26,
+      "previousStageId": 26
+    },
+    "created_at": "2025-12-08 21:11:15.79"
+  },
+  {
+    "id": 3,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Lead stage",
+    "metadata": {
+      "newStageId": 25,
+      "previousStageId": 25
+    },
+    "created_at": "2025-12-08 21:11:18.77"
+  },
+  {
+    "id": 4,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Qualified stage",
+    "metadata": {
+      "newStageId": 26,
+      "previousStageId": 26
+    },
+    "created_at": "2025-12-09 22:44:18.482"
+  },
+  {
+    "id": 5,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Contacted stage",
+    "metadata": {
+      "newStageId": 27,
+      "previousStageId": 27
+    },
+    "created_at": "2025-12-09 22:44:25.023"
+  },
+  {
+    "id": 6,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Proposal stage",
+    "metadata": {
+      "newStageId": 29,
+      "previousStageId": 29
+    },
+    "created_at": "2025-12-10 00:07:07.236"
+  },
+  {
+    "id": 7,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Contacted stage",
+    "metadata": {
+      "newStageId": 27,
+      "previousStageId": 27
+    },
+    "created_at": "2025-12-10 00:07:10.25"
+  },
+  {
+    "id": 8,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Qualified stage",
+    "metadata": {
+      "newStageId": 26,
+      "previousStageId": 26
+    },
+    "created_at": "2025-12-10 00:07:12.952"
+  },
+  {
+    "id": 9,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Lead stage",
+    "metadata": {
+      "newStageId": 25,
+      "previousStageId": 25
+    },
+    "created_at": "2025-12-10 00:07:15.169"
+  },
+  {
+    "id": 10,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Qualified stage",
+    "metadata": {
+      "newStageId": 26,
+      "previousStageId": 26
+    },
+    "created_at": "2025-12-10 00:07:18.017"
+  },
+  {
+    "id": 11,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Contacted stage",
+    "metadata": {
+      "newStageId": 27,
+      "previousStageId": 27
+    },
+    "created_at": "2025-12-10 00:07:21.411"
+  },
+  {
+    "id": 12,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Qualified stage",
+    "metadata": {
+      "newStageId": 26,
+      "previousStageId": 26
+    },
+    "created_at": "2025-12-10 00:07:23.584"
+  },
+  {
+    "id": 13,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Lead stage",
+    "metadata": {
+      "newStageId": 25,
+      "previousStageId": 25
+    },
+    "created_at": "2025-12-10 00:07:25.442"
+  },
+  {
+    "id": 14,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Qualified stage",
+    "metadata": {
+      "newStageId": 26,
+      "previousStageId": 26
+    },
+    "created_at": "2025-12-10 00:07:27.604"
+  },
+  {
+    "id": 15,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Contacted stage",
+    "metadata": {
+      "newStageId": 27,
+      "previousStageId": 27
+    },
+    "created_at": "2025-12-10 00:07:29.337"
+  },
+  {
+    "id": 16,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Proposal stage",
+    "metadata": {
+      "newStageId": 29,
+      "previousStageId": 29
+    },
+    "created_at": "2025-12-10 00:07:30.918"
+  },
+  {
+    "id": 17,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Contacted stage",
+    "metadata": {
+      "newStageId": 27,
+      "previousStageId": 27
+    },
+    "created_at": "2025-12-10 00:07:32.881"
+  },
+  {
+    "id": 18,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Closed Lost stage",
+    "metadata": {
+      "newStageId": 32,
+      "previousStageId": 32
+    },
+    "created_at": "2025-12-10 00:07:55.124"
+  },
+  {
+    "id": 19,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Closed Won stage",
+    "metadata": {
+      "newStageId": 31,
+      "previousStageId": 31
+    },
+    "created_at": "2025-12-10 00:08:01.002"
+  },
+  {
+    "id": 20,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Negotiation stage",
+    "metadata": {
+      "newStageId": 30,
+      "previousStageId": 30
+    },
+    "created_at": "2025-12-10 00:08:03.127"
+  },
+  {
+    "id": 21,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Lead stage",
+    "metadata": {
+      "newStageId": 25,
+      "previousStageId": 25
+    },
+    "created_at": "2025-12-10 00:12:55.542"
+  },
+  {
+    "id": 22,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Qualified stage",
+    "metadata": {
+      "newStageId": 26,
+      "previousStageId": 26
+    },
+    "created_at": "2025-12-10 11:12:13.326"
+  },
+  {
+    "id": 23,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Lead stage",
+    "metadata": {
+      "newStageId": 25,
+      "previousStageId": 25
+    },
+    "created_at": "2025-12-10 11:26:41.936"
+  },
+  {
+    "id": 24,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Qualified stage",
+    "metadata": {
+      "newStageId": 26,
+      "previousStageId": 26
+    },
+    "created_at": "2025-12-10 11:26:55.284"
+  },
+  {
+    "id": 25,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Qualified stage",
+    "metadata": {
+      "newStageId": "26",
+      "previousStageId": 26
+    },
+    "created_at": "2025-12-10 11:27:29.321"
+  },
+  {
+    "id": 26,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"DATAS\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa"
+        ],
+        "title": "DATAS",
+        "value": null,
+        "dueDate": "2025-12-08T05:00:00.000Z",
+        "stageId": "26",
+        "priority": "high",
+        "contactId": 4,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-10 11:27:29.326"
+  },
+  {
+    "id": 27,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Contacted stage",
+    "metadata": {
+      "newStageId": 27,
+      "previousStageId": 27
+    },
+    "created_at": "2025-12-10 11:37:46.997"
+  },
+  {
+    "id": 28,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Lead stage",
+    "metadata": {
+      "newStageId": "25",
+      "previousStageId": 25
+    },
+    "created_at": "2025-12-10 11:38:29.317"
+  },
+  {
+    "id": 29,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"DATAS\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa"
+        ],
+        "title": "DATAS",
+        "value": null,
+        "dueDate": "2025-12-08T05:00:00.000Z",
+        "stageId": "25",
+        "priority": "high",
+        "contactId": 4,
+        "description": "revision proyecto",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-10 11:38:29.325"
+  },
+  {
+    "id": 30,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Qualified stage",
+    "metadata": {
+      "newStageId": 26,
+      "previousStageId": 26
+    },
+    "created_at": "2025-12-10 11:38:52.5"
+  },
+  {
+    "id": 31,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Contacted stage",
+    "metadata": {
+      "newStageId": 27,
+      "previousStageId": 27
+    },
+    "created_at": "2025-12-10 11:38:53.804"
+  },
+  {
+    "id": 32,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Qualified stage",
+    "metadata": {
+      "newStageId": 26,
+      "previousStageId": 26
+    },
+    "created_at": "2025-12-10 11:38:58.15"
+  },
+  {
+    "id": 33,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Lead stage",
+    "metadata": {
+      "newStageId": 25,
+      "previousStageId": 25
+    },
+    "created_at": "2025-12-10 11:38:59.75"
+  },
+  {
+    "id": 34,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Qualified stage",
+    "metadata": {
+      "newStageId": 26,
+      "previousStageId": 26
+    },
+    "created_at": "2025-12-10 11:39:01.129"
+  },
+  {
+    "id": 35,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Contacted stage",
+    "metadata": {
+      "newStageId": 27,
+      "previousStageId": 27
+    },
+    "created_at": "2025-12-10 11:39:15.842"
+  },
+  {
+    "id": 36,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Qualified stage",
+    "metadata": {
+      "newStageId": 26,
+      "previousStageId": 26
+    },
+    "created_at": "2025-12-10 11:39:48.724"
+  },
+  {
+    "id": 37,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Qualified stage",
+    "metadata": {
+      "newStageId": "26",
+      "previousStageId": 26
+    },
+    "created_at": "2025-12-10 11:40:15.872"
+  },
+  {
+    "id": 38,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Propiedad 405\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa"
+        ],
+        "title": "Propiedad 405",
+        "value": null,
+        "dueDate": "2025-12-08T05:00:00.000Z",
+        "stageId": "26",
+        "priority": "high",
+        "contactId": 4,
+        "description": "revision proyecto",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-10 11:40:15.879"
+  },
+  {
+    "id": 39,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Contacted stage",
+    "metadata": {
+      "newStageId": 27,
+      "previousStageId": 27
+    },
+    "created_at": "2025-12-10 11:40:42.766"
+  },
+  {
+    "id": 40,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Qualified stage",
+    "metadata": {
+      "newStageId": 26,
+      "previousStageId": 26
+    },
+    "created_at": "2025-12-10 11:40:44.3"
+  },
+  {
+    "id": 41,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Contacted stage",
+    "metadata": {
+      "newStageId": 27,
+      "previousStageId": 27
+    },
+    "created_at": "2025-12-10 11:45:19.036"
+  },
+  {
+    "id": 42,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Qualified stage",
+    "metadata": {
+      "newStageId": 26,
+      "previousStageId": 26
+    },
+    "created_at": "2025-12-10 11:45:21.432"
+  },
+  {
+    "id": 43,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Lead stage",
+    "metadata": {
+      "newStageId": 25,
+      "previousStageId": 25
+    },
+    "created_at": "2025-12-10 11:45:23.065"
+  },
+  {
+    "id": 44,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Qualified stage",
+    "metadata": {
+      "newStageId": 26,
+      "previousStageId": 26
+    },
+    "created_at": "2025-12-10 11:45:25.7"
+  },
+  {
+    "id": 45,
+    "deal_id": 2,
+    "user_id": 3,
+    "type": "create",
+    "content": "Deal \"Propiedad 402\" created",
+    "metadata": {
+      "createdBy": 3
+    },
+    "created_at": "2025-12-10 11:46:22.513"
+  },
+  {
+    "id": 46,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Contacted stage",
+    "metadata": {
+      "newStageId": 27,
+      "previousStageId": 27
+    },
+    "created_at": "2025-12-10 11:54:05.795"
+  },
+  {
+    "id": 47,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Proposal stage",
+    "metadata": {
+      "newStageId": 29,
+      "previousStageId": 29
+    },
+    "created_at": "2025-12-10 11:59:34.871"
+  },
+  {
+    "id": 48,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Contacted stage",
+    "metadata": {
+      "newStageId": 27,
+      "previousStageId": 27
+    },
+    "created_at": "2025-12-10 11:59:36.684"
+  },
+  {
+    "id": 49,
+    "deal_id": 2,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Qualified stage",
+    "metadata": {
+      "newStageId": 26,
+      "previousStageId": 26
+    },
+    "created_at": "2025-12-10 11:59:38.803"
+  },
+  {
+    "id": 50,
+    "deal_id": 2,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Lead stage",
+    "metadata": {
+      "newStageId": 25,
+      "previousStageId": 25
+    },
+    "created_at": "2025-12-10 11:59:43.08"
+  },
+  {
+    "id": 51,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Qualified stage",
+    "metadata": {
+      "newStageId": 26,
+      "previousStageId": 26
+    },
+    "created_at": "2025-12-10 11:59:44.58"
+  },
+  {
+    "id": 52,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Contacted stage",
+    "metadata": {
+      "newStageId": 27,
+      "previousStageId": 27
+    },
+    "created_at": "2025-12-10 12:01:41.48"
+  },
+  {
+    "id": 53,
+    "deal_id": 2,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Qualified stage",
+    "metadata": {
+      "newStageId": 26,
+      "previousStageId": 26
+    },
+    "created_at": "2025-12-10 12:02:36.345"
+  },
+  {
+    "id": 54,
+    "deal_id": 2,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Lead stage",
+    "metadata": {
+      "newStageId": 25,
+      "previousStageId": 25
+    },
+    "created_at": "2025-12-10 12:02:37.636"
+  },
+  {
+    "id": 55,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Qualified stage",
+    "metadata": {
+      "newStageId": 26,
+      "previousStageId": 26
+    },
+    "created_at": "2025-12-10 12:15:25.833"
+  },
+  {
+    "id": 56,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Contacted stage",
+    "metadata": {
+      "newStageId": 27,
+      "previousStageId": 27
+    },
+    "created_at": "2025-12-10 12:15:27.95"
+  },
+  {
+    "id": 57,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Proposal stage",
+    "metadata": {
+      "newStageId": 29,
+      "previousStageId": 29
+    },
+    "created_at": "2025-12-10 12:15:35.334"
+  },
+  {
+    "id": 58,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Contacted stage",
+    "metadata": {
+      "newStageId": 27,
+      "previousStageId": 27
+    },
+    "created_at": "2025-12-10 12:16:25.441"
+  },
+  {
+    "id": 59,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Qualified stage",
+    "metadata": {
+      "newStageId": 26,
+      "previousStageId": 26
+    },
+    "created_at": "2025-12-10 12:17:16.955"
+  },
+  {
+    "id": 60,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Contacted stage",
+    "metadata": {
+      "newStageId": "27",
+      "previousStageId": 27
+    },
+    "created_at": "2025-12-10 12:23:26.562"
+  },
+  {
+    "id": 61,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Propiedad 405\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa"
+        ],
+        "title": "Propiedad 405",
+        "value": null,
+        "dueDate": "2025-12-08T05:00:00.000Z",
+        "stageId": "27",
+        "priority": "high",
+        "contactId": 4,
+        "description": "revision proyecto",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-10 12:23:26.568"
+  },
+  {
+    "id": 62,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Contacted stage",
+    "metadata": {
+      "newStageId": "27",
+      "previousStageId": 27
+    },
+    "created_at": "2025-12-10 12:34:28.629"
+  },
+  {
+    "id": 63,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Propiedad 405\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa"
+        ],
+        "title": "Propiedad 405",
+        "value": null,
+        "dueDate": "2025-12-08T05:00:00.000Z",
+        "stageId": "27",
+        "priority": "high",
+        "contactId": 4,
+        "description": "revision proyecto gol",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-10 12:34:28.637"
+  },
+  {
+    "id": 64,
+    "deal_id": 2,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Lead stage",
+    "metadata": {
+      "newStageId": "25",
+      "previousStageId": 25
+    },
+    "created_at": "2025-12-10 12:34:44.987"
+  },
+  {
+    "id": 65,
+    "deal_id": 2,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Propiedad 402\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "conocidos"
+        ],
+        "title": "Propiedad 402",
+        "value": null,
+        "dueDate": "2025-12-10T05:00:00.000Z",
+        "stageId": "25",
+        "priority": "medium",
+        "contactId": 2,
+        "description": "administracion bares",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-10 12:34:44.995"
+  },
+  {
+    "id": 66,
+    "deal_id": 2,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Lead stage",
+    "metadata": {
+      "newStageId": "25",
+      "previousStageId": 25
+    },
+    "created_at": "2025-12-10 13:57:22.711"
+  },
+  {
+    "id": 67,
+    "deal_id": 2,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Propiedad 402\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "conocidos",
+          "scraped"
+        ],
+        "title": "Propiedad 402",
+        "value": null,
+        "dueDate": "2025-12-10T05:00:00.000Z",
+        "stageId": "25",
+        "priority": "medium",
+        "contactId": 2,
+        "description": "administracion bares",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-10 13:57:22.72"
+  },
+  {
+    "id": 68,
+    "deal_id": 2,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Qualified stage",
+    "metadata": {
+      "newStageId": 26,
+      "previousStageId": 26
+    },
+    "created_at": "2025-12-10 14:00:54.153"
+  },
+  {
+    "id": 69,
+    "deal_id": 2,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Lead stage",
+    "metadata": {
+      "newStageId": 25,
+      "previousStageId": 25
+    },
+    "created_at": "2025-12-10 14:01:01.37"
+  },
+  {
+    "id": 70,
+    "deal_id": 2,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Lead stage",
+    "metadata": {
+      "newStageId": "25",
+      "previousStageId": 25
+    },
+    "created_at": "2025-12-10 14:01:08.934"
+  },
+  {
+    "id": 71,
+    "deal_id": 2,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Propiedad 402\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "conocidos",
+          "scraped"
+        ],
+        "title": "Propiedad 402",
+        "value": null,
+        "dueDate": "2025-12-10T05:00:00.000Z",
+        "stageId": "25",
+        "priority": "high",
+        "contactId": 2,
+        "description": "administracion bares",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-10 14:01:08.94"
+  },
+  {
+    "id": 72,
+    "deal_id": 2,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Qualified stage",
+    "metadata": {
+      "newStageId": 26,
+      "previousStageId": 26
+    },
+    "created_at": "2025-12-10 16:08:53.591"
+  },
+  {
+    "id": 73,
+    "deal_id": 2,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Lead stage",
+    "metadata": {
+      "newStageId": 25,
+      "previousStageId": 25
+    },
+    "created_at": "2025-12-10 16:08:55.153"
+  },
+  {
+    "id": 74,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Proposal stage",
+    "metadata": {
+      "newStageId": 29,
+      "previousStageId": 29
+    },
+    "created_at": "2025-12-21 20:19:35.51"
+  },
+  {
+    "id": 75,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Proposal stage",
+    "metadata": {
+      "newStageId": "29",
+      "previousStageId": 29
+    },
+    "created_at": "2025-12-21 20:20:13.037"
+  },
+  {
+    "id": 76,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Propiedad 405\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa"
+        ],
+        "title": "Propiedad 405",
+        "value": null,
+        "dueDate": "2025-12-08T05:00:00.000Z",
+        "stageId": "29",
+        "priority": "high",
+        "contactId": 4,
+        "description": "revision proyecto gol en pucallpa peru",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-21 20:20:13.045"
+  },
+  {
+    "id": 77,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Proposal stage",
+    "metadata": {
+      "newStageId": "29",
+      "previousStageId": 29
+    },
+    "created_at": "2025-12-21 20:21:44.081"
+  },
+  {
+    "id": 78,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Propiedad 405\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa"
+        ],
+        "title": "Propiedad 405",
+        "value": null,
+        "dueDate": "2025-12-08T05:00:00.000Z",
+        "stageId": "29",
+        "priority": "high",
+        "contactId": 4,
+        "description": "revision proyecto gol en pucallpa peru\nPerfil del Comerciante:\nEste perfil, sea de Pucallpa, Huánuco o Lima 1, opera con una mentalidad de flujos de caja y apalancamiento. Generalmente busca inversiones con retornos tangibles y una plusvalía realizable a mediano plazo. Valora la capacidad de \"apalancar\" un activo; es decir, maximizar su rentabilidad por metro cuadrado. El argumento de ventas de Villasol, \"de este salen 3 terrenos aumentando tu rentabilidad\" 1, apela directamente a esta mentalidad de subdivisión y reventa. Los comerciantes suelen poseer liquidez y buscan diversificarla activamente fuera de los riesgos de su negocio principal, considerando los bienes raíces como un \"refugio financiero estable\" 2 y una cobertura contra la inflación.3\n",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-21 20:21:44.091"
+  },
+  {
+    "id": 79,
+    "deal_id": 1,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Qualified stage",
+    "metadata": {
+      "newStageId": 26,
+      "previousStageId": 26
+    },
+    "created_at": "2025-12-21 20:21:48.587"
+  },
+  {
+    "id": 80,
+    "deal_id": 25,
+    "user_id": 3,
+    "type": "create",
+    "content": "Deal \"egre\" created",
+    "metadata": {
+      "createdBy": 3
+    },
+    "created_at": "2025-12-22 01:04:56.906"
+  },
+  {
+    "id": 81,
+    "deal_id": 25,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 01:05:41.417"
+  },
+  {
+    "id": 82,
+    "deal_id": 25,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"egre\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "conocidos"
+        ],
+        "title": "egre",
+        "value": null,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 3,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 01:05:41.424"
+  },
+  {
+    "id": 83,
+    "deal_id": 25,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Interesados stage",
+    "metadata": {
+      "newStageId": 47,
+      "previousStageId": 47
+    },
+    "created_at": "2025-12-22 01:15:49.106"
+  },
+  {
+    "id": 84,
+    "deal_id": 25,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": 45,
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 01:15:53.155"
+  },
+  {
+    "id": 85,
+    "deal_id": 25,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 01:16:23.781"
+  },
+  {
+    "id": 161,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 03:05:39.39"
+  },
+  {
+    "id": 86,
+    "deal_id": 25,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"egre\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "conocidos"
+        ],
+        "title": "egre",
+        "value": 150000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 3,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 01:16:23.793"
+  },
+  {
+    "id": 87,
+    "deal_id": 25,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 01:17:40.346"
+  },
+  {
+    "id": 88,
+    "deal_id": 25,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 01:17:51.337"
+  },
+  {
+    "id": 89,
+    "deal_id": 25,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 01:18:02.942"
+  },
+  {
+    "id": 90,
+    "deal_id": 25,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Propiedad 306\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "conocidos",
+          "scraped"
+        ],
+        "title": "Propiedad 306",
+        "value": 150000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 3,
+        "description": "El material de ventas del proyecto \"Villasol\" define a su cliente potencial como: \"Inversionista = Comerciante, profesional y persona natural con negocio\".1 Esta segmentación es fundamental, ya que no se dirige a u",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 01:18:02.959"
+  },
+  {
+    "id": 91,
+    "deal_id": 25,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Interesados stage",
+    "metadata": {
+      "newStageId": 47,
+      "previousStageId": 47
+    },
+    "created_at": "2025-12-22 01:18:28.057"
+  },
+  {
+    "id": 92,
+    "deal_id": 25,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": 45,
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 01:18:29.409"
+  },
+  {
+    "id": 93,
+    "deal_id": 25,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Interesados stage",
+    "metadata": {
+      "newStageId": 47,
+      "previousStageId": 47
+    },
+    "created_at": "2025-12-22 01:21:25.378"
+  },
+  {
+    "id": 94,
+    "deal_id": 25,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Negociación stage",
+    "metadata": {
+      "newStageId": 49,
+      "previousStageId": 49
+    },
+    "created_at": "2025-12-22 01:21:43.632"
+  },
+  {
+    "id": 95,
+    "deal_id": 25,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": 45,
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 01:21:45.68"
+  },
+  {
+    "id": 96,
+    "deal_id": 25,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 01:21:54.249"
+  },
+  {
+    "id": 97,
+    "deal_id": 25,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Propiedad 306\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "conocidos",
+          "scraped"
+        ],
+        "title": "Propiedad 306",
+        "value": 150000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "low",
+        "contactId": 3,
+        "description": "El material de ventas del proyecto \"Villasol\" define a su cliente potencial como: \"Inversionista = Comerciante, profesional y persona natural con negocio\".1 Esta segmentación es fundamental, ya que no se dirige a u",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 01:21:54.262"
+  },
+  {
+    "id": 98,
+    "deal_id": 25,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Interesados stage",
+    "metadata": {
+      "newStageId": 47,
+      "previousStageId": 47
+    },
+    "created_at": "2025-12-22 01:22:03.749"
+  },
+  {
+    "id": 99,
+    "deal_id": 28,
+    "user_id": 3,
+    "type": "create",
+    "content": "Deal \"Propiedad 480\" created",
+    "metadata": {
+      "createdBy": 3
+    },
+    "created_at": "2025-12-22 01:24:08.691"
+  },
+  {
+    "id": 100,
+    "deal_id": 28,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Interesados stage",
+    "metadata": {
+      "newStageId": 47,
+      "previousStageId": 47
+    },
+    "created_at": "2025-12-22 01:24:33.461"
+  },
+  {
+    "id": 101,
+    "deal_id": 28,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Negociación stage",
+    "metadata": {
+      "newStageId": 49,
+      "previousStageId": 49
+    },
+    "created_at": "2025-12-22 01:25:04.941"
+  },
+  {
+    "id": 102,
+    "deal_id": 25,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Negociación stage",
+    "metadata": {
+      "newStageId": 49,
+      "previousStageId": 49
+    },
+    "created_at": "2025-12-22 01:26:21.136"
+  },
+  {
+    "id": 103,
+    "deal_id": 28,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Interesados stage",
+    "metadata": {
+      "newStageId": 47,
+      "previousStageId": 47
+    },
+    "created_at": "2025-12-22 01:26:23.657"
+  },
+  {
+    "id": 104,
+    "deal_id": 30,
+    "user_id": 3,
+    "type": "create",
+    "content": "Deal \"Terreno 36\" created",
+    "metadata": {
+      "createdBy": 3
+    },
+    "created_at": "2025-12-22 01:28:16.774"
+  },
+  {
+    "id": 105,
+    "deal_id": 30,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": 45,
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 01:28:24.152"
+  },
+  {
+    "id": 106,
+    "deal_id": 30,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Interesados stage",
+    "metadata": {
+      "newStageId": 47,
+      "previousStageId": 47
+    },
+    "created_at": "2025-12-22 01:32:06.906"
+  },
+  {
+    "id": 107,
+    "deal_id": 30,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": 45,
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 01:32:09.199"
+  },
+  {
+    "id": 108,
+    "deal_id": 30,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 01:34:10.947"
+  },
+  {
+    "id": 109,
+    "deal_id": 30,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Terreno 36\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "personal"
+        ],
+        "title": "Terreno 36",
+        "value": null,
+        "dueDate": null,
+        "stageId": "45",
+        "priority": "high",
+        "contactId": 33,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 01:34:10.961"
+  },
+  {
+    "id": 110,
+    "deal_id": 28,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Negociación stage",
+    "metadata": {
+      "newStageId": 49,
+      "previousStageId": 49
+    },
+    "created_at": "2025-12-22 01:35:20.873"
+  },
+  {
+    "id": 111,
+    "deal_id": 25,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Interesados stage",
+    "metadata": {
+      "newStageId": 47,
+      "previousStageId": 47
+    },
+    "created_at": "2025-12-22 01:35:23.568"
+  },
+  {
+    "id": 112,
+    "deal_id": 28,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Interesados stage",
+    "metadata": {
+      "newStageId": 47,
+      "previousStageId": 47
+    },
+    "created_at": "2025-12-22 01:35:24.705"
+  },
+  {
+    "id": 113,
+    "deal_id": 30,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Pensando stage",
+    "metadata": {
+      "newStageId": "113",
+      "previousStageId": 113
+    },
+    "created_at": "2025-12-22 01:46:24.429"
+  },
+  {
+    "id": 114,
+    "deal_id": 30,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Terreno 36\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "personal"
+        ],
+        "title": "Terreno 36",
+        "value": null,
+        "dueDate": null,
+        "stageId": "113",
+        "priority": "high",
+        "contactId": 33,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 01:46:24.442"
+  },
+  {
+    "id": 115,
+    "deal_id": 30,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Pensando stage",
+    "metadata": {
+      "newStageId": "113",
+      "previousStageId": 113
+    },
+    "created_at": "2025-12-22 01:46:38.813"
+  },
+  {
+    "id": 116,
+    "deal_id": 30,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Terreno 36\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "personal"
+        ],
+        "title": "Terreno 36",
+        "value": 90000,
+        "dueDate": null,
+        "stageId": "113",
+        "priority": "high",
+        "contactId": 33,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 01:46:38.83"
+  },
+  {
+    "id": 117,
+    "deal_id": 30,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Interesados stage",
+    "metadata": {
+      "newStageId": 47,
+      "previousStageId": 47
+    },
+    "created_at": "2025-12-22 01:46:46.099"
+  },
+  {
+    "id": 118,
+    "deal_id": 30,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": 45,
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 01:46:53.88"
+  },
+  {
+    "id": 119,
+    "deal_id": 30,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 02:01:15.778"
+  },
+  {
+    "id": 120,
+    "deal_id": 30,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Terreno 36\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [],
+        "title": "Terreno 36",
+        "value": 90000,
+        "dueDate": null,
+        "stageId": "45",
+        "priority": "high",
+        "contactId": 33,
+        "description": "",
+        "assignedToUserId": null
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 02:01:15.791"
+  },
+  {
+    "id": 121,
+    "deal_id": 30,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 02:01:50.407"
+  },
+  {
+    "id": 122,
+    "deal_id": 30,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Terreno 36\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa",
+          "whatsapp"
+        ],
+        "title": "Terreno 36",
+        "value": 90000,
+        "dueDate": null,
+        "stageId": "45",
+        "priority": "high",
+        "contactId": 33,
+        "description": "",
+        "assignedToUserId": null
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 02:01:50.416"
+  },
+  {
+    "id": 123,
+    "deal_id": 30,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 02:02:29.998"
+  },
+  {
+    "id": 162,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 03:06:01.049"
+  },
+  {
+    "id": 163,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 03:06:35.747"
+  },
+  {
+    "id": 124,
+    "deal_id": 30,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Terreno 36\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa",
+          "whatsapp"
+        ],
+        "title": "Terreno 36",
+        "value": 90000,
+        "dueDate": null,
+        "stageId": "45",
+        "priority": "high",
+        "contactId": 33,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 02:02:30.013"
+  },
+  {
+    "id": 125,
+    "deal_id": 30,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 02:03:37.856"
+  },
+  {
+    "id": 126,
+    "deal_id": 30,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Terreno 36\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "whatsapp",
+          "personal"
+        ],
+        "title": "Terreno 36",
+        "value": 90000,
+        "dueDate": null,
+        "stageId": "45",
+        "priority": "high",
+        "contactId": 33,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 02:03:37.872"
+  },
+  {
+    "id": 127,
+    "deal_id": 30,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 02:03:48.304"
+  },
+  {
+    "id": 128,
+    "deal_id": 30,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Terreno 36\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [],
+        "title": "Terreno 36",
+        "value": 90000,
+        "dueDate": null,
+        "stageId": "45",
+        "priority": "high",
+        "contactId": 33,
+        "description": "",
+        "assignedToUserId": null
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 02:03:48.317"
+  },
+  {
+    "id": 129,
+    "deal_id": 30,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 02:04:14.157"
+  },
+  {
+    "id": 130,
+    "deal_id": 30,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Terreno 36\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "personal"
+        ],
+        "title": "Terreno 36",
+        "value": 90000,
+        "dueDate": null,
+        "stageId": "45",
+        "priority": "high",
+        "contactId": 33,
+        "description": "",
+        "assignedToUserId": null
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 02:04:14.173"
+  },
+  {
+    "id": 131,
+    "deal_id": 30,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 02:05:28.63"
+  },
+  {
+    "id": 132,
+    "deal_id": 30,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Terreno 36\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [],
+        "title": "Terreno 36",
+        "value": 90000,
+        "dueDate": null,
+        "stageId": "45",
+        "priority": "high",
+        "contactId": 33,
+        "description": "",
+        "assignedToUserId": null
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 02:05:28.646"
+  },
+  {
+    "id": 133,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "create",
+    "content": "Deal \"Protec33\" created",
+    "metadata": {
+      "createdBy": 3
+    },
+    "created_at": "2025-12-22 02:17:43.671"
+  },
+  {
+    "id": 134,
+    "deal_id": 30,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 02:17:56.234"
+  },
+  {
+    "id": 135,
+    "deal_id": 30,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Terreno 36\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [],
+        "title": "Terreno 36",
+        "value": 90000,
+        "dueDate": "2025-12-16T00:00:00.000Z",
+        "stageId": "45",
+        "priority": "high",
+        "contactId": 33,
+        "description": "",
+        "assignedToUserId": null
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 02:17:56.245"
+  },
+  {
+    "id": 136,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": 45,
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 02:18:08.204"
+  },
+  {
+    "id": 137,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 02:18:20.832"
+  },
+  {
+    "id": 138,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "conocidos"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": null
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 02:18:20.841"
+  },
+  {
+    "id": 139,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 02:18:59.953"
+  },
+  {
+    "id": 140,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 02:18:59.969"
+  },
+  {
+    "id": 141,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 02:20:22.385"
+  },
+  {
+    "id": 142,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 02:20:22.396"
+  },
+  {
+    "id": 143,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 02:21:06.049"
+  },
+  {
+    "id": 144,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "scraped",
+          "personal"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": null
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 02:21:06.065"
+  },
+  {
+    "id": 145,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 02:22:25.42"
+  },
+  {
+    "id": 146,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "personal",
+          "conocidos"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": null
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 02:22:25.432"
+  },
+  {
+    "id": 147,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 02:22:29.947"
+  },
+  {
+    "id": 148,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "conocidos"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": null
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 02:22:29.963"
+  },
+  {
+    "id": 149,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 02:22:34.989"
+  },
+  {
+    "id": 150,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": null
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 02:22:35.002"
+  },
+  {
+    "id": 151,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 03:03:39.273"
+  },
+  {
+    "id": 152,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 03:03:43.984"
+  },
+  {
+    "id": 153,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 03:03:44.742"
+  },
+  {
+    "id": 154,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 03:03:51.174"
+  },
+  {
+    "id": 155,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 03:03:52.355"
+  },
+  {
+    "id": 156,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 03:04:36.874"
+  },
+  {
+    "id": 157,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 03:04:50.33"
+  },
+  {
+    "id": 158,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 03:04:51.707"
+  },
+  {
+    "id": 159,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 03:04:52.337"
+  },
+  {
+    "id": 160,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 03:05:37.979"
+  },
+  {
+    "id": 164,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 03:06:53.564"
+  },
+  {
+    "id": 165,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 03:07:15.267"
+  },
+  {
+    "id": 166,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 03:07:29.502"
+  },
+  {
+    "id": 167,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 03:08:00.451"
+  },
+  {
+    "id": 168,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 04:09:45.829"
+  },
+  {
+    "id": 169,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 04:09:45.844"
+  },
+  {
+    "id": 170,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 04:10:15.498"
+  },
+  {
+    "id": 171,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "scraped"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 04:10:15.511"
+  },
+  {
+    "id": 172,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 04:10:50.555"
+  },
+  {
+    "id": 173,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "scraped",
+          "conocidos"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": null
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 04:10:50.57"
+  },
+  {
+    "id": 174,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 04:11:08.676"
+  },
+  {
+    "id": 175,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "scraped",
+          "conocidos"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 04:11:08.686"
+  },
+  {
+    "id": 176,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 04:11:23.661"
+  },
+  {
+    "id": 177,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 04:11:23.669"
+  },
+  {
+    "id": 178,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 04:12:11.015"
+  },
+  {
+    "id": 179,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": null
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 04:12:11.027"
+  },
+  {
+    "id": 180,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 04:12:49.683"
+  },
+  {
+    "id": 181,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "scraped"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": null
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 04:12:49.698"
+  },
+  {
+    "id": 182,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 04:13:19.298"
+  },
+  {
+    "id": 183,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": null
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 04:13:19.31"
+  },
+  {
+    "id": 184,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 04:53:04.734"
+  },
+  {
+    "id": 185,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 04:53:04.748"
+  },
+  {
+    "id": 186,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 04:54:04.382"
+  },
+  {
+    "id": 187,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa",
+          "whatsapp"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 04:54:04.395"
+  },
+  {
+    "id": 188,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 04:54:33.126"
+  },
+  {
+    "id": 189,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa",
+          "scraped"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 04:54:33.138"
+  },
+  {
+    "id": 190,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 04:55:04.611"
+  },
+  {
+    "id": 191,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "scraped"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 04:55:04.625"
+  },
+  {
+    "id": 192,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 04:56:28.852"
+  },
+  {
+    "id": 193,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa",
+          "whatsapp",
+          "conocidos"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 04:56:28.864"
+  },
+  {
+    "id": 194,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 04:57:08.929"
+  },
+  {
+    "id": 195,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa",
+          "personal",
+          "whatsapp",
+          "conocidos",
+          "scraped"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 04:57:08.939"
+  },
+  {
+    "id": 196,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 04:57:35.083"
+  },
+  {
+    "id": 200,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 04:57:50.378"
+  },
+  {
+    "id": 197,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa",
+          "whatsapp",
+          "conocidos",
+          "scraped",
+          "nueperu"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 04:57:35.094"
+  },
+  {
+    "id": 198,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 04:57:40.618"
+  },
+  {
+    "id": 199,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa",
+          "whatsapp",
+          "scraped",
+          "nueperu"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 04:57:40.629"
+  },
+  {
+    "id": 201,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa",
+          "scraped",
+          "nueperu"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 04:57:50.391"
+  },
+  {
+    "id": 202,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 04:58:27.727"
+  },
+  {
+    "id": 203,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa",
+          "scraped",
+          "nueperu"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": null
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 04:58:27.749"
+  },
+  {
+    "id": 204,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 04:58:40.427"
+  },
+  {
+    "id": 205,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa",
+          "scraped",
+          "nueperu"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 04:58:40.437"
+  },
+  {
+    "id": 206,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 04:58:58.439"
+  },
+  {
+    "id": 207,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa",
+          "scraped",
+          "nueperu"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": null
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 04:58:58.449"
+  },
+  {
+    "id": 208,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 05:12:29.236"
+  },
+  {
+    "id": 209,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa",
+          "scraped",
+          "nueperu"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 05:12:29.249"
+  },
+  {
+    "id": 210,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 05:12:48.405"
+  },
+  {
+    "id": 211,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa",
+          "scraped",
+          "nueperu"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": null
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 05:12:48.418"
+  },
+  {
+    "id": 212,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 05:13:36.113"
+  },
+  {
+    "id": 213,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa",
+          "scraped",
+          "nueperu"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 05:13:36.123"
+  },
+  {
+    "id": 214,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 05:13:51.714"
+  },
+  {
+    "id": 215,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa",
+          "scraped",
+          "nueperu"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": null
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 05:13:51.728"
+  },
+  {
+    "id": 216,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 05:14:01.663"
+  },
+  {
+    "id": 217,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa",
+          "scraped",
+          "nueperu"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 05:14:01.673"
+  },
+  {
+    "id": 218,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 05:14:14.711"
+  },
+  {
+    "id": 219,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa",
+          "scraped",
+          "nueperu"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": null
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 05:14:14.721"
+  },
+  {
+    "id": 220,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 05:14:30.888"
+  },
+  {
+    "id": 221,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa",
+          "scraped",
+          "nueperu"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": null
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 05:14:30.898"
+  },
+  {
+    "id": 222,
+    "deal_id": 31,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 05:19:16.686"
+  },
+  {
+    "id": 223,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa",
+          "scraped",
+          "nueperu"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 05:19:16.702"
+  },
+  {
+    "id": 224,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 05:19:32.09"
+  },
+  {
+    "id": 225,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Protec33\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "maritanisa",
+          "scraped",
+          "nueperu"
+        ],
+        "title": "Protec33",
+        "value": 23000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "45",
+        "priority": "medium",
+        "contactId": 35,
+        "description": "",
+        "assignedToUserId": null
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 05:19:32.106"
+  },
+  {
+    "id": 226,
+    "deal_id": 30,
+    "user_id": 1,
+    "type": "stage_change",
+    "content": "Deal moved to Nuevos stage",
+    "metadata": {
+      "newStageId": "45",
+      "previousStageId": 45
+    },
+    "created_at": "2025-12-22 05:29:08.51"
+  },
+  {
+    "id": 227,
+    "deal_id": 30,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Terreno 36\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [],
+        "title": "Terreno 36",
+        "value": 90000,
+        "dueDate": "2025-12-16T00:00:00.000Z",
+        "stageId": "45",
+        "priority": "high",
+        "contactId": 33,
+        "description": "",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 05:29:08.538"
+  },
+  {
+    "id": 228,
+    "deal_id": 28,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Interesados stage",
+    "metadata": {
+      "newStageId": "47",
+      "previousStageId": 47
+    },
+    "created_at": "2025-12-22 05:33:38.35"
+  },
+  {
+    "id": 229,
+    "deal_id": 28,
+    "user_id": 3,
+    "type": "update",
+    "content": "Deal \"Propiedad 480\" updated",
+    "metadata": {
+      "changes": {
+        "tags": [
+          "whatsapp",
+          "personal"
+        ],
+        "title": "Propiedad 480",
+        "value": 200000,
+        "dueDate": "2025-12-21T05:00:00.000Z",
+        "stageId": "47",
+        "priority": "high",
+        "contactId": 31,
+        "description": "El material de ventas del proyecto \"Villasol\" define a su cliente potencial como: \"Inversionista = Comerciante, profesional y persona natural con negocio\".1 Esta segmentación es fundamental, ya que no se dirige a u",
+        "assignedToUserId": 3
+      },
+      "updatedBy": 3
+    },
+    "created_at": "2025-12-22 05:33:38.369"
+  },
+  {
+    "id": 230,
+    "deal_id": 28,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Pensando stage",
+    "metadata": {
+      "newStageId": 113,
+      "previousStageId": 113
+    },
+    "created_at": "2025-12-22 05:33:53.548"
+  },
+  {
+    "id": 231,
+    "deal_id": 25,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Finalsasss stage",
+    "metadata": {
+      "newStageId": 114,
+      "previousStageId": 114
+    },
+    "created_at": "2025-12-22 06:00:44.658"
+  },
+  {
+    "id": 232,
+    "deal_id": 28,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Interesados stage",
+    "metadata": {
+      "newStageId": 47,
+      "previousStageId": 47
+    },
+    "created_at": "2025-12-22 06:12:51.274"
+  },
+  {
+    "id": 233,
+    "deal_id": 31,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Finalsasss stage",
+    "metadata": {
+      "newStageId": 114,
+      "previousStageId": 114
+    },
+    "created_at": "2025-12-22 07:12:08.498"
+  },
+  {
+    "id": 234,
+    "deal_id": 28,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Finalsasss stage",
+    "metadata": {
+      "newStageId": 114,
+      "previousStageId": 114
+    },
+    "created_at": "2025-12-22 07:12:11.265"
+  },
+  {
+    "id": 235,
+    "deal_id": 28,
+    "user_id": 3,
+    "type": "stage_change",
+    "content": "Deal moved to Negociación stage",
+    "metadata": {
+      "newStageId": 49,
+      "previousStageId": 49
+    },
+    "created_at": "2025-12-22 07:12:13.494"
+  }
+]

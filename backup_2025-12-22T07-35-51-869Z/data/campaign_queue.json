@@ -1,0 +1,68 @@
+[
+  {
+    "id": 1,
+    "campaign_id": 1,
+    "recipient_id": 1,
+    "account_id": 1,
+    "priority": 1,
+    "scheduled_for": "2025-12-08 19:47:13.479",
+    "attempts": 0,
+    "max_attempts": 3,
+    "status": "completed",
+    "started_at": "2025-12-08 19:47:13.599",
+    "completed_at": "2025-12-08 19:47:15.281",
+    "error_message": null,
+    "last_error_at": null,
+    "metadata": {
+      "content": "ian Ampudia nash {{Hace un tiempo|Hace unos meses|Anteriormente}} me dejaste tu numero, en facebook, sobre tu interés en invertir. Te escribo porque la zona de Villasol ha cambiado mucho: la Escuela Técnica de la Policía y las megaobras vecinas ya son una realidad 👮‍♂️🏗️, y esto está disparando el valor de los lotes.",
+      "recipient_name": "ian Ampudia nash",
+      "recipient_phone": "+51906770420"
+    },
+    "created_at": "2025-12-08 19:47:04.479025",
+    "updated_at": "2025-12-08 19:47:15.281122"
+  },
+  {
+    "id": 2,
+    "campaign_id": 1,
+    "recipient_id": 2,
+    "account_id": 1,
+    "priority": 1,
+    "scheduled_for": "2025-12-08 19:47:18.48",
+    "attempts": 0,
+    "max_attempts": 3,
+    "status": "completed",
+    "started_at": "2025-12-08 19:47:19.615",
+    "completed_at": "2025-12-08 19:47:20.761",
+    "error_message": null,
+    "last_error_at": null,
+    "metadata": {
+      "content": "ian {{Hace un tiempo|Hace unos meses|Anteriormente}} me dejaste tu numero, en facebook, sobre tu interés en invertir. Te escribo porque la zona de Villasol ha cambiado mucho: la Escuela Técnica de la Policía y las megaobras vecinas ya son una realidad 👮‍♂️🏗️, y esto está disparando el valor de los lotes.",
+      "recipient_name": "ian",
+      "recipient_phone": "+51981139299"
+    },
+    "created_at": "2025-12-08 19:47:04.479025",
+    "updated_at": "2025-12-08 19:47:20.763542"
+  },
+  {
+    "id": 3,
+    "campaign_id": 1,
+    "recipient_id": 3,
+    "account_id": 1,
+    "priority": 1,
+    "scheduled_for": "2025-12-08 19:47:26.48",
+    "attempts": 0,
+    "max_attempts": 3,
+    "status": "completed",
+    "started_at": "2025-12-08 19:47:28.648",
+    "completed_at": "2025-12-08 19:47:30.696",
+    "error_message": null,
+    "last_error_at": null,
+    "metadata": {
+      "content": "Ian Ampudia Guerrero {{Hace un tiempo|Hace unos meses|Anteriormente}} me dejaste tu numero, en facebook, sobre tu interés en invertir. Te escribo porque la zona de Villasol ha cambiado mucho: la Escuela Técnica de la Policía y las megaobras vecinas ya son una realidad 👮‍♂️🏗️, y esto está disparando el valor de los lotes.",
+      "recipient_name": "Ian Ampudia Guerrero",
+      "recipient_phone": "+51965001709"
+    },
+    "created_at": "2025-12-08 19:47:04.479025",
+    "updated_at": "2025-12-08 19:47:30.698752"
+  }
+]

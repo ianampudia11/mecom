@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Download, Loader2 } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
+import MediaLightbox from './MediaLightbox';
 
 interface OptimizedMediaBubbleProps {
   message: any;
@@ -11,16 +12,18 @@ interface OptimizedMediaBubbleProps {
 
 const MAX_AUTO_LOAD_SIZE = 2 * 1024 * 1024; // 2MB as per business requirements
 
-export default function OptimizedMediaBubble({ 
-  message, 
-  mediaUrl, 
-  onDownload, 
-  isDownloading = false 
+export default function OptimizedMediaBubble({
+  message,
+  mediaUrl,
+  onDownload,
+  isDownloading = false
 }: OptimizedMediaBubbleProps) {
   const { t } = useTranslation();
   const [shouldAutoLoad, setShouldAutoLoad] = useState(false);
   const [mediaSize, setMediaSize] = useState<number | null>(null);
   const [isCheckingSize, setIsCheckingSize] = useState(true);
+  const [showLightbox, setShowLightbox] = useState(false);
+  const [lightboxMedia, setLightboxMedia] = useState<{ url: string; type: 'image' | 'video' } | null>(null);
 
   useEffect(() => {
     if (mediaUrl) {
@@ -118,10 +121,14 @@ export default function OptimizedMediaBubble({
                 <img
                   src={mediaUrl}
                   alt={t('message_bubble.image_message', 'Image message')}
-                  className="max-w-full rounded-md object-contain"
+                  className="max-w-full rounded-md object-contain cursor-pointer hover:opacity-90 transition-opacity"
                   style={{ maxHeight: '240px' }}
                   crossOrigin="anonymous"
                   loading="eager"
+                  onClick={() => {
+                    setLightboxMedia({ url: mediaUrl, type: 'image' });
+                    setShowLightbox(true);
+                  }}
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                     e.currentTarget.parentElement?.classList.add('flex', 'items-center', 'justify-center', 'h-40');
@@ -178,10 +185,15 @@ export default function OptimizedMediaBubble({
             <div className="message-media">
               <video
                 controls
-                className="max-w-full rounded-md"
+                className="max-w-full rounded-md cursor-pointer"
                 style={{ maxHeight: '240px' }}
                 crossOrigin="anonymous"
                 preload="metadata"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setLightboxMedia({ url: mediaUrl, type: 'video' });
+                  setShowLightbox(true);
+                }}
               >
                 <source src={mediaUrl} type="video/mp4" />
                 {t('message_bubble.video_not_supported', 'Your browser does not support the video element.')}
@@ -409,5 +421,20 @@ export default function OptimizedMediaBubble({
     }
   };
 
-  return renderContent();
+  return (
+    <>
+      {renderContent()}
+      {showLightbox && lightboxMedia && (
+        <MediaLightbox
+          mediaUrl={lightboxMedia.url}
+          mediaType={lightboxMedia.type}
+          onClose={() => {
+            setShowLightbox(false);
+            setLightboxMedia(null);
+          }}
+          onDownload={onDownload}
+        />
+      )}
+    </>
+  );
 }

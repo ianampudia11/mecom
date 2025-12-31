@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "company_id": 4,
+    "created_by_id": 3,
+    "name": "Test Planilla",
+    "description": "Planilla de prueba 001",
+    "category": "general",
+    "content": "{{name}} {{Hace un tiempo|Hace unos meses|Anteriormente}} me dejaste tu numero, en facebook, sobre tu interés en invertir. Te escribo porque la zona de Villasol ha cambiado mucho: la Escuela Técnica de la Policía y las megaobras vecinas ya son una realidad 👮‍♂️🏗️, y esto está disparando el valor de los lotes.",
+    "content_type": "text",
+    "media_urls": [
+      "/uploads/templates/template-1765222708667-248560065.jpg"
+    ],
+    "media_metadata": {},
+    "variables": [],
+    "channel_type": "whatsapp",
+    "is_active": true,
+    "usage_count": 1,
+    "created_at": "2025-12-08 19:38:28.698335",
+    "updated_at": "2025-12-08 19:47:04.418169",
+    "whatsapp_channel_type": "unofficial",
+    "whatsapp_template_category": null,
+    "whatsapp_template_status": "pending",
+    "whatsapp_template_id": "",
+    "whatsapp_template_name": "",
+    "whatsapp_template_language": "en",
+    "connection_id": null,
+    "media_handle": null
+  }
+]

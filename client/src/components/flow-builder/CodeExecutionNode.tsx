@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { Handle, Position } from 'reactflow';
 import { useReactFlow } from 'reactflow';
 import { Trash2, Copy, Code2, Settings, Play, Loader2, Eye, EyeOff, Check, HelpCircle, X, Code, Network, AlertCircle, CheckCircle, Variable, Globe, Clock, Shield } from 'lucide-react';
-import { useFlowContext } from '../../pages/flow-builder';
+import { useFlowContext } from './FlowContext';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";

@@ -12,7 +12,7 @@ export type BrandingSettings = {
 };
 
 const DEFAULT_BRANDING: BrandingSettings = {
-  appName: "PowerChat",
+  appName: "Iawarrior tech",
   primaryColor: "#333235",
   secondaryColor: "#4F46E5",
 };
@@ -107,45 +107,45 @@ export function BrandingProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
       setError(null);
 
-      
+
       let res = await fetch("/public/branding", {
         method: "GET",
         headers: { "Content-Type": "application/json" }
       });
-      
+
 
       if (!res.ok) {
-        
+
         res = await apiRequest("GET", "/api/branding");
-        
+
       }
 
       if (!res.ok) {
-        
+
         setBranding(DEFAULT_BRANDING);
         applyBrandingToDOM(DEFAULT_BRANDING);
         return;
       }
 
       const settings = await res.json();
-      
+
 
       const brandingSetting = settings.find((s: any) => s.key === 'branding');
       const logoSetting = settings.find((s: any) => s.key === 'branding_logo');
       const faviconSetting = settings.find((s: any) => s.key === 'branding_favicon');
 
-      
-      
-      
-      
+
+
+
+
 
       let brandingValue = brandingSetting?.value;
       if (typeof brandingValue === 'string') {
         try {
           brandingValue = JSON.parse(brandingValue);
-          
+
         } catch (e) {
-          
+
           brandingValue = {};
         }
       }
@@ -157,7 +157,7 @@ export function BrandingProvider({ children }: { children: ReactNode }) {
         faviconUrl: faviconSetting?.value,
       };
 
-      
+
       setBranding(newBranding);
       applyBrandingToDOM(newBranding);
     } catch (err) {

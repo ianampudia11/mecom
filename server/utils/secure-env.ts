@@ -32,7 +32,7 @@ class SecureEnvironment {
   private getOrCreateEncryptionKey(): string {
     const key = process.env.ENCRYPTION_KEY || crypto.randomBytes(32).toString('hex');
     if (!process.env.ENCRYPTION_KEY) {
-      
+
     }
     return key;
   }
@@ -69,11 +69,11 @@ class SecureEnvironment {
     const algorithm = 'aes-256-gcm';
     const key = Buffer.from(this.encryptionKey, 'hex');
     const iv = crypto.randomBytes(16);
-    
+
     const cipher = crypto.createCipher(algorithm, key);
     let encrypted = cipher.update(text, 'utf8', 'hex');
     encrypted += cipher.final('hex');
-    
+
     return iv.toString('hex') + ':' + encrypted;
   }
 
@@ -85,11 +85,11 @@ class SecureEnvironment {
     const key = Buffer.from(this.encryptionKey, 'hex');
     const [ivHex, encrypted] = encryptedText.split(':');
     const iv = Buffer.from(ivHex, 'hex');
-    
+
     const decipher = crypto.createDecipher(algorithm, key);
     let decrypted = decipher.update(encrypted, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
-    
+
     return decrypted;
   }
 
@@ -98,18 +98,18 @@ class SecureEnvironment {
    */
   public get(key: string, defaultValue?: string): string | undefined {
     const value = process.env[key] || defaultValue;
-    
+
     if (!value) return undefined;
-    
+
     if (this.sensitiveKeys.includes(key) && value.includes(':')) {
       try {
         return this.decrypt(value);
       } catch (error) {
-        
+
         return value;
       }
     }
-    
+
     return value;
   }
 
@@ -137,7 +137,7 @@ class SecureEnvironment {
 
     const sslMode = this.get('PGSSLMODE') || (process.env.NODE_ENV === 'production' ? 'prefer' : 'disable');
     url.searchParams.set('sslmode', sslMode);
-    url.searchParams.set('application_name', 'powerchat-prod');
+    url.searchParams.set('application_name', 'iawarrior-prod');
 
     return url.toString();
   }

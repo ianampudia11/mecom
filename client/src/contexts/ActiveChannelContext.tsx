@@ -27,7 +27,7 @@ interface ActiveChannelProviderProps {
   children: ReactNode;
 }
 
-const ACTIVE_CHANNEL_STORAGE_KEY = 'powerchat_active_channel_id';
+const ACTIVE_CHANNEL_STORAGE_KEY = 'iawarrior_active_channel_id';
 
 export function ActiveChannelProvider({ children }: ActiveChannelProviderProps) {
   const [activeChannelId, setActiveChannelIdState] = useState<number | null>(null);
@@ -49,7 +49,7 @@ export function ActiveChannelProvider({ children }: ActiveChannelProviderProps) 
 
 
   const availableChannels = channels.filter(channel => channel.status === 'active');
-  
+
 
   const activeChannel = availableChannels.find(channel => channel.id === activeChannelId) || null;
 
@@ -66,33 +66,22 @@ export function ActiveChannelProvider({ children }: ActiveChannelProviderProps) 
 
 
   useEffect(() => {
-    if (availableChannels.length > 0) {
+    if (isLoading) return;
 
+    if (availableChannels.length > 0) {
       if (!activeChannelId) {
         const firstChannel = availableChannels[0];
         setActiveChannelIdState(firstChannel.id);
         localStorage.setItem(ACTIVE_CHANNEL_STORAGE_KEY, firstChannel.id.toString());
-
       }
-
-      else if (!availableChannels.find(c => c.id === activeChannelId)) {
-        const firstChannel = availableChannels[0];
-        const previousChannelId = activeChannelId;
-        setActiveChannelIdState(firstChannel.id);
-        localStorage.setItem(ACTIVE_CHANNEL_STORAGE_KEY, firstChannel.id.toString());
-
-      }
-    } else if (activeChannelId) {
-
-
-      setActiveChannelIdState(null);
-      localStorage.removeItem(ACTIVE_CHANNEL_STORAGE_KEY);
+      // REMOVED: Logic to auto-reset channel if current ID is not in availableChannels
+      // This allows the selection to be "sticky" even if the list reloads or filters temporarily exclude it.
     }
-  }, [availableChannels, activeChannelId]);
+  }, [availableChannels, activeChannelId, isLoading]);
 
   const setActiveChannelId = (channelId: number | null) => {
     setActiveChannelIdState(channelId);
-    
+
     if (channelId) {
       localStorage.setItem(ACTIVE_CHANNEL_STORAGE_KEY, channelId.toString());
     } else {

@@ -3,7 +3,7 @@ import { Handle, Position, useReactFlow } from 'reactflow';
 import { ListOrdered, Copy, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation';
-import { useFlowContext } from '../../pages/flow-builder';
+import { useFlowContext } from './FlowContext';
 import {
   Tooltip,
   TooltipContent,

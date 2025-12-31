@@ -137,7 +137,7 @@ class MessageCacheService {
 
   private async _initDatabase(): Promise<void> {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open('PowerChatPlusCache', this.config.version);
+      const request = indexedDB.open('IawarriorTechPlusCache', this.config.version);
 
       request.onerror = () => {
         console.error('Failed to open IndexedDB:', request.error);
@@ -264,16 +264,16 @@ class MessageCacheService {
    * Get cached messages for a conversation with pagination
    */
   async getCachedMessages(
-    conversationId: number, 
-    page: number = 1, 
+    conversationId: number,
+    page: number = 1,
     limit: number = 25
   ): Promise<{ messages: CachedMessage[]; hasMore: boolean; total: number; staleMediaCount: number }> {
     await this.ensureInitialized();
-    
+
     const transaction = this.getTransaction(['messages'], 'readonly');
     const store = transaction.objectStore('messages');
     const index = store.index('conversationId');
-    
+
     const allMessages = await this.executeRequest(
       index.getAll(IDBKeyRange.only(conversationId))
     );
@@ -298,12 +298,12 @@ class MessageCacheService {
     if (messages.length > 0) {
       const updateTransaction = this.getTransaction(['messages'], 'readwrite');
       const updateStore = updateTransaction.objectStore('messages');
-      
+
       const updatePromises = messages.map(msg => {
         msg.lastAccessed = now;
         return this.executeRequest(updateStore.put(msg));
       });
-      
+
       await Promise.all(updatePromises);
     }
 

@@ -1,0 +1,203 @@
+
+[2025-12-21T22:28:36.789Z] POST /api/deals
+providedStageId: 45
+pipelineStage: {"id":45,"pipelineId":3,"companyId":null,"name":"Nuevos","color":"#3B82F6","order":0,"createdAt":"2025-12-21T21:22:59.343Z","updatedAt":"2025-12-21T21:22:59.343Z"}
+pipelineIdToCheck: 3
+Pipeline Query Result: {"company_id":4}
+User CompanyId: 4
+
+[2025-12-21T22:28:38.755Z] POST /api/deals
+providedStageId: 45
+pipelineStage: {"id":45,"pipelineId":3,"companyId":null,"name":"Nuevos","color":"#3B82F6","order":0,"createdAt":"2025-12-21T21:22:59.343Z","updatedAt":"2025-12-21T21:22:59.343Z"}
+pipelineIdToCheck: 3
+Pipeline Query Result: {"company_id":4}
+User CompanyId: 4
+
+[2025-12-21T22:28:39.935Z] POST /api/deals
+providedStageId: 45
+pipelineStage: {"id":45,"pipelineId":3,"companyId":null,"name":"Nuevos","color":"#3B82F6","order":0,"createdAt":"2025-12-21T21:22:59.343Z","updatedAt":"2025-12-21T21:22:59.343Z"}
+pipelineIdToCheck: 3
+Pipeline Query Result: {"company_id":4}
+User CompanyId: 4
+
+[2025-12-21T23:13:18.441Z] POST /api/deals
+providedStageId: 107
+pipelineStage: {"id":107,"pipelineId":12,"companyId":null,"name":"Nuevos","color":"#3B82F6","order":0,"createdAt":"2025-12-21T22:51:32.406Z","updatedAt":"2025-12-21T22:51:32.406Z"}
+pipelineIdToCheck: 12
+Pipeline Query Result: {"company_id":5}
+User CompanyId: 5
+
+[2025-12-21T23:14:14.577Z] POST /api/deals
+providedStageId: 107
+pipelineStage: {"id":107,"pipelineId":12,"companyId":null,"name":"Nuevos","color":"#3B82F6","order":0,"createdAt":"2025-12-21T22:51:32.406Z","updatedAt":"2025-12-21T22:51:32.406Z"}
+pipelineIdToCheck: 12
+Pipeline Query Result: {"company_id":5}
+User CompanyId: 5
+
+[2025-12-21T23:14:19.699Z] POST /api/deals
+providedStageId: 107
+pipelineStage: {"id":107,"pipelineId":12,"companyId":null,"name":"Nuevos","color":"#3B82F6","order":0,"createdAt":"2025-12-21T22:51:32.406Z","updatedAt":"2025-12-21T22:51:32.406Z"}
+pipelineIdToCheck: 12
+Pipeline Query Result: {"company_id":5}
+User CompanyId: 5
+
+[2025-12-21T23:33:11.034Z] POST /api/deals
+providedStageId: 107
+pipelineStage: {"id":107,"pipelineId":12,"companyId":null,"name":"Nuevos","color":"#3B82F6","order":0,"createdAt":"2025-12-21T22:51:32.406Z","updatedAt":"2025-12-21T22:51:32.406Z"}
+pipelineIdToCheck: 12
+Pipeline Query Result: {"company_id":5}
+User CompanyId: 5
+
+[2025-12-21T23:49:43.805Z] POST /api/deals
+providedStageId: 93
+pipelineStage: {"id":93,"pipelineId":11,"companyId":null,"name":"Nuevos","color":"#3B82F6","order":0,"createdAt":"2025-12-21T21:26:54.287Z","updatedAt":"2025-12-21T21:26:54.287Z"}
+pipelineIdToCheck: 11
+Pipeline Query Result: {"company_id":4}
+User CompanyId: 4
+
+[2025-12-21T23:58:12.436Z] POST /api/deals
+providedStageId: 45
+pipelineStage: {"id":45,"pipelineId":3,"companyId":null,"name":"Nuevos","color":"#3B82F6","order":4,"createdAt":"2025-12-21T21:22:59.343Z","updatedAt":"2025-12-21T21:22:59.343Z"}
+pipelineIdToCheck: 3
+Pipeline Query Result: {"company_id":4}
+User CompanyId: 4
+
+[2025-12-21T23:58:14.648Z] POST /api/deals
+providedStageId: 45
+pipelineStage: {"id":45,"pipelineId":3,"companyId":null,"name":"Nuevos","color":"#3B82F6","order":4,"createdAt":"2025-12-21T21:22:59.343Z","updatedAt":"2025-12-21T21:22:59.343Z"}
+pipelineIdToCheck: 3
+Pipeline Query Result: {"company_id":4}
+User CompanyId: 4
+
+[2025-12-22T00:09:18.133Z] POST /api/deals
+providedStageId: 93
+pipelineStage: {"id":93,"pipelineId":11,"companyId":null,"name":"Nuevoskk","color":"#3B82F6","order":1,"createdAt":"2025-12-21T21:26:54.287Z","updatedAt":"2025-12-21T21:26:54.287Z"}
+pipelineIdToCheck: 11
+Pipeline Query Result: {"company_id":4}
+User CompanyId: 4
+
+[2025-12-22T00:54:46.409Z] POST /api/deals
+providedStageId: 107
+pipelineStage: {"id":107,"pipelineId":12,"companyId":null,"name":"Nuevos","color":"#3B82F6","order":3,"createdAt":"2025-12-21T22:51:32.406Z","updatedAt":"2025-12-21T22:51:32.406Z"}
+pipelineIdToCheck: 12
+Pipeline Query Result: {"company_id":5}
+User CompanyId: 5
+
+[2025-12-22T00:58:13.659Z] POST /api/deals
+providedStageId: 45
+pipelineStage: {"id":45,"pipelineId":3,"companyId":null,"name":"Nuevos","color":"#3B82F6","order":4,"createdAt":"2025-12-21T21:22:59.343Z","updatedAt":"2025-12-21T21:22:59.343Z"}
+pipelineIdToCheck: 3
+Pipeline Query Result: {"company_id":4}
+User CompanyId: 4
+
+[2025-12-22T00:58:45.203Z] POST /api/deals
+providedStageId: 45
+pipelineStage: {"id":45,"pipelineId":3,"companyId":null,"name":"Nuevos","color":"#3B82F6","order":4,"createdAt":"2025-12-21T21:22:59.343Z","updatedAt":"2025-12-21T21:22:59.343Z"}
+pipelineIdToCheck: 3
+Pipeline Query Result: {"company_id":4}
+User CompanyId: 4
+
+[2025-12-22T01:04:56.894Z] POST /api/deals
+providedStageId: 45
+pipelineStage: {"id":45,"pipelineId":3,"companyId":null,"name":"Nuevos","color":"#3B82F6","order":4,"createdAt":"2025-12-21T21:22:59.343Z","updatedAt":"2025-12-21T21:22:59.343Z"}
+pipelineIdToCheck: 3
+Pipeline Query Result: {"company_id":4}
+User CompanyId: 4
+
+[2025-12-22T01:23:46.940Z] POST /api/deals
+providedStageId: 49
+pipelineStage: {"id":49,"pipelineId":3,"companyId":null,"name":"Negociación","color":"#EC4899","order":29,"createdAt":"2025-12-21T21:22:59.353Z","updatedAt":"2025-12-21T21:22:59.353Z"}
+pipelineIdToCheck: 3
+Pipeline Query Result: {"company_id":4}
+User CompanyId: 4
+
+[2025-12-22T01:23:56.134Z] POST /api/deals
+providedStageId: 45
+pipelineStage: {"id":45,"pipelineId":3,"companyId":null,"name":"Nuevos","color":"#3B82F6","order":4,"createdAt":"2025-12-21T21:22:59.343Z","updatedAt":"2025-12-21T21:22:59.343Z"}
+pipelineIdToCheck: 3
+Pipeline Query Result: {"company_id":4}
+User CompanyId: 4
+
+[2025-12-22T01:24:08.672Z] POST /api/deals
+providedStageId: 45
+pipelineStage: {"id":45,"pipelineId":3,"companyId":null,"name":"Nuevos","color":"#3B82F6","order":4,"createdAt":"2025-12-21T21:22:59.343Z","updatedAt":"2025-12-21T21:22:59.343Z"}
+pipelineIdToCheck: 3
+Pipeline Query Result: {"company_id":4}
+User CompanyId: 4
+
+[2025-12-22T01:28:02.765Z] POST /api/deals
+providedStageId: 49
+pipelineStage: {"id":49,"pipelineId":3,"companyId":null,"name":"Negociación","color":"#EC4899","order":29,"createdAt":"2025-12-21T21:22:59.353Z","updatedAt":"2025-12-21T21:22:59.353Z"}
+pipelineIdToCheck: 3
+Pipeline Query Result: {"company_id":4}
+User CompanyId: 4
+
+[2025-12-22T01:28:16.753Z] POST /api/deals
+providedStageId: 49
+pipelineStage: {"id":49,"pipelineId":3,"companyId":null,"name":"Negociación","color":"#EC4899","order":29,"createdAt":"2025-12-21T21:22:59.353Z","updatedAt":"2025-12-21T21:22:59.353Z"}
+pipelineIdToCheck: 3
+Pipeline Query Result: {"company_id":4}
+User CompanyId: 4
+
+[2025-12-22T02:17:43.656Z] POST /api/deals
+providedStageId: 113
+pipelineStage: {"id":113,"pipelineId":3,"companyId":null,"name":"Pensando","color":"#f3722c","order":5,"createdAt":"2025-12-22T01:43:36.945Z","updatedAt":"2025-12-22T01:43:36.945Z"}
+pipelineIdToCheck: 3
+Pipeline Query Result: {"company_id":4}
+User CompanyId: 4
+
+[2025-12-22T19:54:49.578Z] POST /api/deals
+providedStageId: 45
+pipelineStage: {"id":45,"pipelineId":3,"companyId":null,"name":"Nuevos","color":"#3B82F6","order":0,"createdAt":"2025-12-21T21:22:59.343Z","updatedAt":"2025-12-21T21:22:59.343Z"}
+pipelineIdToCheck: 3
+Pipeline Query Result: {"company_id":4}
+User CompanyId: 4
+
+[2025-12-22T19:54:59.368Z] POST /api/deals
+providedStageId: 45
+pipelineStage: {"id":45,"pipelineId":3,"companyId":null,"name":"Nuevos","color":"#3B82F6","order":0,"createdAt":"2025-12-21T21:22:59.343Z","updatedAt":"2025-12-21T21:22:59.343Z"}
+pipelineIdToCheck: 3
+Pipeline Query Result: {"company_id":4}
+User CompanyId: 4
+
+[2025-12-27T23:44:24.240Z] POST /api/deals
+providedStageId: 45
+pipelineStage: {"id":45,"pipelineId":3,"companyId":null,"name":"Nuevos","color":"#3B82F6","order":0,"createdAt":"2025-12-21T21:22:59.343Z","updatedAt":"2025-12-21T21:22:59.343Z"}
+pipelineIdToCheck: 3
+Pipeline Query Result: {"company_id":4}
+User CompanyId: 4
+
+[2025-12-28T01:36:05.308Z] POST /api/deals
+providedStageId: 93
+pipelineStage: {"id":93,"pipelineId":11,"companyId":null,"name":"Nuevoskk","color":"#3B82F6","order":0,"createdAt":"2025-12-21T21:26:54.287Z","updatedAt":"2025-12-21T21:26:54.287Z"}
+pipelineIdToCheck: 11
+Pipeline Query Result: {"company_id":4}
+User CompanyId: 4
+
+[2025-12-28T01:36:24.326Z] POST /api/deals
+providedStageId: 93
+pipelineStage: {"id":93,"pipelineId":11,"companyId":null,"name":"Nuevoskk","color":"#3B82F6","order":0,"createdAt":"2025-12-21T21:26:54.287Z","updatedAt":"2025-12-21T21:26:54.287Z"}
+pipelineIdToCheck: 11
+Pipeline Query Result: {"company_id":4}
+User CompanyId: 4
+
+[2025-12-28T01:42:30.686Z] POST /api/deals
+providedStageId: 93
+pipelineStage: {"id":93,"pipelineId":11,"companyId":null,"name":"Nuevoskk","color":"#3B82F6","order":0,"createdAt":"2025-12-21T21:26:54.287Z","updatedAt":"2025-12-21T21:26:54.287Z"}
+pipelineIdToCheck: 11
+Pipeline Query Result: {"company_id":4}
+User CompanyId: 4
+
+[2025-12-28T06:43:04.427Z] POST /api/deals
+providedStageId: 93
+pipelineStage: {"id":93,"pipelineId":11,"companyId":null,"name":"Nuevoskk","color":"#3B82F6","order":1,"createdAt":"2025-12-21T21:26:54.287Z","updatedAt":"2025-12-21T21:26:54.287Z"}
+pipelineIdToCheck: 11
+Pipeline Query Result: {"company_id":4}
+User CompanyId: 4
+
+[2025-12-28T07:34:52.972Z] POST /api/deals
+providedStageId: 45
+pipelineStage: {"id":45,"pipelineId":3,"companyId":null,"name":"Nuevos","color":"#3B82F6","order":2,"createdAt":"2025-12-21T21:22:59.343Z","updatedAt":"2025-12-21T21:22:59.343Z"}
+pipelineIdToCheck: 3
+Pipeline Query Result: {"company_id":4}
+User CompanyId: 4

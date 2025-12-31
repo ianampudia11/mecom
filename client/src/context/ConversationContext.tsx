@@ -23,6 +23,8 @@ interface ConversationContextProps {
   setActiveConversationId: (id: number | null) => void;
   activeChannelId: number | null;
   setActiveChannelId: (id: number | null) => void;
+  pendingNewConversationContactId: number | null;
+  setPendingNewConversationContactId: (id: number | null) => void;
   conversations: any[];
   groupConversations: any[];
   contacts: any[];
@@ -611,6 +613,8 @@ export function ConversationProvider({ children }: ConversationProviderProps) {
     return isContactWhatsApp && isConversationWhatsApp;
   };
 
+  const [pendingNewConversationContactId, setPendingNewConversationContactId] = useState<number | null>(null);
+
   useEffect(() => {
     const selectedContactId = localStorage.getItem('selectedContactId');
     const selectedChannelType = localStorage.getItem('selectedChannelType');
@@ -619,11 +623,8 @@ export function ConversationProvider({ children }: ConversationProviderProps) {
       return;
     }
 
-    if (selectedContactId && selectedChannelType && conversations.length === 0) {
-      return;
-    }
-
-    if (selectedContactId && selectedChannelType && conversations.length > 0) {
+    // Attempt to handle redirection even if conversations list is empty initially
+    if (selectedContactId && selectedChannelType) {
       const contactId = parseInt(selectedContactId);
 
       if (isNaN(contactId)) {
@@ -632,6 +633,7 @@ export function ConversationProvider({ children }: ConversationProviderProps) {
         return;
       }
 
+      // 1. Try to find an exact match in the currently loaded conversations (including potentially older ones if loaded)
       const exactMatch = conversations.find(conv =>
         conv.contactId === contactId &&
         areChannelTypesCompatible(selectedChannelType, conv.channelType)
@@ -640,50 +642,66 @@ export function ConversationProvider({ children }: ConversationProviderProps) {
       if (exactMatch) {
         setActiveConversationId(exactMatch.id);
         setActiveChannelId(exactMatch.channelId);
-
         localStorage.removeItem('selectedContactId');
         localStorage.removeItem('selectedChannelType');
         return;
       }
 
+      // 2. Try to find any match for this contact
       const contactMatch = conversations.find(conv => conv.contactId === contactId);
-
       if (contactMatch) {
         setActiveConversationId(contactMatch.id);
         setActiveChannelId(contactMatch.channelId);
-
         localStorage.removeItem('selectedContactId');
         localStorage.removeItem('selectedChannelType');
         return;
       }
 
-      setTimeout(() => {
-        const retryConversations = conversations;
-        const retryExactMatch = retryConversations.find(conv =>
-          conv.contactId === contactId &&
-          areChannelTypesCompatible(selectedChannelType, conv.channelType)
-        );
+      // 3. If not found locally, fetch specific conversation from server
+      const fetchAndRedirect = async () => {
+        try {
+          // We use apiRequest directly or use queryClient if available
+          // Using apiRequest from imports
+          const queryStr = `contactId=${contactId}`;
+          const res = await apiRequest('GET', `/api/conversations?${queryStr}`);
+          if (!res.ok) return;
 
-        if (retryExactMatch) {
-          setActiveConversationId(retryExactMatch.id);
-          setActiveChannelId(retryExactMatch.channelId);
+          const data = await res.json();
+          const serverConversations = data.conversations || [];
+
+          // Try to find a compatible one first
+          let targetConv = serverConversations.find((c: any) =>
+            areChannelTypesCompatible(selectedChannelType, c.channelType)
+          );
+
+          // Fallback to any conversation with this contact
+          if (!targetConv && serverConversations.length > 0) {
+            targetConv = serverConversations[0];
+          }
+
+          if (targetConv) {
+            // Add to local state so it appears in list
+            setAllConversations(prev => {
+              if (prev.find(c => c.id === targetConv.id)) return prev;
+              return [targetConv, ...prev];
+            });
+
+            setActiveConversationId(targetConv.id);
+            if (targetConv.channelId) setActiveChannelId(targetConv.channelId);
+          } else {
+            // No conversation exists at all. Trigger new conversation flow.
+            setPendingNewConversationContactId(contactId);
+          }
+        } catch (error) {
+          console.error("Failed to fetch conversation for redirect", error);
+        } finally {
+          // Always clear to prevent infinite loops or stale redirects
           localStorage.removeItem('selectedContactId');
           localStorage.removeItem('selectedChannelType');
-          return;
         }
+      };
 
-        const retryContactMatch = retryConversations.find(conv => conv.contactId === contactId);
-        if (retryContactMatch) {
-          setActiveConversationId(retryContactMatch.id);
-          setActiveChannelId(retryContactMatch.channelId);
-          localStorage.removeItem('selectedContactId');
-          localStorage.removeItem('selectedChannelType');
-          return;
-        }
-
-        localStorage.removeItem('selectedContactId');
-        localStorage.removeItem('selectedChannelType');
-      }, 1000);
+      fetchAndRedirect();
     }
   }, [conversations, setActiveConversationId, setActiveChannelId, activeConversationId, conversationsPagination.loading, authLoading, user, areChannelTypesCompatible]);
 
@@ -1605,6 +1623,8 @@ export function ConversationProvider({ children }: ConversationProviderProps) {
     setActiveConversationId,
     activeChannelId,
     setActiveChannelId,
+    pendingNewConversationContactId,
+    setPendingNewConversationContactId,
     conversations: conversations as any[],
     groupConversations: groupConversations as any[],
     contacts: contacts as any[],

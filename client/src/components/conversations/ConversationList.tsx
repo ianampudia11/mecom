@@ -19,12 +19,16 @@ export default function ConversationList() {
     activeConversationId,
     setActiveConversationId,
     conversationsPagination,
-    loadMoreConversations
+    loadMoreConversations,
+    pendingNewConversationContactId,
+    setPendingNewConversationContactId,
+    contacts
   } = useConversations();
   const { t } = useTranslation();
   const [filterStatus, setFilterStatus] = useState<'all' | 'unassigned' | 'assigned' | 'assigned_to_me'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isNewConversationModalOpen, setIsNewConversationModalOpen] = useState(false);
+  const [prefillData, setPrefillData] = useState<{ name: string; phoneNumber: string } | undefined>(undefined);
 
   const { user } = useAuth();
   const { canViewAllConversations, canOnlyViewAssignedConversations } = usePermissions();
@@ -42,6 +46,20 @@ export default function ConversationList() {
       setFilterStatus('assigned_to_me');
     }
   }, [canOnlyViewAssignedConversations, user?.isSuperAdmin]);
+
+  useEffect(() => {
+    if (pendingNewConversationContactId && contacts && contacts.length > 0) {
+      const contact = contacts.find((c: any) => c.id === pendingNewConversationContactId);
+      if (contact) {
+        setPrefillData({
+          name: contact.name || '',
+          phoneNumber: contact.phone || ''
+        });
+        setIsNewConversationModalOpen(true);
+        setPendingNewConversationContactId(null);
+      }
+    }
+  }, [pendingNewConversationContactId, contacts, setPendingNewConversationContactId]);
 
 
   const handleScroll = useCallback(() => {
@@ -215,11 +233,10 @@ export default function ConversationList() {
       <div className="flex px-3 sm:px-4 py-2 border-b border-gray-200 space-x-1 overflow-x-auto scrollbar-hide">
         {(canViewAllConversations() || user?.isSuperAdmin) && (
           <button
-            className={`px-3 sm:px-4 py-2 sm:py-1 rounded-full text-sm font-medium whitespace-nowrap min-h-[23px] sm:min-h-auto flex items-center ${
-              filterStatus === 'all'
+            className={`px-3 sm:px-4 py-2 sm:py-1 rounded-full text-sm font-medium whitespace-nowrap min-h-[23px] sm:min-h-auto flex items-center ${filterStatus === 'all'
                 ? 'bg-primary-100 text-primary-700'
                 : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-            }`}
+              }`}
             onClick={() => setFilterStatus('all')}
           >
             {t('inbox.filter.all', 'All')}
@@ -228,11 +245,10 @@ export default function ConversationList() {
 
         {(canViewAllConversations() || user?.isSuperAdmin) && (
           <button
-            className={`px-3 sm:px-4 py-2 sm:py-1 rounded-full text-sm font-medium whitespace-nowrap min-h-[23px] sm:min-h-auto flex items-center ${
-              filterStatus === 'unassigned'
+            className={`px-3 sm:px-4 py-2 sm:py-1 rounded-full text-sm font-medium whitespace-nowrap min-h-[23px] sm:min-h-auto flex items-center ${filterStatus === 'unassigned'
                 ? 'bg-primary-100 text-primary-700'
                 : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-            }`}
+              }`}
             onClick={() => setFilterStatus('unassigned')}
           >
             {t('inbox.filter.unassigned', 'Unassigned')}
@@ -240,11 +256,10 @@ export default function ConversationList() {
         )}
 
         <button
-          className={`px-3 sm:px-4 py-2 sm:py-1 rounded-full text-sm font-medium whitespace-nowrap min-h-[23px] sm:min-h-auto flex items-center ${
-            filterStatus === 'assigned_to_me'
+          className={`px-3 sm:px-4 py-2 sm:py-1 rounded-full text-sm font-medium whitespace-nowrap min-h-[23px] sm:min-h-auto flex items-center ${filterStatus === 'assigned_to_me'
               ? 'bg-primary-100 text-primary-700'
               : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-          }`}
+            }`}
           onClick={() => setFilterStatus('assigned_to_me')}
         >
           {t('inbox.filter.my_chats', 'My Chats')}
@@ -252,11 +267,10 @@ export default function ConversationList() {
 
         {(canViewAllConversations() || user?.isSuperAdmin) && (
           <button
-            className={`px-3 sm:px-4 py-2 sm:py-1 rounded-full text-sm font-medium whitespace-nowrap min-h-[23px] sm:min-h-auto flex items-center ${
-              filterStatus === 'assigned'
+            className={`px-3 sm:px-4 py-2 sm:py-1 rounded-full text-sm font-medium whitespace-nowrap min-h-[23px] sm:min-h-auto flex items-center ${filterStatus === 'assigned'
                 ? 'bg-primary-100 text-primary-700'
                 : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-            }`}
+              }`}
             onClick={() => setFilterStatus('assigned')}
           >
             {t('inbox.filter.assigned', 'Assigned')}
@@ -343,8 +357,12 @@ export default function ConversationList() {
 
       <NewConversationModal
         isOpen={isNewConversationModalOpen}
-        onClose={() => setIsNewConversationModalOpen(false)}
+        onClose={() => {
+          setIsNewConversationModalOpen(false);
+          setPrefillData(undefined);
+        }}
         onConversationCreated={handleConversationCreated}
+        prefillData={prefillData}
       />
     </div>
   );
