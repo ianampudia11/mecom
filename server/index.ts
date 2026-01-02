@@ -101,6 +101,24 @@ app.use((req, res, next) => {
 
   const basePort = parseInt(process.env.PORT || "9000", 10);
   const port = process.env.NODE_ENV === 'development' ? basePort + 100 : basePort;
+
+  // Run migrations BEFORE starting the server
+  try {
+    console.log(`DEBUG: Current working directory: ${process.cwd()}`);
+    const fs = await import('fs');
+    if (fs.existsSync(path.join(process.cwd(), 'migrations'))) {
+      console.log('DEBUG: Migrations directory found. Files:', fs.readdirSync(path.join(process.cwd(), 'migrations')));
+    } else {
+      console.error('DEBUG: Migrations directory NOT found at ' + path.join(process.cwd(), 'migrations'));
+    }
+
+    await migrationSystem.runPendingMigrations();
+    logger.info('migration', 'Database migrations completed successfully');
+  } catch (error) {
+    logger.error('migration', 'Migration failed:', error);
+    process.exit(1); // Exit if migrations fail
+  }
+
   server.listen({
     port,
     host: "0.0.0.0",
@@ -112,12 +130,8 @@ app.use((req, res, next) => {
 
 
 
-        try {
-          await migrationSystem.runPendingMigrations();
-          logger.info('migration', 'Database migrations completed successfully');
-        } catch (error) {
-          logger.error('migration', 'Migration failed:', error);
-        }
+
+        // Migrations have been moved to before server.listen
 
 
         logger.info('whatsapp', 'Starting WhatsApp auto-reconnection...');
