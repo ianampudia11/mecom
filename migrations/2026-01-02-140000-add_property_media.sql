@@ -68,11 +68,15 @@ BEGIN
   IF OLD.is_primary = true THEN
     UPDATE property_media 
     SET is_primary = true
-    WHERE property_id = OLD.property_id 
-      AND id != OLD.id 
-      AND media_type = 'image'
-    ORDER BY order_num 
-    LIMIT 1;
+    WHERE id = (
+      SELECT id
+      FROM property_media
+      WHERE property_id = OLD.property_id 
+        AND id != OLD.id 
+        AND media_type = 'image'
+      ORDER BY order_num ASC
+      LIMIT 1
+    );
   END IF;
   RETURN OLD;
 END;
