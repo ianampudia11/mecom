@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-console.log('Starting production build...');
+console.log(`Starting production build... Timestamp: ${new Date().toISOString()}`);
 
 try {
     // Execute the actual production build command

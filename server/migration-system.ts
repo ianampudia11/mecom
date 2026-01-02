@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { Pool } from 'pg';
 import { pool } from './db.js';
+import crypto from 'crypto';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -71,7 +72,6 @@ export class MigrationSystem {
     }
   }
   private async calculateChecksum(content: string): Promise<string> {
-    const crypto = await import('crypto');
     return crypto.createHash('sha256').update(content).digest('hex');
   }
 
@@ -81,7 +81,6 @@ export class MigrationSystem {
    * Special handling for ${ADMIN_PASSWORD}: Hashes it using scrypt before substitution.
    */
   private substituteEnvironmentVariables(content: string): string {
-    const crypto = require('crypto');
     try {
       const defaults = {
         ADMIN_EMAIL: 'admin@app.com',

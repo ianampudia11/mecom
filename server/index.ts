@@ -1,6 +1,5 @@
 import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
 import { migrationSystem } from "./migration-system";
 import path from "path";
 import { logger } from "./utils/logger";
@@ -9,11 +8,8 @@ import { setupSecurityMiddleware, setupSecurityReporting } from "./middleware/se
 import { serveStatic } from "./static-server";
 import { ensureUploadDirectories } from "./utils/file-system";
 import dotenv from "dotenv";
-import { registerWebhookRoutes } from "./webhook-routes";
-import "./services/message-scheduler"; // Import message scheduler (but don't auto-start)
 import { licenseValidator } from "./services/license-validator";
 import { ensureLicenseValid } from "./middleware/license-guard";
-
 
 dotenv.config();
 
@@ -37,7 +33,7 @@ if (process.env.NODE_ENV === 'production') {
   setupSecurityMiddleware(app);
 }
 
-registerWebhookRoutes(app);
+
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
@@ -73,7 +69,30 @@ app.use((req, res, next) => {
   await ensureUploadDirectories();
   console.log('DEBUG: Upload directories ensured');
 
+  // Run migrations BEFORE starting the server and registering routes
+  try {
+    console.log(`DEBUG: Current working directory: ${process.cwd()}`);
+    const fs = await import('fs');
+    if (fs.existsSync(path.join(process.cwd(), 'migrations'))) {
+      console.log('DEBUG: Migrations directory found. Files:', fs.readdirSync(path.join(process.cwd(), 'migrations')));
+    } else {
+      console.error('DEBUG: Migrations directory NOT found at ' + path.join(process.cwd(), 'migrations'));
+    }
+
+    await migrationSystem.runPendingMigrations();
+    logger.info('migration', 'Database migrations completed successfully');
+  } catch (error) {
+    logger.error('migration', 'Migration failed:', error);
+    process.exit(1); // Exit if migrations fail
+  }
+
+  console.log('DEBUG: Registering webhook routes...');
+  const { registerWebhookRoutes } = await import("./webhook-routes");
+  registerWebhookRoutes(app);
+  console.log('DEBUG: Webhook routes registered');
+
   console.log('DEBUG: Registering routes...');
+  const { registerRoutes } = await import("./routes");
   const server = await registerRoutes(app);
   console.log('DEBUG: Routes registered');
 
@@ -102,22 +121,7 @@ app.use((req, res, next) => {
   const basePort = parseInt(process.env.PORT || "9000", 10);
   const port = process.env.NODE_ENV === 'development' ? basePort + 100 : basePort;
 
-  // Run migrations BEFORE starting the server
-  try {
-    console.log(`DEBUG: Current working directory: ${process.cwd()}`);
-    const fs = await import('fs');
-    if (fs.existsSync(path.join(process.cwd(), 'migrations'))) {
-      console.log('DEBUG: Migrations directory found. Files:', fs.readdirSync(path.join(process.cwd(), 'migrations')));
-    } else {
-      console.error('DEBUG: Migrations directory NOT found at ' + path.join(process.cwd(), 'migrations'));
-    }
 
-    await migrationSystem.runPendingMigrations();
-    logger.info('migration', 'Database migrations completed successfully');
-  } catch (error) {
-    logger.error('migration', 'Migration failed:', error);
-    process.exit(1); // Exit if migrations fail
-  }
 
   server.listen({
     port,

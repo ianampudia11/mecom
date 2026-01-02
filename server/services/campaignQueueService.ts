@@ -8,6 +8,8 @@ import {
 } from '@shared/schema';
 import { and, asc, eq, inArray, lte, sql } from 'drizzle-orm';
 import path from 'path';
+
+console.log('DEBUG: CampaignQueueService module loaded');
 import { getDb } from '../db';
 import {
   Campaign,
@@ -117,9 +119,9 @@ export class CampaignQueueService {
     this.activeProcessingPromises = new Map<number, Promise<void>>();
   }
 
-  
-  
-  
+
+
+
 
   public startQueueProcessor(): void {
     if (this.isGlobalProcessing) {
@@ -218,15 +220,15 @@ export class CampaignQueueService {
         campaign_status: campaigns.status,
         campaign_company_id: campaigns.companyId
       })
-      .from(campaignQueue)
-      .leftJoin(campaigns, eq(campaignQueue.campaignId, campaigns.id))
-      .where(and(
-        eq(campaignQueue.status, 'pending'),
-        lte(campaignQueue.scheduledFor, new Date()),
-        eq(campaigns.status, 'running')
-      ))
-      .orderBy(asc(campaignQueue.priority), asc(campaignQueue.scheduledFor))
-      .limit(50);
+        .from(campaignQueue)
+        .leftJoin(campaigns, eq(campaignQueue.campaignId, campaigns.id))
+        .where(and(
+          eq(campaignQueue.status, 'pending'),
+          lte(campaignQueue.scheduledFor, new Date()),
+          eq(campaigns.status, 'running')
+        ))
+        .orderBy(asc(campaignQueue.priority), asc(campaignQueue.scheduledFor))
+        .limit(50);
 
 
       if (queueItems.length === 0) {
@@ -234,7 +236,7 @@ export class CampaignQueueService {
       }
 
 
-      
+
       const itemsByCompany = this.groupItemsByCompany(queueItems);
 
 
@@ -243,6 +245,10 @@ export class CampaignQueueService {
       }
 
     } catch (error) {
+      if ((error as any)?.code === '42P01') {
+        console.warn('[Campaign Queue] Tables not ready yet (42P01). Waiting for migrations...');
+        return;
+      }
       console.error('Failed to process queue:', error);
     }
   }
@@ -279,7 +285,7 @@ export class CampaignQueueService {
 
   private async getCampaignChannelConnection(campaignId: number): Promise<ChannelConnection | null> {
     try {
-      
+
       const [campaign] = await getDb().select({
         id: campaigns.id,
         channelId: campaigns.channelId,
@@ -288,8 +294,8 @@ export class CampaignQueueService {
         companyId: campaigns.companyId,
         antiBanSettings: campaigns.antiBanSettings
       })
-      .from(campaigns)
-      .where(eq(campaigns.id, campaignId));
+        .from(campaigns)
+        .where(eq(campaigns.id, campaignId));
 
       if (!campaign) {
         return null;
@@ -298,16 +304,16 @@ export class CampaignQueueService {
       const channelIds = campaign.channelIds as number[] || [];
       const antiBanSettings = campaign.antiBanSettings as any || {};
 
-      
-     
-      
+
+
+
       if (channelIds.length > 0 && antiBanSettings.accountRotation) {
-      
+
         const selectedChannelId = await this.selectOptimalAccount(channelIds, campaign.companyId, antiBanSettings);
 
         if (!selectedChannelId) {
-    
-          
+
+
           if (campaign.channelId) {
             const [fallbackConnection] = await getDb().select()
               .from(channelConnections)
@@ -324,7 +330,7 @@ export class CampaignQueueService {
           return null;
         }
 
-        
+
         const [channelConnection] = await getDb().select()
           .from(channelConnections)
           .where(and(
@@ -339,12 +345,12 @@ export class CampaignQueueService {
         return channelConnection as ChannelConnection;
       }
 
-      
+
       if (!campaign.channelId) {
         return null;
       }
 
-      
+
       const [channelConnection] = await getDb().select()
         .from(channelConnections)
         .where(and(
@@ -356,7 +362,7 @@ export class CampaignQueueService {
         return null;
       }
 
-      
+
       if (!channelConnection.channelType.includes('whatsapp')) {
         return null;
       }
@@ -372,7 +378,7 @@ export class CampaignQueueService {
     try {
 
       if (!channelIds || channelIds.length === 0) {
-        
+
         return null;
       }
 
@@ -409,34 +415,34 @@ export class CampaignQueueService {
       }
 
       if (availableAccounts.length === 0) {
-        
+
         return null;
       }
 
 
-      
+
       if (!antiBanSettings.mode || antiBanSettings.mode === 'simple') {
         const selectedAccount = availableAccounts[Math.floor(Math.random() * availableAccounts.length)];
         return selectedAccount.id;
       }
 
-      
+
       const accountsWithStats = await Promise.all(
         availableAccounts.map(async (account) => {
           try {
-            
+
             const allMessages = await getDb().select({
               completedAt: campaignQueue.completedAt
             })
-            .from(campaignQueue)
-            .leftJoin(campaigns, eq(campaignQueue.campaignId, campaigns.id))
-            .where(and(
-              eq(campaignQueue.accountId, account.id),
-              eq(campaignQueue.status, 'completed'),
-              eq(campaigns.companyId, companyId)
-            ));
+              .from(campaignQueue)
+              .leftJoin(campaigns, eq(campaignQueue.campaignId, campaigns.id))
+              .where(and(
+                eq(campaignQueue.accountId, account.id),
+                eq(campaignQueue.status, 'completed'),
+                eq(campaigns.companyId, companyId)
+              ));
 
-            
+
             const now = new Date();
             const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             const hourStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours());
@@ -449,17 +455,17 @@ export class CampaignQueueService {
               if (message.completedAt) {
                 const completedAt = new Date(message.completedAt);
 
-                
+
                 if (completedAt >= todayStart) {
                   messageCountToday++;
                 }
 
-                
+
                 if (completedAt >= hourStart) {
                   messageCountHour++;
                 }
 
-                
+
                 if (!lastMessageAt || completedAt > lastMessageAt) {
                   lastMessageAt = completedAt;
                 }
@@ -485,48 +491,48 @@ export class CampaignQueueService {
       );
 
       if (accountsWithStats.length === 0) {
-        
+
         return null;
       }
 
-      
+
       const scoredAccounts = accountsWithStats.map(account => {
-        let score = 100; 
+        let score = 100;
 
         const messageCountToday = account.messageCountToday || 0;
         const messageCountHour = account.messageCountHour || 0;
         const lastMessageAt = account.lastMessageAt ? new Date(account.lastMessageAt) : null;
 
-        
+
         const rateLimits = this.getRateLimitsForMode(antiBanSettings.mode);
 
 
-        
+
         if (messageCountToday > rateLimits.maxPerDay * 0.8) {
-          score -= 50; 
+          score -= 50;
         } else if (messageCountToday > rateLimits.maxPerDay * 0.6) {
-          score -= 25; 
+          score -= 25;
         }
 
-        
+
         if (messageCountHour > rateLimits.maxPerHour * 0.8) {
           score -= 40;
         } else if (messageCountHour > rateLimits.maxPerHour * 0.6) {
           score -= 20;
         }
 
-        
+
         if (lastMessageAt) {
           const timeSinceLastMessage = Date.now() - lastMessageAt.getTime();
-          const cooldownPeriod = (antiBanSettings.cooldownPeriod || 30) * 60 * 1000; 
+          const cooldownPeriod = (antiBanSettings.cooldownPeriod || 30) * 60 * 1000;
 
           if (timeSinceLastMessage > cooldownPeriod) {
-            score += 20; 
+            score += 20;
           } else if (timeSinceLastMessage < cooldownPeriod * 0.5) {
-            score -= 15; 
+            score -= 15;
           }
         } else {
-          score += 30; 
+          score += 30;
         }
 
         return {
@@ -538,17 +544,17 @@ export class CampaignQueueService {
         };
       });
 
-      
+
       const eligibleAccounts = scoredAccounts.filter(account => {
         const rateLimits = this.getRateLimitsForMode(antiBanSettings.mode);
         return account.messageCountToday < rateLimits.maxPerDay &&
-               account.messageCountHour < rateLimits.maxPerHour;
+          account.messageCountHour < rateLimits.maxPerHour;
       });
 
       if (eligibleAccounts.length === 0) {
-        
 
-        
+
+
         if (scoredAccounts.length > 0) {
           scoredAccounts.sort((a, b) => a.messageCountToday - b.messageCountToday);
           const fallbackAccount = scoredAccounts[0];
@@ -559,7 +565,7 @@ export class CampaignQueueService {
         return null;
       }
 
-      
+
       eligibleAccounts.sort((a, b) => b.score - a.score);
       const selectedAccount = eligibleAccounts[0];
 
@@ -568,10 +574,10 @@ export class CampaignQueueService {
     } catch (error) {
       console.error('❌ Failed to select optimal account:', error);
 
-      
+
       try {
 
-        
+
         for (const channelId of channelIds) {
           try {
             const fallbackAccount = await getDb().select()
@@ -616,7 +622,7 @@ export class CampaignQueueService {
   private async processCompanyItems(companyId: number, items: QueueItem[]): Promise<void> {
     try {
 
-      
+
       const itemsByCampaign = this.groupItemsByCampaign(items);
 
 
@@ -653,36 +659,36 @@ export class CampaignQueueService {
       }
 
 
-      
+
       const recipientIds = items.map(item => item.recipient_id);
       const recipientData = await this.getRecipientsData(recipientIds);
       const recipientMap = new Map(recipientData.map(r => [r.id, r]));
 
-      
+
       const [campaignForSettings] = await getDb().select({
         antiBanSettings: campaigns.antiBanSettings
       })
-      .from(campaigns)
-      .where(eq(campaigns.id, campaignId));
+        .from(campaigns)
+        .where(eq(campaigns.id, campaignId));
 
       const antiBanSettings = campaignForSettings?.antiBanSettings as any || {};
 
-      
+
       for (let i = 0; i < items.length; i += BATCH_SIZE) {
         const batch = items.slice(i, i + BATCH_SIZE);
 
 
-        
+
         for (const item of batch) {
           try {
             const recipient = recipientMap.get(item.recipient_id);
             if (!recipient) {
-              
+
               await this.markItemAsFailed(item.id, 'Recipient not found');
               continue;
             }
 
-            
+
             await getDb().update(campaignQueue)
               .set({
                 accountId: channelConnection.id,
@@ -691,13 +697,13 @@ export class CampaignQueueService {
               })
               .where(eq(campaignQueue.id, item.id));
 
-            
+
             await this.processQueueItemWithData({
               ...item,
               account_id: channelConnection.id
             }, channelConnection, recipient);
 
-            
+
             await this.addConnectionDelay(channelConnection.id, antiBanSettings);
 
           } catch (error) {
@@ -706,7 +712,7 @@ export class CampaignQueueService {
           }
         }
 
-        
+
         if (i + BATCH_SIZE < items.length) {
           await new Promise(resolve => setTimeout(resolve, BATCH_DELAY));
         }
@@ -764,7 +770,7 @@ export class CampaignQueueService {
         allVariables
       );
 
-      
+
       const updatedMetadata: CampaignQueueMetadata = {
         ...(queueItem.metadata as CampaignQueueMetadata || {}),
         content: personalizedContent,
@@ -899,7 +905,7 @@ export class CampaignQueueService {
             throw new Error(`Unsupported channel type: ${connection.channelType}`);
           }
 
-          
+
           personalizedContent = '';
         }
 
@@ -1065,16 +1071,16 @@ export class CampaignQueueService {
 
         const components: any[] = [];
         const templateVariables = (templateData.variables as string[]) || [];
-        
+
 
         let templateMediaUrls = (templateData.mediaUrls as string[]) || [];
         const campaignMediaUrls = (campaignData.mediaUrls as string[]) || [];
-        
+
 
         const mediaUrls = campaignMediaUrls.length > 0 ? campaignMediaUrls : templateMediaUrls;
         const mediaHandle = templateData.mediaHandle; // Get stored media handle from template
 
-        
+
 
 
         const hasMediaHandle = !!mediaHandle;
@@ -1090,7 +1096,7 @@ export class CampaignQueueService {
         if (hasAnyMedia) {
 
           let headerFormat = 'IMAGE'; // Default to IMAGE
-          
+
 
           if (mediaUrls.length > 0) {
             const urlLower = mediaUrls[0].toLowerCase();
@@ -1108,7 +1114,7 @@ export class CampaignQueueService {
 
 
           const isMediaHandleUrl = mediaHandle && (mediaHandle.startsWith('http://') || mediaHandle.startsWith('https://'));
-          
+
           if (isMediaHandleUrl) {
             console.warn('[Campaign Queue] mediaHandle is a URL, not a media ID. Moving to mediaUrls for upload.');
 
@@ -1121,7 +1127,7 @@ export class CampaignQueueService {
 
 
 
-            
+
             components.push({
               type: 'header',
               parameters: [{
@@ -1178,7 +1184,7 @@ export class CampaignQueueService {
 
             } catch (uploadError: any) {
               console.error('[Campaign Queue] Failed to upload media, trying with link as fallback:', uploadError.message);
-              
+
 
               components.push({
                 type: 'header',
@@ -1199,7 +1205,7 @@ export class CampaignQueueService {
               mediaUrls: templateData.mediaUrls,
               mediaHandle: templateData.mediaHandle
             });
-            
+
             throw new Error(`Template "${templateData.whatsappTemplateName}" requires media in header, but no media URL or media handle is configured. Please upload media for this template or select a different template.`);
           }
         }
@@ -1284,12 +1290,12 @@ export class CampaignQueueService {
           };
         } catch (error: any) {
           console.error(`[Campaign Queue] Error sending template message:`, error);
-          
+
 
           if (error.response?.data) {
             console.error('[Campaign Queue] WhatsApp API Error Response:', JSON.stringify(error.response.data, null, 2));
           }
-          
+
 
           console.error('[Campaign Queue] Failed template payload:', JSON.stringify({
             templateName: templateData.whatsappTemplateName,
@@ -1299,11 +1305,11 @@ export class CampaignQueueService {
             hasMediaComponent: components.some((c: any) => c.type === 'header'),
             components: components
           }, null, 2));
-          
+
 
           const errorMessage = error.message || '';
           const errorDetails = error.response?.data?.error?.error_data?.details || '';
-          
+
           if (errorMessage.includes('#132012') || errorDetails.includes('Format mismatch')) {
 
             console.error('\n❌ MEDIA HEADER MISSING ERROR DETECTED ❌');
@@ -1324,7 +1330,7 @@ export class CampaignQueueService {
             console.error('\nOR add media to campaign:');
             console.error(`   UPDATE campaigns SET media_urls = '["https://your-domain.com/image.jpg"]'::jsonb WHERE id = ${queueItem.campaign_id};`);
             console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
-            
+
 
             throw new Error(
               `Template "${templateData.whatsappTemplateName}" requires media header but none configured. ` +
@@ -1332,7 +1338,7 @@ export class CampaignQueueService {
               `See logs above for detailed instructions.`
             );
           }
-          
+
           throw error;
         }
       }
@@ -1403,7 +1409,7 @@ export class CampaignQueueService {
           personalizedContent = '';
         }
 
-        
+
         if (personalizedContent.trim()) {
           if (channelConnection.channelType === 'whatsapp_unofficial') {
             result = await whatsappService.sendWhatsAppMessage(
@@ -1451,7 +1457,7 @@ export class CampaignQueueService {
       }
 
 
-      
+
       await getDb().update(campaignQueue)
         .set({
           status: 'completed',
@@ -1459,7 +1465,7 @@ export class CampaignQueueService {
         })
         .where(eq(campaignQueue.id, queueItem.id));
 
-      
+
       await getDb().update(campaignRecipients)
         .set({
           status: 'sent',
@@ -1467,10 +1473,10 @@ export class CampaignQueueService {
         })
         .where(eq(campaignRecipients.id, queueItem.recipient_id));
 
-      
+
       await this.updateCampaignStatistics(queueItem.campaign_id);
 
-      
+
       const progressStats = await this.getCampaignProgress(queueItem.campaign_id);
 
 
@@ -1516,9 +1522,9 @@ export class CampaignQueueService {
         name: contacts.name,
         email: contacts.email
       })
-      .from(campaignRecipients)
-      .leftJoin(contacts, eq(campaignRecipients.contactId, contacts.id))
-      .where(inArray(campaignRecipients.id, recipientIds));
+        .from(campaignRecipients)
+        .leftJoin(contacts, eq(campaignRecipients.contactId, contacts.id))
+        .where(inArray(campaignRecipients.id, recipientIds));
 
       return recipients.map(r => ({
         id: r.id,
@@ -1568,7 +1574,7 @@ export class CampaignQueueService {
       const maxAttempts = queueItem.max_attempts || 3;
 
       if (attempts >= maxAttempts) {
-        
+
         await getDb().update(campaignQueue)
           .set({
             status: 'failed',
@@ -1578,7 +1584,7 @@ export class CampaignQueueService {
           })
           .where(eq(campaignQueue.id, queueItem.id));
 
-        
+
         await getDb().update(campaignRecipients)
           .set({
             status: 'failed',
@@ -1587,20 +1593,20 @@ export class CampaignQueueService {
           })
           .where(eq(campaignRecipients.id, queueItem.recipient_id));
 
-        
+
         await this.updateCampaignStatistics(queueItem.campaign_id);
 
-        
+
         const [campaignData] = await getDb().select({
           id: campaigns.id,
           name: campaigns.name,
           companyId: campaigns.companyId
         })
-        .from(campaigns)
-        .where(eq(campaigns.id, queueItem.campaign_id));
+          .from(campaigns)
+          .where(eq(campaigns.id, queueItem.campaign_id));
 
         if (campaignData) {
-          
+
           const progressStats = await this.getCampaignProgress(queueItem.campaign_id);
 
 
@@ -1616,8 +1622,8 @@ export class CampaignQueueService {
         }
 
       } else {
-        
-        const retryDelay = Math.pow(2, attempts) * 60000; 
+
+        const retryDelay = Math.pow(2, attempts) * 60000;
         const retryTime = new Date(Date.now() + retryDelay);
 
         await getDb().update(campaignQueue)
@@ -1638,50 +1644,50 @@ export class CampaignQueueService {
 
   private async addConnectionDelay(_connectionId: number, antiBanSettings?: any): Promise<void> {
     try {
-      let baseDelay = 6000; 
-      let randomRange = [1000, 3000]; 
+      let baseDelay = 6000;
+      let randomRange = [1000, 3000];
 
-      
+
       if (antiBanSettings) {
         if (antiBanSettings.randomizeDelay) {
-          const minDelay = (antiBanSettings.minDelay || 3) * 1000; 
-          const maxDelay = (antiBanSettings.maxDelay || 15) * 1000; 
+          const minDelay = (antiBanSettings.minDelay || 3) * 1000;
+          const maxDelay = (antiBanSettings.maxDelay || 15) * 1000;
           randomRange = [minDelay, maxDelay];
-          baseDelay = 0; 
+          baseDelay = 0;
         }
 
-        
+
         switch (antiBanSettings.mode) {
           case 'conservative':
-            baseDelay = Math.max(baseDelay, 10000); 
+            baseDelay = Math.max(baseDelay, 10000);
             break;
           case 'moderate':
-            baseDelay = Math.max(baseDelay, 6000); 
+            baseDelay = Math.max(baseDelay, 6000);
             break;
           case 'aggressive':
-            baseDelay = Math.max(baseDelay, 3000); 
+            baseDelay = Math.max(baseDelay, 3000);
             break;
         }
 
-        
+
         if (antiBanSettings.businessHoursOnly) {
           const now = new Date();
           const hour = now.getHours();
 
-          
+
           if (hour < 9 || hour >= 18) {
-            baseDelay += 300000; 
+            baseDelay += 300000;
           }
         }
 
-        
+
         if (antiBanSettings.respectWeekends) {
           const now = new Date();
           const dayOfWeek = now.getDay();
 
-          
+
           if (dayOfWeek === 0 || dayOfWeek === 6) {
-            baseDelay += 600000; 
+            baseDelay += 600000;
           }
         }
       }
@@ -1698,9 +1704,9 @@ export class CampaignQueueService {
     }
   }
 
-  
-  
-  
+
+
+
 
   private async recordAnalyticsSnapshots(): Promise<void> {
 
@@ -1710,7 +1716,7 @@ export class CampaignQueueService {
     }
 
     try {
-      
+
       const runningCampaigns = await getDb().select()
         .from(campaigns)
         .where(eq(campaigns.status, 'running'));
@@ -1736,13 +1742,13 @@ export class CampaignQueueService {
     }
 
     try {
-      
+
       const potentiallyCompletedCampaigns = await getDb().select()
         .from(campaigns)
         .where(eq(campaigns.status, 'running'));
       for (const campaign of potentiallyCompletedCampaigns) {
         try {
-          
+
           const queueStats = await getDb().select({
             total: sql`COUNT(*)`,
             pending: sql`COUNT(*) FILTER (WHERE status = 'pending')`,
@@ -1751,8 +1757,8 @@ export class CampaignQueueService {
             failed: sql`COUNT(*) FILTER (WHERE status = 'failed')`,
             cancelled: sql`COUNT(*) FILTER (WHERE status = 'cancelled')`
           })
-          .from(campaignQueue)
-          .where(eq(campaignQueue.campaignId, campaign.id));
+            .from(campaignQueue)
+            .where(eq(campaignQueue.campaignId, campaign.id));
 
           const stats = queueStats[0];
           if (!stats) {
@@ -1766,11 +1772,11 @@ export class CampaignQueueService {
           const failedItems = parseInt(String(stats.failed));
 
 
-          
+
           const activePendingItems = pendingItems + processingItems;
 
           if (totalItems > 0 && activePendingItems === 0) {
-            
+
             await getDb().update(campaigns)
               .set({
                 status: 'completed',
@@ -1778,11 +1784,11 @@ export class CampaignQueueService {
               })
               .where(eq(campaigns.id, campaign.id));
 
-            
+
             await this.campaignService.recordAnalyticsSnapshot(campaign.id);
 
 
-            
+
             CampaignEventEmitter.emitCampaignCompleted(
               campaign.id,
               campaign.companyId,
@@ -1799,13 +1805,17 @@ export class CampaignQueueService {
         }
       }
     } catch (error) {
+      if ((error as any)?.code === '42P01') {
+        // Silent return or debug log, avoid error spam
+        return;
+      }
       console.error('Failed to check campaign completion:', error);
     }
   }
 
-  
-  
-  
+
+
+
 
   public async getQueueStats(companyId: number): Promise<CampaignStats> {
     try {
@@ -1817,9 +1827,9 @@ export class CampaignQueueService {
         failed: sql`COUNT(*) FILTER (WHERE status = 'failed')`,
         cancelled: sql`COUNT(*) FILTER (WHERE status = 'cancelled')`
       })
-      .from(campaignQueue)
-      .leftJoin(campaigns, eq(campaignQueue.campaignId, campaigns.id))
-      .where(eq(campaigns.companyId, companyId));
+        .from(campaignQueue)
+        .leftJoin(campaigns, eq(campaignQueue.campaignId, campaigns.id))
+        .where(eq(campaigns.companyId, companyId));
 
       const result = stats[0];
       if (!result) {
@@ -1931,21 +1941,21 @@ export class CampaignQueueService {
     }
   }
 
-  
-  
-  
+
+
+
 
   private async updateCampaignStatistics(campaignId: number): Promise<void> {
     try {
-      
+
       const recipientStats = await getDb().select({
         total: sql`COUNT(*)`,
         sent: sql`COUNT(*) FILTER (WHERE status IN ('sent', 'delivered', 'read'))`,
         failed: sql`COUNT(*) FILTER (WHERE status = 'failed')`,
         pending: sql`COUNT(*) FILTER (WHERE status IN ('pending', 'processing'))`
       })
-      .from(campaignRecipients)
-      .where(eq(campaignRecipients.campaignId, campaignId));
+        .from(campaignRecipients)
+        .where(eq(campaignRecipients.campaignId, campaignId));
 
       const stats = recipientStats[0];
       const totalRecipients = parseInt(String(stats.total)) || 0;
@@ -1953,7 +1963,7 @@ export class CampaignQueueService {
       const failedSends = parseInt(String(stats.failed)) || 0;
       const processedRecipients = successfulSends + failedSends;
 
-      
+
       await getDb().update(campaigns)
         .set({
           totalRecipients,
@@ -1969,9 +1979,9 @@ export class CampaignQueueService {
     }
   }
 
-  
-  
-  
+
+
+
 
   private async getCampaignProgress(campaignId: number): Promise<{
     totalRecipients: number;
@@ -1981,15 +1991,15 @@ export class CampaignQueueService {
     progressPercentage: number;
   }> {
     try {
-      
+
       const [campaign] = await getDb().select({
         totalRecipients: campaigns.totalRecipients,
         processedRecipients: campaigns.processedRecipients,
         successfulSends: campaigns.successfulSends,
         failedSends: campaigns.failedSends
       })
-      .from(campaigns)
-      .where(eq(campaigns.id, campaignId));
+        .from(campaigns)
+        .where(eq(campaigns.id, campaignId));
 
       if (!campaign) {
         throw new Error('Campaign not found');
@@ -2023,14 +2033,14 @@ export class CampaignQueueService {
     }
   }
 
-  
-  
-  
-  
 
-  
-  
-  
+
+
+
+
+
+
+
 
   /**
    * NEW: Concurrent queue processing method
@@ -2058,15 +2068,15 @@ export class CampaignQueueService {
         campaign_status: campaigns.status,
         campaign_company_id: campaigns.companyId
       })
-      .from(campaignQueue)
-      .leftJoin(campaigns, eq(campaignQueue.campaignId, campaigns.id))
-      .where(and(
-        eq(campaignQueue.status, 'pending'),
-        lte(campaignQueue.scheduledFor, new Date()),
-        eq(campaigns.status, 'running')
-      ))
-      .orderBy(asc(campaignQueue.priority), asc(campaignQueue.scheduledFor))
-      .limit(100); // Increased limit for concurrent processing
+        .from(campaignQueue)
+        .leftJoin(campaigns, eq(campaignQueue.campaignId, campaigns.id))
+        .where(and(
+          eq(campaignQueue.status, 'pending'),
+          lte(campaignQueue.scheduledFor, new Date()),
+          eq(campaigns.status, 'running')
+        ))
+        .orderBy(asc(campaignQueue.priority), asc(campaignQueue.scheduledFor))
+        .limit(100); // Increased limit for concurrent processing
 
 
 
@@ -2078,21 +2088,21 @@ export class CampaignQueueService {
 
 
       const itemsByConnection = await this.groupItemsByConnection(queueItems);
-      
+
 
       const connectionIds = Array.from(itemsByConnection.keys());
       const connectionBatches = [];
-      
+
       for (let i = 0; i < connectionIds.length; i += this.maxConcurrentConnections) {
         connectionBatches.push(connectionIds.slice(i, i + this.maxConcurrentConnections));
       }
 
 
       for (const batch of connectionBatches) {
-        const processingPromises = batch.map(connectionId => 
+        const processingPromises = batch.map(connectionId =>
           this.processConnectionItems(connectionId, itemsByConnection.get(connectionId)!)
         );
-        
+
         try {
           await Promise.allSettled(processingPromises);
         } catch (error) {
@@ -2101,6 +2111,10 @@ export class CampaignQueueService {
       }
 
     } catch (error) {
+      if ((error as any)?.code === '42P01') {
+        // Silent return or debug log
+        return;
+      }
       console.error('Failed to process concurrent queue:', error);
     }
   }
@@ -2230,36 +2244,36 @@ export class CampaignQueueService {
   private canProcessConnection(pool: ConnectionProcessingPool): boolean {
     const now = new Date();
     const rateLimiter = pool.rateLimiter;
-    
+
 
     if (now.getTime() - rateLimiter.lastHourReset.getTime() > 3600000) {
       rateLimiter.hourlyCount = 0;
       rateLimiter.lastHourReset = now;
     }
-    
+
 
     if (now.getTime() - rateLimiter.lastDayReset.getTime() > 86400000) {
       rateLimiter.dailyCount = 0;
       rateLimiter.lastDayReset = now;
     }
-    
+
 
     const maxPerMinute = 10;
     const maxPerHour = 300;
     const maxPerDay = 5000;
     const minDelayBetweenMessages = 2000; // 2 seconds
-    
+
 
     const timeSinceLastMessage = now.getTime() - rateLimiter.lastSentAt.getTime();
     if (timeSinceLastMessage < minDelayBetweenMessages) {
       return false;
     }
-    
+
 
     if (rateLimiter.hourlyCount >= maxPerHour || rateLimiter.dailyCount >= maxPerDay) {
       return false;
     }
-    
+
     return true;
   }
 
@@ -2341,7 +2355,7 @@ export class CampaignQueueService {
             await this.handleItemFailure(item, error instanceof Error ? error.message : 'Unknown error');
           }
         }
-        
+
 
         if (i + BATCH_SIZE < items.length) {
           await new Promise(resolve => setTimeout(resolve, 1000));
@@ -2349,11 +2363,11 @@ export class CampaignQueueService {
       }
 
 
-      
+
     } catch (error) {
       console.error(`Error in connection batch processing for connection ${connectionId}:`, error);
       await this.markItemsAsFailed(
-        items.map(item => item.id), 
+        items.map(item => item.id),
         `Connection batch processing error: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
@@ -2365,25 +2379,25 @@ export class CampaignQueueService {
   private cleanupInactivePools(): void {
     const now = new Date();
     const maxInactiveTime = 300000; // 5 minutes
-    
+
     const poolsToDelete: number[] = [];
-    
+
     this.connectionPools.forEach((pool, connectionId) => {
       const timeSinceLastProcessing = now.getTime() - pool.lastProcessedAt.getTime();
-      
+
       if (!pool.isProcessing && timeSinceLastProcessing > maxInactiveTime) {
         poolsToDelete.push(connectionId);
       }
     });
-    
+
     poolsToDelete.forEach(connectionId => {
       this.connectionPools.delete(connectionId);
 
     });
   }
 
-  public getProcessingStatus(): { 
-    isProcessing: boolean; 
+  public getProcessingStatus(): {
+    isProcessing: boolean;
     accountRotationSize: number;
     concurrentConnections: number;
     activePools: number;
@@ -2400,9 +2414,9 @@ export class CampaignQueueService {
     this.accountRotation.clear();
   }
 
-  
-  
-  
+
+
+
 
   private getMediaTypeFromUrl(mediaUrl: string): 'image' | 'video' | 'audio' | 'document' {
     const urlPath = mediaUrl.toLowerCase();
@@ -2419,9 +2433,9 @@ export class CampaignQueueService {
   }
 
   private getMediaPathFromUrl(mediaUrl: string): string {
-    
-    
-    
+
+
+
     const relativePath = mediaUrl.startsWith('/') ? mediaUrl.slice(1) : mediaUrl;
     return path.join(process.cwd(), relativePath);
   }
@@ -2460,10 +2474,10 @@ export class CampaignQueueService {
 
       const formData = new FormData();
       formData.append('messaging_product', 'whatsapp');
-      
+
       const fileExtension = this.getFileExtension(mediaUrl);
       const contentType = mediaResponse.headers['content-type'] || this.getContentTypeFromExtension(fileExtension);
-      
+
       formData.append('file', Buffer.from(mediaResponse.data), {
         filename: `campaign_media.${fileExtension}`,
         contentType: contentType

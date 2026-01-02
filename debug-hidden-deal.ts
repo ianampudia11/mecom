@@ -18,9 +18,14 @@ async function main() {
 
         console.log(`DEAL 2 STAGE ID: ${deal.stageId}`);
 
+        if (!deal.stageId) {
+            console.log("Deal has no stage ID assigned.");
+            process.exit(0);
+        }
+
         // Get Stage info
         const stage = await db.query.pipelineStages.findFirst({
-            where: (s, { eq }) => eq(s.id, deal.stageId)
+            where: (s, { eq }) => eq(s.id, deal.stageId!)
         });
 
         console.log(`STAGE INFO: ID=${stage?.id}, Name=${stage?.name}, PipelineID=${stage?.pipelineId}`);

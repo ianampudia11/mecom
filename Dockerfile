@@ -46,7 +46,7 @@ ARG ADMIN_EMAIL="admin@powerchatapp.net"
 ARG COMPANY_NAME="PowerChat"
 ARG INSTANCE_NAME="default"
 
-# Build the application
+# Build the application - CACHE BUSTER: 2026-01-02-1715
 RUN npm run build
 
 # Perform string replacements in built files

@@ -18,7 +18,7 @@ ENV APP_PORT=9000
 COPY package*.json ./
 RUN npm ci --omit=dev --include=optional
 
-# Copy the pre-built application
+# Copy the pre-built application - CACHE BUSTER: 2026-01-02-1715
 COPY dist/ ./dist/
 COPY migrations/ ./migrations/
 
