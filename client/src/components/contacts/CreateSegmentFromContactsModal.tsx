@@ -20,6 +20,7 @@ interface CreateSegmentFromContactsModalProps {
   onClose: () => void;
   selectedContactIds: number[];
   onSegmentCreated: (segment: any) => void;
+  onSuccessAction?: 'default' | 'campaign';
 }
 
 interface FormData {
@@ -37,7 +38,8 @@ export function CreateSegmentFromContactsModal({
   isOpen,
   onClose,
   selectedContactIds,
-  onSegmentCreated
+  onSegmentCreated,
+  onSuccessAction
 }: CreateSegmentFromContactsModalProps) {
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -117,12 +119,23 @@ export function CreateSegmentFromContactsModal({
 
       const data = await response.json();
       if (data.success) {
+        onSegmentCreated(data.data);
+
+        if (onSuccessAction === 'campaign') {
+          toast({
+            title: t('common.success', 'Success'),
+            description: t('contacts.redirecting_to_campaign', 'Segment created, redirecting to campaign builder...'),
+          });
+          setLocation(`/campaigns/new?segmentId=${data.data.id}`);
+          onClose(); // Close strictly, preventing success state flicker
+          return;
+        }
+
         setSuccessState({
           isVisible: true,
           segmentName: formData.name,
           segmentId: data.data.id
         });
-        onSegmentCreated(data.data);
       } else {
         throw new Error(data.error);
       }
@@ -134,6 +147,8 @@ export function CreateSegmentFromContactsModal({
         variant: 'destructive'
       });
     } finally {
+      // Only reset loading if we didn't redirect (if we redirected, component might unmount or we want to prevent interactions)
+      // Actually safe to reset here.
       setIsLoading(false);
     }
   };
@@ -161,7 +176,7 @@ export function CreateSegmentFromContactsModal({
                   name: successState.segmentName
                 })}
               </h3>
-              
+
             </div>
 
             <div className="flex justify-center gap-3">
@@ -183,78 +198,78 @@ export function CreateSegmentFromContactsModal({
         ) : (
 
           <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Selected Contacts Summary */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div className="flex items-center gap-2 text-blue-800">
-              <CheckCircle className="w-4 h-4" />
-              <span className="font-medium">
-                {t('segments.create_from_contacts.selected_count', '{{count}} contacts selected', {
-                  count: selectedContactIds.length
-                })}
-              </span>
+            {/* Selected Contacts Summary */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-center gap-2 text-blue-800">
+                <CheckCircle className="w-4 h-4" />
+                <span className="font-medium">
+                  {t('segments.create_from_contacts.selected_count', '{{count}} contacts selected', {
+                    count: selectedContactIds.length
+                  })}
+                </span>
+              </div>
+              <p className="text-sm text-blue-600 mt-1">
+                {t('segments.create_from_contacts.selected_description', 'These contacts will be included in the new segment')}
+              </p>
             </div>
-            <p className="text-sm text-blue-600 mt-1">
-              {t('segments.create_from_contacts.selected_description', 'These contacts will be included in the new segment')}
-            </p>
-          </div>
 
-          <Separator />
+            <Separator />
 
-          {/* Form Fields */}
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="name">{t('segments.create.name_label', 'Segment Name')}</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                placeholder={t('segments.create.name_placeholder', 'e.g., VIP Customers, New Leads')}
-                required
+            {/* Form Fields */}
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="name">{t('segments.create.name_label', 'Segment Name')}</Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder={t('segments.create.name_placeholder', 'e.g., VIP Customers, New Leads')}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="description">{t('segments.create.description_label', 'Description (Optional)')}</Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder={t('segments.create.description_placeholder', 'Describe this segment...')}
+                  rows={3}
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex justify-end gap-3 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleClose}
                 disabled={isLoading}
-              />
+              >
+                {t('common.cancel', 'Cancel')}
+              </Button>
+              <Button
+                type="submit"
+                disabled={isLoading || !formData.name.trim()}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    {t('segments.create.creating', 'Creating...')}
+                  </>
+                ) : (
+                  <>
+                    <Users className="w-4 h-4 mr-2" />
+                    {t('segments.create.create_segment', 'Create Segment')}
+                  </>
+                )}
+              </Button>
             </div>
-
-            <div>
-              <Label htmlFor="description">{t('segments.create.description_label', 'Description (Optional)')}</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder={t('segments.create.description_placeholder', 'Describe this segment...')}
-                rows={3}
-                disabled={isLoading}
-              />
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex justify-end gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleClose}
-              disabled={isLoading}
-            >
-              {t('common.cancel', 'Cancel')}
-            </Button>
-            <Button
-              type="submit"
-              disabled={isLoading || !formData.name.trim()}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  {t('segments.create.creating', 'Creating...')}
-                </>
-              ) : (
-                <>
-                  <Users className="w-4 h-4 mr-2" />
-                  {t('segments.create.create_segment', 'Create Segment')}
-                </>
-              )}
-            </Button>
-          </div>
-        </form>
+          </form>
         )}
       </DialogContent>
     </Dialog>

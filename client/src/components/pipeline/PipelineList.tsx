@@ -219,13 +219,19 @@ const TagPropertyManager = ({ deal, onUpdateTags, onLinkProperty, onUnlinkProper
     const [tagSearch, setTagSearch] = useState("");
     const [propSearch, setPropSearch] = useState("");
 
-    // Fetch available tags
-    const { data: availableTags = [] } = useQuery({
-        queryKey: ['/api/contacts/tags'],
-        queryFn: () => fetch('/api/contacts/tags').then(res => res.json()).then(data => Array.isArray(data) ? data : []),
-        staleTime: 60000,
-        enabled: openTags
+    // Fetch tags with stats/colors
+    const { data: tagStats = [] } = useQuery<any[]>({
+        queryKey: ['/api/tags/stats'],
+        queryFn: async () => {
+            const res = await fetch('/api/tags/stats');
+            if (!res.ok) return [];
+            return await res.json();
+        },
+        staleTime: 60000
     });
+
+    const availableTags = tagStats.map((t: any) => t.tag);
+    const tagColorsMap = new Map(tagStats.map((t: any) => [t.tag, t.color]));
 
     // Fetch properties
     const { data: properties = [] } = useQuery({
@@ -254,44 +260,73 @@ const TagPropertyManager = ({ deal, onUpdateTags, onLinkProperty, onUnlinkProper
     };
 
     return (
-        <div className="flex flex-col gap-1 items-start w-full" onClick={e => e.stopPropagation()}>
+        <div className="flex flex-col gap-2" onClick={e => e.stopPropagation()}>
             {/* TAGS ROW */}
-            <Popover open={openTags} onOpenChange={setOpenTags}>
-                <PopoverTrigger asChild>
-                    <div className="flex flex-wrap gap-1 mb-1 min-h-[24px] w-full cursor-pointer hover:bg-gray-100 p-1 rounded transition-colors group">
-                        {currentTags.length > 0 ? (
-                            currentTags.map((tag, i) => (
-                                <ColoredTag key={i} name={tag} size="sm" />
-                            ))
-                        ) : (
-                            <span className="text-xs text-muted-foreground opacity-50 group-hover:opacity-100">Add tags...</span>
-                        )}
-                    </div>
-                </PopoverTrigger>
-                <PopoverContent className="w-[300px] p-0" align="start">
-                    <Command>
-                        <CommandInput placeholder="Search tags..." value={tagSearch} onValueChange={setTagSearch} />
-                        <CommandList>
-                            <CommandEmpty>
-                                {tagSearch && (
-                                    <div className="p-2 text-xs cursor-pointer hover:bg-accent flex items-center gap-2" onClick={handleAddTag}>
-                                        <Plus className="h-3 w-3" /> Create "{tagSearch}"
-                                    </div>
-                                )}
-                            </CommandEmpty>
-                            <CommandGroup heading="Available Tags">
-                                {availableTags.map((tag: string) => (
-                                    <CommandItem key={tag} value={tag} onSelect={() => toggleTag(tag)}>
-                                        <Check className={cn("mr-2 h-4 w-4", currentTags.includes(tag) ? "opacity-100" : "opacity-0")} />
-                                        <ColoredTag name={tag} size="sm" />
-                                    </CommandItem>
-                                ))}
-                            </CommandGroup>
-                        </CommandList>
-                    </Command>
-                </PopoverContent>
-            </Popover>
+            <div className="flex flex-wrap gap-1">
+                {currentTags.slice(0, 3).map((tag, i) => (
+                    <ColoredTag
+                        key={i}
+                        name={tag}
+                        color={tagColorsMap.get(tag) || undefined}
+                        size="sm"
+                    />
+                ))}
+                {currentTags.length > 3 && (
+                    <Badge variant="outline" className="text-xs">
+                        +{currentTags.length - 3}
+                    </Badge>
+                )}
 
+                <Popover open={openTags} onOpenChange={(open) => {
+                    setOpenTags(open);
+                    if (open) console.log('Popover opened');
+                }}>
+                    <PopoverTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-5 w-5 p-0 rounded-full">
+                            <Plus className="h-3 w-3" />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="p-0" side="right" align="start">
+                        <Command>
+                            <CommandInput
+                                placeholder="Add tag..."
+                                value={tagSearch}
+                                onValueChange={setTagSearch}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleAddTag();
+                                }}
+                            />
+                            <CommandList>
+                                <CommandEmpty>Press Enter to add "{tagSearch}"</CommandEmpty>
+                                <CommandGroup heading="Tags">
+                                    {availableTags.map((tag) => (
+                                        <CommandItem
+                                            key={tag}
+                                            value={tag}
+                                            onSelect={() => {
+                                                if (currentTags.includes(tag)) {
+                                                    onUpdateTags(currentTags.filter(t => t !== tag));
+                                                } else {
+                                                    onUpdateTags([...currentTags, tag]);
+                                                }
+                                            }}
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                {currentTags.includes(tag) && <Check className="h-4 w-4" />}
+                                                <ColoredTag
+                                                    name={tag}
+                                                    color={tagColorsMap.get(tag) || undefined}
+                                                    size="sm"
+                                                />
+                                            </div>
+                                        </CommandItem>
+                                    ))}
+                                </CommandGroup>
+                            </CommandList>
+                        </Command>
+                    </PopoverContent>
+                </Popover>
+            </div>
             {/* PROPERTIES ROW */}
             <Popover open={openProps} onOpenChange={setOpenProps}>
                 <PopoverTrigger asChild>

@@ -80,13 +80,14 @@ app.use((req, res, next) => {
     }
 
     // SKIP MIGRATIONS FOR LOCAL DEBUGGING - DB IS FIXED MANUALLY
-    console.log('DEBUG: Running pending migrations...');
-    await migrationSystem.runPendingMigrations();
-    logger.info('migration', 'Database migrations completed successfully');
+    console.log('DEBUG: Running pending migrations... SKIPPED');
+    // await migrationSystem.runPendingMigrations();
+    // logger.info('migration', 'Database migrations completed successfully');
   } catch (error) {
     logger.error('migration', 'Migration failed (but ignored for debug):', error);
     // process.exit(1); // Exit if migrations fail
   }
+  console.log('DEBUG: FINISHED MIGRATION CHECK BLOCK');
 
   console.log('DEBUG: Registering webhook routes...');
   const { registerWebhookRoutes } = await import("./webhook-routes");
@@ -98,25 +99,34 @@ app.use((req, res, next) => {
   const server = await registerRoutes(app);
   console.log('DEBUG: Routes registered');
 
+  console.log('DEBUG: Setting up security reporting...');
   setupSecurityReporting(app);
+  console.log('DEBUG: Security reporting set up');
+
+  // Error handling setup
+
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
-
+    console.error('Error handler caught:', err);
     if (!res.headersSent) {
       res.status(status).json({ message });
     }
-
-
-    console.error('Error handler:', err);
   });
 
-
   if (process.env.NODE_ENV === 'production') {
-
+    console.log('DEBUG: Production mode detected. Setting up license guard...');
     app.use(ensureLicenseValid);
-    serveStatic(app);
+    console.log('DEBUG: License guard set up. Serving static files...');
+    try {
+      serveStatic(app);
+      console.log('DEBUG: Static files serving set up');
+    } catch (e) {
+      console.error('DEBUG: Failed to setup static file serving:', e);
+      // Don't crash, just log? Or crash? Better to crash if critical.
+      throw e;
+    }
   }
 
 
@@ -124,7 +134,7 @@ app.use((req, res, next) => {
   const port = process.env.NODE_ENV === 'development' ? basePort + 100 : basePort;
 
 
-
+  console.log('DEBUG: ATTEMPTING LISTENER on port ' + port);
   server.listen({
     port,
     host: "0.0.0.0",

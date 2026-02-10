@@ -42,12 +42,12 @@ export class CampaignService {
 
   async createCampaign(companyId: number, userId: number, campaignData: Partial<InsertCampaign>): Promise<Campaign> {
     try {
-      
-      
+
+
 
       try {
         await this.checkCampaignLimitations(companyId);
-        
+
       } catch (limitError) {
         console.error('Campaign limitations check failed:', limitError);
         if (limitError instanceof Error) {
@@ -67,10 +67,10 @@ export class CampaignService {
 
       const [campaign] = await db.insert(campaigns).values(campaignInsertData).returning();
 
-      
+
 
       if (campaignData.segmentId) {
-        
+
         await this.populateCampaignRecipients(campaign.id, campaignData.segmentId);
       }
 
@@ -121,12 +121,12 @@ export class CampaignService {
         segmentName: contactSegments.name,
         creatorName: sql`users.full_name`
       })
-      .from(campaigns)
-      .leftJoin(campaignTemplates, eq(campaigns.templateId, campaignTemplates.id))
-      .leftJoin(contactSegments, eq(campaigns.segmentId, contactSegments.id))
-      .leftJoin(sql`users`, sql`campaigns.created_by_id = users.id`)
-      .where(and(...whereConditions))
-      .orderBy(desc(campaigns.createdAt));
+        .from(campaigns)
+        .leftJoin(campaignTemplates, eq(campaigns.templateId, campaignTemplates.id))
+        .leftJoin(contactSegments, eq(campaigns.segmentId, contactSegments.id))
+        .leftJoin(sql`users`, sql`campaigns.created_by_id = users.id`)
+        .where(and(...whereConditions))
+        .orderBy(desc(campaigns.createdAt));
 
       if (filters.limit && filters.offset) {
         return await baseQuery.limit(filters.limit).offset(filters.offset);
@@ -303,9 +303,9 @@ export class CampaignService {
       const segmentContacts = await this.getContactsBySegment(segment);
 
       const existingRecipients = await db.select({
-          contactId: campaignRecipients.contactId,
-          phone: contacts.phone
-        })
+        contactId: campaignRecipients.contactId,
+        phone: contacts.phone
+      })
         .from(campaignRecipients)
         .leftJoin(contacts, eq(campaignRecipients.contactId, contacts.id))
         .where(eq(campaignRecipients.campaignId, campaignId));
@@ -351,7 +351,7 @@ export class CampaignService {
         .set({ totalRecipients: recipients.length })
         .where(eq(campaigns.id, campaignId));
 
-      
+
       return recipients.length;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -381,18 +381,26 @@ export class CampaignService {
       whereConditions.push(sql`${contacts.phone} IS NOT NULL AND ${contacts.phone} != ''`);
       whereConditions.push(sql`LENGTH(REGEXP_REPLACE(${contacts.phone}, '[^0-9]', '', 'g')) <= 14`);
 
+      // NEW: Support for specific contact IDs (Quick Campaign feature)
+      if (criteria.contactIds && criteria.contactIds.length > 0) {
+        console.log('[getContactsBySegment] Filtering by specific contact IDs:', criteria.contactIds.length);
+        whereConditions.push(inArray(contacts.id, criteria.contactIds));
+      } else {
+        // Apply normal filters only if not filtering by specific IDs
+        // Create tag filter condition
+        const tagCondition = this.createTagFilterCondition(criteria.tags);
+        console.log('[getContactsBySegment] Tag condition created:', tagCondition ? 'YES' : 'NO', 'for tags:', criteria.tags);
+        if (tagCondition) {
+          whereConditions.push(tagCondition);
+        }
 
-      const tagCondition = this.createTagFilterCondition(criteria.tags);
-      if (tagCondition) {
-        whereConditions.push(tagCondition);
-      }
+        if (criteria.created_after) {
+          whereConditions.push(gte(contacts.createdAt, new Date(criteria.created_after)));
+        }
 
-      if (criteria.created_after) {
-        whereConditions.push(gte(contacts.createdAt, new Date(criteria.created_after)));
-      }
-
-      if (criteria.created_before) {
-        whereConditions.push(lte(contacts.createdAt, new Date(criteria.created_before)));
+        if (criteria.created_before) {
+          whereConditions.push(lte(contacts.createdAt, new Date(criteria.created_before)));
+        }
       }
 
       if (criteria.excludedContactIds && criteria.excludedContactIds.length > 0) {
@@ -405,9 +413,12 @@ export class CampaignService {
         .where(and(...whereConditions))
         .orderBy(desc(contacts.createdAt));
 
+      console.log('[getContactsBySegment] Retrieved contacts before deduplication:', allContacts.length);
+      console.log('[getContactsBySegment] Sample contact tags:', allContacts.slice(0, 3).map(c => ({ id: c.id, name: c.name, tags: c.tags })));
 
-
+      // Deduplicate contacts by phone number
       const deduplicatedContacts = this.deduplicateContactsByPhone(allContacts);
+      console.log('[getContactsBySegment] Contacts after deduplication:', deduplicatedContacts.length);
 
       return deduplicatedContacts;
     } catch (error) {
@@ -502,7 +513,9 @@ export class CampaignService {
    */
   private createTagFilterCondition(tags: string[] | undefined) {
     try {
+      console.log('[TagFilter] Input tags:', tags);
       if (!tags || tags.length === 0) {
+        console.log('[TagFilter] No tags provided, returning null');
         return null;
       }
 
@@ -512,7 +525,9 @@ export class CampaignService {
         .map((tag: string) => tag.trim().toLowerCase())
         .filter((tag: string) => tag.length <= 100); // Prevent extremely long tags
 
+      console.log('[TagFilter] Valid tags after processing:', validTags);
       if (validTags.length === 0) {
+        console.log('[TagFilter] No valid tags after filtering, returning null');
         return null;
       }
 
@@ -537,11 +552,13 @@ export class CampaignService {
         });
       }
 
-      return sql`
+      const finalCondition = sql`
         ${contacts.tags} IS NOT NULL
         AND array_length(${contacts.tags}, 1) > 0
         AND (${combinedCondition})
       `;
+      console.log('[TagFilter] Generated SQL condition for tags:', validTags);
+      return finalCondition;
     } catch (error) {
       console.error('[TagFilter] Error creating tag filter condition:', error);
       return null;
@@ -630,7 +647,7 @@ export class CampaignService {
         }
       });
 
-      
+
 
       return { duplicates, totalDuplicates };
     } catch (error) {
@@ -887,7 +904,7 @@ export class CampaignService {
           eq(campaignTemplates.companyId, companyId)
         ));
     } catch (error) {
-      
+
       const errorMessage = error instanceof Error ? error.message : String(error);
       throw new Error(`Failed to delete template: ${errorMessage}`);
     }
@@ -908,16 +925,16 @@ export class CampaignService {
         completed: sql`COUNT(*) FILTER (WHERE status = 'completed')`,
         failed: sql`COUNT(*) FILTER (WHERE status = 'failed')`
       })
-      .from(campaigns)
-      .where(eq(campaigns.companyId, companyId));
+        .from(campaigns)
+        .where(eq(campaigns.companyId, companyId));
 
       const recipientStats = await db.select({
         totalRecipients: sql`COALESCE(SUM(total_recipients), 0)`,
         successfulSends: sql`COALESCE(SUM(successful_sends), 0)`,
         failedSends: sql`COALESCE(SUM(failed_sends), 0)`
       })
-      .from(campaigns)
-      .where(eq(campaigns.companyId, companyId));
+        .from(campaigns)
+        .where(eq(campaigns.companyId, companyId));
 
       const campaignResult = campaignStats[0];
       const recipientResult = recipientStats[0];
@@ -1096,17 +1113,17 @@ export class CampaignService {
 
       let sanitizedUpdateData = { ...updateData };
       const updateDataAny = updateData as any;
-      
+
       if (updateData.criteria || updateDataAny.excludedContactIds !== undefined) {
         const criteria = (updateData.criteria as any) || { ...(existingSegment.criteria as any) };
-        
+
 
         if (updateDataAny.excludedContactIds !== undefined) {
           criteria.excludedContactIds = updateDataAny.excludedContactIds || [];
         } else if (!criteria.excludedContactIds) {
           criteria.excludedContactIds = [];
         }
-        
+
 
         if (criteria.tags && Array.isArray(criteria.tags)) {
           criteria.tags = criteria.tags
@@ -1115,9 +1132,9 @@ export class CampaignService {
             .filter((tag: string) => tag.length <= 100)
             .slice(0, 50);
         }
-        
+
         sanitizedUpdateData.criteria = criteria;
-        
+
 
         delete (sanitizedUpdateData as any).excludedContactIds;
       }
@@ -1227,8 +1244,8 @@ export class CampaignService {
         read: sql`COUNT(*) FILTER (WHERE status = 'read')`,
         failed: sql`COUNT(*) FILTER (WHERE status = 'failed')`
       })
-      .from(campaignRecipients)
-      .where(eq(campaignRecipients.campaignId, campaignId));
+        .from(campaignRecipients)
+        .where(eq(campaignRecipients.campaignId, campaignId));
 
       const result = stats[0];
       const total = parseInt(result.total_recipients as string) || 0;
@@ -1297,32 +1314,32 @@ export class CampaignService {
 
   async checkCampaignLimitations(companyId: number): Promise<void> {
     try {
-      
+
 
       const [company] = await db.select({
         plan: companies.plan
       })
-      .from(companies)
-      .where(eq(companies.id, companyId));
+        .from(companies)
+        .where(eq(companies.id, companyId));
 
       if (!company) {
         throw new Error('Company not found');
       }
 
-      
+
 
       let planLimitations: any = null;
       if (company.plan && company.plan !== 'free') {
-        
+
         const [plan] = await db.select()
           .from(plans)
           .where(eq(plans.name, company.plan));
         planLimitations = plan;
-        
+
       }
 
       if (!planLimitations) {
-        
+
         planLimitations = {
           maxCampaigns: 5,
           maxCampaignRecipients: 1000,
@@ -1330,36 +1347,36 @@ export class CampaignService {
         };
       }
 
-      
+
 
       const maxCampaigns = planLimitations.maxCampaigns || 5;
-      
 
-      
+
+
       const campaignCountResult = await db.select({
         count: count()
       })
-      .from(campaigns)
-      .where(and(
-        eq(campaigns.companyId, companyId),
-        not(eq(campaigns.status, 'cancelled'))
-      ));
+        .from(campaigns)
+        .where(and(
+          eq(campaigns.companyId, companyId),
+          not(eq(campaigns.status, 'cancelled'))
+        ));
 
       const campaignCount = campaignCountResult[0];
-      
+
 
       if (!campaignCount) {
-        
+
         return;
       }
 
-      
+
 
       if (Number(campaignCount.count) >= maxCampaigns) {
         throw new Error(`Campaign limit reached. Your plan allows ${maxCampaigns} campaigns. Please upgrade your plan or delete existing campaigns.`);
       }
 
-      
+
 
     } catch (error) {
       console.error('Error in checkCampaignLimitations:', error);
@@ -1370,55 +1387,55 @@ export class CampaignService {
 
   async checkRecipientLimitations(companyId: number, newRecipientsCount: number): Promise<void> {
     try {
-      
+
 
       const [company] = await db.select({
         plan: companies.plan
       })
-      .from(companies)
-      .where(eq(companies.id, companyId));
+        .from(companies)
+        .where(eq(companies.id, companyId));
 
       if (!company) {
         throw new Error('Company not found');
       }
 
-      
+
 
       let planLimitations: any = null;
       if (company.plan && company.plan !== 'free') {
-        
+
         const [plan] = await db.select()
           .from(plans)
           .where(eq(plans.name, company.plan));
         planLimitations = plan;
-        
+
       }
 
       if (!planLimitations) {
-        
+
         planLimitations = {
           maxCampaignRecipients: 1000
         };
       }
 
       const maxCampaignRecipients = planLimitations.maxCampaignRecipients || 1000;
-      
+
 
       const [recipientCount] = await db.select({
         count: count()
       })
-      .from(campaignRecipients)
-      .leftJoin(campaigns, eq(campaignRecipients.campaignId, campaigns.id))
-      .where(eq(campaigns.companyId, companyId));
+        .from(campaignRecipients)
+        .leftJoin(campaigns, eq(campaignRecipients.campaignId, campaigns.id))
+        .where(eq(campaigns.companyId, companyId));
 
       const totalRecipients = Number(recipientCount.count) + newRecipientsCount;
-      
+
 
       if (totalRecipients > maxCampaignRecipients) {
         throw new Error(`Campaign recipient limit exceeded. Your plan allows ${maxCampaignRecipients} total recipients. Adding ${newRecipientsCount} recipients would exceed this limit. Please upgrade your plan.`);
       }
 
-      
+
 
     } catch (error) {
       console.error('Error in checkRecipientLimitations:', error);

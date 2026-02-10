@@ -44,6 +44,7 @@ export default function ConversationView() {
     conversations,
     groupConversations
   } = useConversations();
+
   const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -61,6 +62,79 @@ export default function ConversationView() {
   const [isParticipantsModalOpen, setIsParticipantsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const {
+    isMobile,
+    isTablet,
+    isContactDetailsOpen,
+    toggleConversationList,
+    toggleContactDetails
+  } = useMobileLayout();
+
+  const isGroupConversation = (conversationId: number): boolean => {
+    const groupConv = groupConversations.find(conv => conv.id === conversationId);
+    if (groupConv) return true;
+    const regularConv = conversations.find(conv => conv.id === conversationId);
+    if (regularConv && (regularConv.isGroup || regularConv.groupJid)) return true;
+    return false;
+  };
+
+  const { data: activeConversation, isLoading } = useQuery({
+    queryKey: (() => {
+      if (!activeConversationId) return ['/api/conversations', null];
+      const isGroup = isGroupConversation(activeConversationId);
+      return isGroup
+        ? ['/api/group-conversations', activeConversationId]
+        : ['/api/conversations', activeConversationId];
+    })(),
+    enabled: !!activeConversationId,
+    queryFn: async ({ queryKey }) => {
+      const conversationId = queryKey[1] as number;
+      const isGroupEndpoint = queryKey[0] === '/api/group-conversations';
+      const endpoint = isGroupEndpoint
+        ? `/api/group-conversations/${conversationId}`
+        : `/api/conversations/${conversationId}`;
+      const response = await fetch(endpoint);
+      if (!response.ok) throw new Error('Failed to fetch conversation');
+      return response.json();
+    }
+  });
+
+  const contact = activeConversation?.contact;
+
+  // Fetch deals specifically for this contact to sync tags and assignment
+  const { data: contactDeals = [] } = useQuery({
+    queryKey: ['/api/deals/contact', contact?.id],
+    enabled: !!contact?.id,
+    queryFn: async () => {
+      try {
+        const res = await fetch(`/api/deals/contact/${contact?.id}`);
+        if (!res.ok) return [];
+        const data = await res.json();
+        return Array.isArray(data) ? data : [];
+      } catch (e) {
+        return [];
+      }
+    }
+  });
+
+  // Sync Assignment Logic
+  useEffect(() => {
+    if (activeConversation) {
+      let assigned = activeConversation.assignedToUserId;
+      if (!assigned && Array.isArray(contactDeals) && contactDeals.length > 0) {
+        const dealWithAssignment = contactDeals.find((d: any) => d.assignedToUserId);
+        if (dealWithAssignment) {
+          assigned = dealWithAssignment.assignedToUserId;
+        }
+      }
+      setAssignedUserId(assigned || null);
+    }
+  }, [activeConversation, contactDeals]);
+
+  // Combined Tags Logic
+  const dealTags = Array.isArray(contactDeals) ? contactDeals.flatMap((d: any) => d.tags || []) : [];
+  const allTags = Array.from(new Set([...(contact?.tags || []), ...dealTags]));
 
 
   const handleDeleteContact = async () => {
@@ -105,46 +179,7 @@ export default function ConversationView() {
     }
   };
 
-  const {
-    isMobile,
-    isTablet,
-    isContactDetailsOpen,
-    toggleConversationList,
-    toggleContactDetails
-  } = useMobileLayout();
 
-  const isGroupConversation = (conversationId: number): boolean => {
-    const groupConv = groupConversations.find(conv => conv.id === conversationId);
-    if (groupConv) return true;
-
-    const regularConv = conversations.find(conv => conv.id === conversationId);
-    if (regularConv && (regularConv.isGroup || regularConv.groupJid)) return true;
-
-    return false;
-  };
-
-  const { data: activeConversation, isLoading } = useQuery({
-    queryKey: (() => {
-      if (!activeConversationId) return ['/api/conversations', null];
-      const isGroup = isGroupConversation(activeConversationId);
-      return isGroup
-        ? ['/api/group-conversations', activeConversationId]
-        : ['/api/conversations', activeConversationId];
-    })(),
-    enabled: !!activeConversationId,
-    queryFn: async ({ queryKey }) => {
-      const conversationId = queryKey[1] as number;
-      const isGroupEndpoint = queryKey[0] === '/api/group-conversations';
-
-      const endpoint = isGroupEndpoint
-        ? `/api/group-conversations/${conversationId}`
-        : `/api/conversations/${conversationId}`;
-
-      const response = await fetch(endpoint);
-      if (!response.ok) throw new Error('Failed to fetch conversation');
-      return response.json();
-    }
-  });
 
   const isWhatsApp = activeConversation?.channelType === 'whatsapp' ||
     activeConversation?.channelType === 'whatsapp_unofficial' ||
@@ -221,11 +256,7 @@ export default function ConversationView() {
     }
   }, [activeConversationId, lastActiveConversationId]);
 
-  useEffect(() => {
-    if (activeConversation) {
-      setAssignedUserId(activeConversation.assignedToUserId || null);
-    }
-  }, [activeConversation]);
+
 
   useEffect(() => {
     if (shouldScrollOnLoad && messagesEndRef.current) {
@@ -444,7 +475,7 @@ export default function ConversationView() {
     );
   }
 
-  const contact = activeConversation?.contact;
+
 
   const getChannelInfo = (channelType: string) => {
     switch (channelType) {
@@ -563,7 +594,7 @@ export default function ConversationView() {
               {!activeConversation?.isGroup && contact && (
                 <TagManager
                   contactId={contact.id}
-                  initialTags={contact.tags || []}
+                  initialTags={allTags || []}
                 />
               )}
             </div>

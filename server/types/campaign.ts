@@ -126,6 +126,8 @@ export interface CampaignSegment {
 
 export interface SegmentFilterCriteria {
   tags?: string[];
+  contactIds?: number[]; // Specific contact IDs to include
+  excludedContactIds?: number[]; // Contact IDs to exclude
   custom_fields?: Record<string, any>;
   date_range?: {
     field: string;
@@ -191,7 +193,7 @@ export interface WhatsAppBusinessHoursSettings {
 }
 
 
-export interface RateLimitSettings extends WhatsAppRateLimitSettings {}
+export interface RateLimitSettings extends WhatsAppRateLimitSettings { }
 
 export interface CampaignAnalytics {
   id: number;

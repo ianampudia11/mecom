@@ -1,0 +1,297 @@
+# 📁 ESTRUCTURA DEL PROYECTO CRM PLUS
+
+## 📊 RESUMEN GENERAL
+Este es un sistema CRM (Customer Relationship Management) completo con frontend React, backend Node.js/Express, y múltiples integraciones.
+
+===============================================================================
+## 🗂️ ESTRUCTURA PRINCIPAL
+===============================================================================
+
+ianampudia11/
+├── 📂 client/                          # Frontend de la aplicación
+│   ├── 📂 public/                      # Archivos públicos estáticos
+│   ├── 📂 src/                         # Código fuente del frontend
+│   │   ├── App.tsx                     # Componente principal de la app
+│   │   ├── main.tsx                    # Punto de entrada principal
+│   │   ├── index.css                   # Estilos globales
+│   │   ├── types.ts                    # Definiciones de tipos TypeScript
+│   │   ├── 📂 components/              # Componentes React (302 archivos)
+│   │   ├── 📂 pages/                   # Páginas de la aplicación (61 archivos)
+│   │   ├── 📂 hooks/                   # React Hooks personalizados (38 archivos)
+│   │   ├── 📂 contexts/                # Contextos de React (7 archivos)
+│   │   ├── 📂 context/                 # Contextos adicionales
+│   │   ├── 📂 services/                # Servicios para llamadas API (9 archivos)
+│   │   ├── 📂 utils/                   # Utilidades y helpers (15 archivos)
+│   │   ├── 📂 lib/                     # Librerías compartidas (9 archivos)
+│   │   ├── 📂 types/                   # Tipos TypeScript adicionales
+│   │   └── 📂 styles/                  # Estilos adicionales
+│   └── index.html                      # HTML base
+│
+├── 📂 server/                          # Backend de la aplicación
+│   ├── index.ts                        # Servidor principal
+│   ├── routes.ts                       # Rutas principales (776KB)
+│   ├── storage.ts                      # Capa de almacenamiento/base de datos
+│   ├── db.ts                          # Configuración de base de datos
+│   ├── auth.ts                        # Autenticación (46KB)
+│   ├── middleware.ts                  # Middlewares globales
+│   ├── migration-system.ts            # Sistema de migraciones
+│   │
+│   ├── 📂 modules/                    # Módulos del backend (arquitectura modular)
+│   │   ├── 📂 admin/                  # Administración
+│   │   ├── 📂 analytics/              # Analítica
+│   │   ├── 📂 calendar/               # Calendario
+│   │   ├── 📂 channels/               # Canales de comunicación
+│   │   ├── 📂 contacts/               # Gestión de contactos
+│   │   ├── 📂 deals/                  # Gestión de tratos/ventas
+│   │   ├── 📂 flows/                  # Flujos de trabajo
+│   │   ├── 📂 integrations/           # Integraciones externas
+│   │   ├── 📂 languages/              # Idiomas/traducciones
+│   │   ├── 📂 messages/               # Mensajería
+│   │   ├── 📂 notes/                  # Notas
+│   │   ├── 📂 payments/               # Pagos
+│   │   ├── 📂 pipelines/              # Pipelines de ventas
+│   │   ├── 📂 plans/                  # Planes de suscripción
+│   │   ├── 📂 properties/             # Propiedades inmobiliarias
+│   │   ├── 📂 settings/               # Configuraciones
+│   │   ├── 📂 tags/                   # Etiquetas
+│   │   ├── 📂 tasks/                  # Tareas
+│   │   ├── 📂 webhooks/               # Webhooks
+│   │   └── 📂 websites/               # Sitios web
+│   │
+│   ├── 📂 middleware/                 # Middlewares específicos (7 archivos)
+│   ├── 📂 routes/                     # Rutas organizadas (25 archivos)
+│   ├── 📂 services/                   # Servicios del backend (78 archivos)
+│   │   ├── 📂 channels/               # Servicios de canales
+│   │   └── 📂 document-processors/    # Procesadores de documentos
+│   ├── 📂 types/                      # Tipos TypeScript del backend
+│   ├── 📂 utils/                      # Utilidades del backend (16 archivos)
+│   ├── 📂 widgets/                    # Widgets
+│   └── 📂 test/                       # Pruebas
+│
+├── 📂 shared/                         # Código compartido frontend/backend
+│   └── 📂 types/                      # Tipos TypeScript compartidos
+│
+├── 📂 migrations/                     # Migraciones de base de datos (86 archivos)
+│
+├── 📂 scripts/                        # Scripts de utilidad (61 archivos)
+│
+├── 📂 translations/                   # Traducciones (3 archivos)
+│
+├── 📂 public/                         # Archivos públicos del servidor
+│
+├── 📂 uploads/                        # Archivos subidos
+│   └── 📂 webchat/                    # Archivos del webchat
+│
+├── 📂 media/                          # Archivos multimedia
+│   └── 📂 temp/                       # Archivos temporales
+│
+├── 📂 whatsapp-sessions/              # Sesiones de WhatsApp
+│
+├── 📂 backups/                        # Respaldos
+│
+├── 📂 dist/                           # Build de producción
+│   └── 📂 public/
+│       ├── 📂 assets/
+│       └── 📂 uploads/
+│
+├── 📂 node_modules/                   # Dependencias de Node.js
+│
+├── 📂 .agent/                         # Configuración del agente
+│
+└── 📂 .git/                           # Repositorio Git
+
+===============================================================================
+## 📄 ARCHIVOS DE CONFIGURACIÓN PRINCIPAL
+===============================================================================
+
+### Configuración del Proyecto
+- package.json - Dependencias y scripts npm
+- package-lock.json - Lockfile de dependencias
+- tsconfig.json - Configuración de TypeScript
+- vite.config.ts - Configuración de Vite (build tool)
+- vitest.config.ts - Configuración de tests
+- tailwind.config.ts - Configuración de Tailwind CSS
+- postcss.config.js - Configuración de PostCSS
+- eslint.config.js - Configuración de ESLint
+
+### Variables de Entorno
+- .env - Variables de entorno (713 bytes)
+- .env.local - Variables locales
+- .env.development - Variables de desarrollo
+- .env.example - Ejemplo de variables
+- .env.template - Plantilla de variables
+
+### Docker
+- Dockerfile - Dockerfile principal (2887 bytes)
+- Dockerfile.deploy - Dockerfile de deploy (868 bytes)
+- Dockerfile.simple - Dockerfile simplificado
+- docker-compose.yml - Configuración de Docker Compose
+- docker-compose.dev.yml - Docker Compose para desarrollo
+- docker-compose.template.yml - Plantilla de Docker Compose
+- docker-entrypoint.sh - Script de entrada de Docker
+- docker-entrypoint-deploy.sh - Script de entrada para deploy
+- docker-entrypoint-simple.sh - Script de entrada simplificado
+
+### Base de Datos
+- drizzle.config.js - Configuración de Drizzle ORM
+- drizzle.config.ts - Configuración TypeScript de Drizzle
+- init-db.sql - Inicialización de base de datos
+- init-schema.sql - Schema inicial
+
+### Deploy y Scripts
+- deploy.sh - Script de despliegue (26KB)
+- start.js - Script de inicio
+
+===============================================================================
+## 🔧 SCRIPTS DE UTILIDAD
+===============================================================================
+
+### Scripts de Debug
+- debug-deals.ts - Debug de tratos
+- debug-pipelines.ts - Debug de pipelines
+- debug-migration.ts - Debug de migraciones
+- debug-get-deals.ts - Debug de obtención de tratos
+- debug-deal-props.ts - Debug de propiedades de tratos
+- debug-hidden-deal.ts - Debug de tratos ocultos
+- debug-props.ts - Debug de propiedades
+
+### Scripts de Base de Datos
+- check-db-schema.ts - Verificar schema de BD
+- check_db.ts - Verificar BD
+- make_contact_id_nullable.ts - Hacer contactId nullable
+- create_media_table.ts - Crear tabla de media
+- add_checklist_column.ts - Añadir columna checklist
+- add_contact_assignee.ts - Añadir asignado de contacto
+- run-migration.ts - Ejecutar migraciones
+
+### Scripts de Configuración
+- seed-all.ts - Poblar base de datos
+- seed-test-data.sql - Datos de prueba
+- enable-registration.ts - Habilitar registro
+- check-registration.ts - Verificar registro
+- update-branding.ts - Actualizar branding
+- verify-data.ts - Verificar datos
+
+### Scripts de Reparación
+- fix-broken-stage.ts - Reparar stage roto
+- fix-pipeline-stages.ts - Reparar stages de pipeline
+- fix-trigger.ts - Reparar trigger
+- fix_index.js - Reparar índice
+- fix_storage.cjs - Reparar storage
+- repair_index.js - Reparar índice
+
+### Otros Scripts
+- create-test-deal.ts - Crear trato de prueba
+- disable-trigger.ts - Deshabilitar trigger
+- get-trigger-source.ts - Obtener fuente de trigger
+- find-deals-line.ts - Encontrar línea de deals
+- find-error-source.ts - Encontrar fuente de error
+- generate-hash.js - Generar hash
+- clean_storage.py - Limpiar storage (Python)
+
+===============================================================================
+## 📦 MÓDULOS DEL BACKEND (server/modules)
+===============================================================================
+
+Cada módulo típicamente contiene:
+- routes.ts - Rutas del módulo
+- service.ts - Lógica de negocio
+- types.ts - Tipos TypeScript
+
+### Lista de Módulos (20 módulos):
+
+1.  admin         - Administración del sistema
+2.  analytics     - Analítica y reportes
+3.  calendar      - Gestión de calendario y citas
+4.  channels      - Canales de comunicación (WhatsApp, Email, etc.)
+5.  contacts      - Gestión de contactos
+6.  deals         - Gestión de tratos/ventas
+7.  flows         - Flujos de trabajo automatizados
+8.  integrations  - Integraciones con servicios externos
+9.  languages     - Internacionalización
+10. messages      - Sistema de mensajería
+11. notes         - Notas
+12. payments      - Procesamiento de pagos
+13. pipelines     - Pipelines de ventas
+14. plans         - Planes de suscripción
+15. properties    - Gestión de propiedades inmobiliarias
+16. settings      - Configuraciones del sistema
+17. tags          - Sistema de etiquetas
+18. tasks         - Gestión de tareas
+19. webhooks      - Webhooks
+20. websites      - Generación de sitios web
+
+===============================================================================
+## 📚 ESTADÍSTICAS DEL PROYECTO
+===============================================================================
+
+Frontend:
+- Componentes:    302+
+- Páginas:        61
+- Hooks:          38
+- Servicios:      9
+- Contextos:      7
+
+Backend:
+- Módulos:        20
+- Servicios:      78
+- Rutas:          25 archivos organizados
+- Middlewares:    7
+
+Base de Datos:
+- Migraciones:    86
+
+Otros:
+- Scripts:        61+
+
+===============================================================================
+## 🛠️ TECNOLOGÍAS PRINCIPALES
+===============================================================================
+
+### Frontend
+- React con TypeScript
+- Vite (Build tool)
+- Tailwind CSS (Estilos)
+- React Router (Navegación)
+- React Query (Gestión de estado servidor)
+
+### Backend
+- Node.js con Express
+- TypeScript
+- PostgreSQL (Base de datos)
+- Drizzle ORM
+- WebSockets (Comunicación en tiempo real)
+
+### DevOps
+- Docker y Docker Compose
+- Git (Control de versiones)
+- Scripts de deploy automatizado
+
+### Integraciones
+- WhatsApp
+- Email
+- Webhooks
+- Calendarios
+- Sistemas de pago
+
+===============================================================================
+## 📝 NOTAS IMPORTANTES
+===============================================================================
+
+1. El archivo routes.ts del servidor es muy grande (776KB), sugiere una 
+   arquitectura monolítica que podría beneficiarse de más modularización.
+
+2. Hay múltiples archivos de backup y logs que podrían limpiarse periódicamente.
+
+3. El proyecto tiene 86 migraciones de base de datos, lo que indica un 
+   desarrollo activo y evolutivo.
+
+4. La estructura modular del backend (carpeta modules/) es una buena práctica 
+   de arquitectura.
+
+5. El proyecto está configurado tanto para desarrollo local como para 
+   despliegue en producción con Docker.
+
+===============================================================================
+
+Fecha: 12/1/2026

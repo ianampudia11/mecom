@@ -42,16 +42,23 @@ export function TagManager({ contactId, initialTags = [], readOnly = false }: Ta
         setTags(initialTags || []);
     }, [initialTags]);
 
-    const { data: availableTags = [] } = useQuery({
-        queryKey: ['/api/contacts/tags'],
+    const { data: availableTagObjects = [] } = useQuery<any[]>({
+        queryKey: ['/api/tags'],
         queryFn: async () => {
-            const res = await fetch('/api/contacts/tags');
-            if (!res.ok) return [];
-            const data = await res.json();
-            return Array.isArray(data) ? data : [];
+            try {
+                const res = await fetch('/api/tags');
+                if (!res.ok) return [];
+                const data = await res.json();
+                return Array.isArray(data) ? data : [];
+            } catch (e) {
+                return [];
+            }
         },
-        staleTime: 60000, // Cache for 1 minute
+        staleTime: 300000,
     });
+
+    const availableTags = availableTagObjects.map((t: any) => t.tag);
+    const tagColorsMap = new Map(availableTagObjects.map((t: any) => [t.tag, t.color]));
 
     const updateTagsMutation = useMutation({
         mutationFn: async (newTags: string[]) => {
@@ -67,8 +74,7 @@ export function TagManager({ contactId, initialTags = [], readOnly = false }: Ta
             queryClient.invalidateQueries({ queryKey: ['/api/contacts', contactId] });
             queryClient.invalidateQueries({ queryKey: ['/api/contacts'] });
             queryClient.invalidateQueries({ queryKey: ['/api/conversations'] });
-            // Update local available tags if we added a new one
-            queryClient.invalidateQueries({ queryKey: ['/api/contacts/tags'] });
+            queryClient.invalidateQueries({ queryKey: ['/api/tags/stats'] });
         },
         onError: () => {
             toast({
@@ -110,7 +116,12 @@ export function TagManager({ contactId, initialTags = [], readOnly = false }: Ta
         return (
             <div className="flex flex-wrap gap-1">
                 {tags.map((tag) => (
-                    <ColoredTag key={tag} name={tag} size="sm" />
+                    <ColoredTag
+                        key={tag}
+                        name={tag}
+                        color={tagColorsMap.get(tag) || undefined}
+                        size="sm"
+                    />
                 ))}
             </div>
         );
@@ -123,6 +134,7 @@ export function TagManager({ contactId, initialTags = [], readOnly = false }: Ta
                     key={tag}
                     name={tag}
                     onRemove={() => handleToggleTag(tag)}
+                    color={tagColorsMap.get(tag) || undefined}
                     size="md"
                 />
             ))}

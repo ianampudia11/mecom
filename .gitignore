@@ -7,7 +7,6 @@ whatsapp-sessions
 vite.config.ts.*
 *.tar.gz
 *.zip
-*.md
 backups/
 /.idea/AugmentWebviewStateStore.xml
 /.idea/misc.xml

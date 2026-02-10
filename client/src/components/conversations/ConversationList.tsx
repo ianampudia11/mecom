@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useConversations } from '@/context/ConversationContext';
 import { useTranslation } from '@/hooks/use-translation';
 import ConversationItem from './ConversationItem';
@@ -103,6 +104,26 @@ export default function ConversationList() {
     }
   };
 
+  // Fetch tag colors (lightweight)
+  const { data: tags = [] } = useQuery<any[]>({
+    queryKey: ['/api/tags'],
+    queryFn: async () => {
+      try {
+        const res = await fetch('/api/tags');
+        if (!res.ok) return [];
+        const data = await res.json();
+        return Array.isArray(data) ? data : [];
+      } catch (e) {
+        return [];
+      }
+    },
+    staleTime: 300000, // 5 minutes
+  });
+
+  const tagColorsMap = useMemo(() => {
+    return new Map<string, string | null>(tags.map((t: any) => [t.tag, t.color]));
+  }, [tags]);
+
   if (isLoadingConversations) {
     return (
       <div className={`
@@ -125,19 +146,14 @@ export default function ConversationList() {
     );
   }
 
-
-
   const filteredConversations = conversations
     .filter(conversation => {
-
       if (activeChannelId !== null) {
         return conversation.channelId === activeChannelId;
       }
       return true;
     })
     .filter(conversation => {
-
-
       if (filterStatus === 'all') return true;
       if (filterStatus === 'assigned') return conversation.assignedToUserId !== null;
       if (filterStatus === 'unassigned') return conversation.assignedToUserId === null;
@@ -145,7 +161,6 @@ export default function ConversationList() {
       return true;
     })
     .filter(conversation => {
-
       if (!searchQuery) return true;
 
       const query = searchQuery.toLowerCase().trim();
@@ -234,8 +249,8 @@ export default function ConversationList() {
         {(canViewAllConversations() || user?.isSuperAdmin) && (
           <button
             className={`px-3 sm:px-4 py-2 sm:py-1 rounded-full text-sm font-medium whitespace-nowrap min-h-[23px] sm:min-h-auto flex items-center ${filterStatus === 'all'
-                ? 'bg-primary-100 text-primary-700'
-                : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+              ? 'bg-primary-100 text-primary-700'
+              : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
               }`}
             onClick={() => setFilterStatus('all')}
           >
@@ -246,8 +261,8 @@ export default function ConversationList() {
         {(canViewAllConversations() || user?.isSuperAdmin) && (
           <button
             className={`px-3 sm:px-4 py-2 sm:py-1 rounded-full text-sm font-medium whitespace-nowrap min-h-[23px] sm:min-h-auto flex items-center ${filterStatus === 'unassigned'
-                ? 'bg-primary-100 text-primary-700'
-                : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+              ? 'bg-primary-100 text-primary-700'
+              : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
               }`}
             onClick={() => setFilterStatus('unassigned')}
           >
@@ -257,8 +272,8 @@ export default function ConversationList() {
 
         <button
           className={`px-3 sm:px-4 py-2 sm:py-1 rounded-full text-sm font-medium whitespace-nowrap min-h-[23px] sm:min-h-auto flex items-center ${filterStatus === 'assigned_to_me'
-              ? 'bg-primary-100 text-primary-700'
-              : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+            ? 'bg-primary-100 text-primary-700'
+            : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
             }`}
           onClick={() => setFilterStatus('assigned_to_me')}
         >
@@ -268,8 +283,8 @@ export default function ConversationList() {
         {(canViewAllConversations() || user?.isSuperAdmin) && (
           <button
             className={`px-3 sm:px-4 py-2 sm:py-1 rounded-full text-sm font-medium whitespace-nowrap min-h-[23px] sm:min-h-auto flex items-center ${filterStatus === 'assigned'
-                ? 'bg-primary-100 text-primary-700'
-                : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+              ? 'bg-primary-100 text-primary-700'
+              : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
               }`}
             onClick={() => setFilterStatus('assigned')}
           >
@@ -310,6 +325,7 @@ export default function ConversationList() {
                 isActive={conversation.id === activeConversationId}
                 onClick={() => handleConversationClick(conversation.id)}
                 searchQuery={searchQuery}
+                tagColorsMap={tagColorsMap}
               />
             ))}
 

@@ -14,7 +14,7 @@ export function log(message: string, source = "express") {
     hour12: true,
   });
 
-  
+
 }
 
 export function serveStatic(app: Express) {
@@ -25,11 +25,15 @@ export function serveStatic(app: Express) {
     : path.resolve(__dirname, "public");
 
 
+  console.log(`DEBUG: serveStatic called. NODE_ENV=${process.env.NODE_ENV}, __dirname=${__dirname}`);
+  console.log(`DEBUG: serveStatic distPath resolved to: ${distPath}`);
+
   if (!fs.existsSync(distPath)) {
+    console.error(`DEBUG: distPath does not exist! ls of parent dir (${path.dirname(distPath)}):`, fs.readdirSync(path.dirname(distPath)));
     if (process.env.NODE_ENV === 'development') {
-      
-      
-      
+
+
+
 
 
       app.use("*", (req, res, next) => {

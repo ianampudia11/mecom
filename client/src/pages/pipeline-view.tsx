@@ -37,13 +37,18 @@ import {
 } from '@/components/ui/dialog';
 import { apiRequest } from '@/lib/queryClient';
 import { Deal, PipelineStage } from '@shared/schema';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { cn } from '@/lib/utils';
 
 interface Pipeline {
   id: number;
   name: string;
 }
 
-export default function PipelineView() {
+// ... imports remain the same
+
+// 1. Rename existing component to PipelineViewContent
+function PipelineViewContent() {
   const { user, isLoading } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -73,8 +78,6 @@ export default function PipelineView() {
   // History Dialog State
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
   const [historyDeal, setHistoryDeal] = useState<any | null>(null);
-
-
 
   const { onMessage } = useSocket('/ws');
 
@@ -169,13 +172,17 @@ export default function PipelineView() {
       if (searchTerm) {
         queryParams.append('generalSearch', searchTerm);
       }
-      // Note: Backend doesn't strictly filter by pipelineId on /api/deals yet, 
-      // but client-side filtering logic depends on stageId mapping.
       const url = `/api/deals${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
       const res = await apiRequest('GET', url);
-      return res.json();
+      const data = await res.json();
+      // Ensure backend response is always an array
+      const finalData = Array.isArray(data) ? data : [];
+      console.log('PipelineViewContent: deals loaded:', finalData);
+      return finalData;
     },
   });
+
+  console.log('PipelineViewContent: rendering with deals:', deals);
 
   // Set default pipeline
   useEffect(() => {
@@ -199,7 +206,7 @@ export default function PipelineView() {
   const [tagFilter, setTagFilter] = useState<string>('all');
   const [propertyFilter, setPropertyFilter] = useState<string>('all');
 
-  // Fetch Tags and Properties (reusing what we saw in AddDealModal)
+  // Fetch Tags and Properties
   const { data: availableTags = [] } = useQuery({
     queryKey: ['/api/contacts/tags'],
     queryFn: async () => {
@@ -216,25 +223,23 @@ export default function PipelineView() {
   });
 
   // Filter Deals Logic
-  const filteredDeals = deals.filter((deal: Deal) => {
-    const matchesStage = stageFilter === 'all' || deal.stageId === parseInt(stageFilter);
-    // Note: deal.assignedTo might be string email or ID depending on schema, assume email or check schema. 
-    // In tasks.tsx it was string. In pipeline, let's check schema/previous `AddDealModal`.
-    // AddDealModal used `teamMembers` and `deal.assignedTo`.
-    // Let's assume deal.assignedTo is strictly comparable to filter or check if filter 'all'.
-    // If deal.assignedTo matches assigneeFilter (which comes from team member email or id).
-    // Let's verify schema or usage. AddDealModal uses member.id.
-    const matchesAssignee = assigneeFilter === 'all' || (deal as any).assignedTo === assigneeFilter || (deal as any).userId === parseInt(assigneeFilter);
-    const matchesTag = tagFilter === 'all' || ((deal as any).tags && (deal as any).tags.includes(tagFilter));
+  let filteredDeals: Deal[] = [];
+  const safeDeals = Array.isArray(deals) ? deals : [];
 
-    // Property matching: deal.properties is array of {id, title}. We check if any property matches the ID.
-    const matchesProperty = propertyFilter === 'all' || ((deal as any).properties && (deal as any).properties.some((p: any) => p.id === parseInt(propertyFilter)));
+  try {
+    filteredDeals = safeDeals.filter((deal: Deal) => {
+      const matchesStage = stageFilter === 'all' || deal.stageId === parseInt(stageFilter);
+      const matchesAssignee = assigneeFilter === 'all' || (deal as any).assignedTo === assigneeFilter || (deal as any).userId === parseInt(assigneeFilter);
+      const matchesTag = tagFilter === 'all' || ((deal as any).tags && (deal as any).tags.includes(tagFilter));
+      const matchesProperty = propertyFilter === 'all' || ((deal as any).properties && (deal as any).properties.some((p: any) => p.id === parseInt(propertyFilter)));
+      const matchesPipeline = pipelineStages.some(stage => stage.id === deal.stageId);
 
-    // Verify deal belongs to current pipeline (backend returns all deals)
-    const matchesPipeline = pipelineStages.some(stage => stage.id === deal.stageId);
-
-    return matchesStage && matchesAssignee && matchesTag && matchesProperty && matchesPipeline;
-  });
+      return matchesStage && matchesAssignee && matchesTag && matchesProperty && matchesPipeline;
+    });
+  } catch (err) {
+    console.error("Critical Error filtering deals:", err);
+    filteredDeals = [];
+  }
 
   if (isLoading) {
     return (
@@ -249,15 +254,15 @@ export default function PipelineView() {
   }
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden font-sans text-gray-800">
+    <div className="h-full flex flex-col overflow-hidden font-sans text-gray-800">
       <Header />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        <main className="flex-1 overflow-y-auto">
-          <div className="container mx-auto px-4 py-6">
+        <main className="flex-1 flex flex-col overflow-hidden">
+          <div className="container mx-auto px-4 py-6 flex flex-col h-full bg-slate-50/50">
 
-            {/* Header & Controls */}
-            <div className="mb-6 space-y-4">
+            {/* Header & Controls - flex-none to keep natural height */}
+            <div className="flex-none mb-6 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">Ruta de Lead</h1>
@@ -265,7 +270,7 @@ export default function PipelineView() {
                 </div>
                 <div className="flex items-center gap-3">
                   {/* View Toggle */}
-                  <div className="hidden md:flex items-center border border-gray-200 rounded-lg p-1 bg-white">
+                  <div className="hidden md:flex items-center border border-gray-200 rounded-lg p-1 bg-white shadow-sm">
                     <Button
                       variant={viewMode === 'board' ? 'default' : 'ghost'}
                       size="sm"
@@ -278,7 +283,12 @@ export default function PipelineView() {
                       variant={viewMode === 'list' ? 'default' : 'ghost'}
                       size="sm"
                       onClick={() => setViewMode('list')}
-                      className="flex items-center gap-2 h-8 px-3"
+                      className={cn(
+                        "flex items-center gap-2 h-8 px-3 transition-colors",
+                        viewMode === 'list'
+                          ? "bg-slate-900 text-white hover:bg-slate-800"
+                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                      )}
                     >
                       <List className="h-4 w-4" />
                       Lista
@@ -301,7 +311,7 @@ export default function PipelineView() {
                       }
                     }}
                   >
-                    <SelectTrigger className="w-[200px] h-9">
+                    <SelectTrigger className="w-[200px] h-9 bg-white">
                       <SelectValue placeholder="Ruta Principal" />
                     </SelectTrigger>
                     <SelectContent>
@@ -326,7 +336,7 @@ export default function PipelineView() {
 
                   <Button
                     onClick={() => setIsAddDealModalOpen(true)}
-                    className="flex items-center gap-2 h-9"
+                    className="flex items-center gap-2 h-9 shadow-md"
                   >
                     <Plus className="h-4 w-4" />
                     Agregar oportunidad
@@ -340,9 +350,7 @@ export default function PipelineView() {
                 </div>
               </div>
 
-
-
-              {/* Filters Row - Styled like Tasks */}
+              {/* Filters Row */}
               <div className="flex flex-wrap gap-4 items-center bg-white p-3 rounded-lg border shadow-sm">
                 {/* Stage Filter */}
                 <div className="w-[200px]">
@@ -373,7 +381,6 @@ export default function PipelineView() {
                     <SelectContent>
                       <SelectItem value="all">Todos los asignados</SelectItem>
                       {teamMembers.map((member: any) => (
-                        // value should match deal.assignedTo type. Assuming ID for now or checking usage
                         <SelectItem key={member.id} value={member.id.toString()}>
                           {member.fullName || member.username}
                         </SelectItem>
@@ -416,8 +423,6 @@ export default function PipelineView() {
                   </Select>
                 </div>
 
-
-
                 {/* Right Aligned Action Buttons */}
                 <div className="ml-auto flex items-center gap-2">
                   <Button
@@ -442,34 +447,35 @@ export default function PipelineView() {
                     Import/Export
                   </Button>
                 </div>
-
               </div>
             </div>
 
-            {/* List/Board View */}
-            <div className="h-[calc(100vh-220px)] overflow-y-auto">
+            {/* List/Board View - flex-1 to fill remaining space */}
+            <div className="flex-1 overflow-y-auto min-h-0 bg-white rounded-lg border shadow-sm">
               {viewMode === 'board' ? (
-                <KanbanBoard
-                  deals={filteredDeals}
-                  pipelineStages={pipelineStages}
-                  pipelineId={selectedPipelineId || undefined}
-                  searchTerm={searchTerm}
-                  isLoading={isLoadingDeals || isLoadingStages}
-                  onAddDeal={() => setIsAddDealModalOpen(true)}
-                  showSelectionMode={showSelectionMode}
-                  selectedDeals={selectedDeals}
-                  onDealSelect={(deal, selected) => {
-                    if (selected) {
-                      setSelectedDeals(prev => [...prev, deal]);
-                    } else {
-                      setSelectedDeals(prev => prev.filter(d => d.id !== deal.id));
-                    }
-                  }}
-                  onClearSelection={() => setSelectedDeals([])}
-                  onUpdateDeals={() => {
-                    queryClient.invalidateQueries({ queryKey: ['/api/deals'] });
-                  }}
-                />
+                <div className="h-full p-2">
+                  <KanbanBoard
+                    deals={filteredDeals}
+                    pipelineStages={pipelineStages}
+                    pipelineId={selectedPipelineId || undefined}
+                    searchTerm={searchTerm}
+                    isLoading={isLoadingDeals || isLoadingStages}
+                    onAddDeal={() => setIsAddDealModalOpen(true)}
+                    showSelectionMode={showSelectionMode}
+                    selectedDeals={selectedDeals}
+                    onDealSelect={(deal, selected) => {
+                      if (selected) {
+                        setSelectedDeals(prev => [...prev, deal]);
+                      } else {
+                        setSelectedDeals(prev => prev.filter(d => d.id !== deal.id));
+                      }
+                    }}
+                    onClearSelection={() => setSelectedDeals([])}
+                    onUpdateDeals={() => {
+                      queryClient.invalidateQueries({ queryKey: ['/api/deals'] });
+                    }}
+                  />
+                </div>
               ) : (
                 <PipelineList
                   deals={filteredDeals}
@@ -483,7 +489,6 @@ export default function PipelineView() {
                       setQuickChatDeal(deal);
                       setIsQuickChatOpen(true);
                     } else {
-                      // If no contact, maybe just open edit modal or toast
                       setEditingDeal(deal);
                       setIsEditDealModalOpen(true);
                     }
@@ -508,6 +513,7 @@ export default function PipelineView() {
                 />
               )}
             </div>
+
           </div>
         </main>
       </div>
@@ -612,7 +618,7 @@ export default function PipelineView() {
         </DialogContent>
       </Dialog>
 
-      {/* Bulk Operations Bar - Lifted from KanbanBoard */}
+      {/* Bulk Operations Bar */}
       <BulkOperationsBar
         selectedDeals={selectedDeals}
         stages={pipelineStages}
@@ -622,6 +628,17 @@ export default function PipelineView() {
           queryClient.invalidateQueries({ queryKey: ['/api/deals'] });
         }}
       />
-    </div >
+    </div>
+  );
+}
+
+// 2. Export the Wrapper
+export default function PipelineView() {
+  return (
+    <div className="h-screen w-full flex flex-col">
+      <ErrorBoundary>
+        <PipelineViewContent />
+      </ErrorBoundary>
+    </div>
   );
 }

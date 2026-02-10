@@ -1,0 +1,200 @@
+﻿  "priority": "medium",
+  "status": "not_started",
+  "dueDate": "2026-01-19",
+  "assignedTo": "",
+  "category": "",
+  "tags": [],
+  "checklist": [],
+  "backgroundColor": "#ffffff"
+}
+[CREATE TASK] User companyId: 1
+[CREATE TASK] Task data to insert: {
+  "contactId": null,
+  "title": "ed23d23",
+  "description": "23d23d32",
+  "priority": "medium",
+  "status": "not_started",
+  "dueDate": "2026-01-19",
+  "assignedTo": null,
+  "category": null,
+  "tags": null,
+  "checklist": null,
+  "backgroundColor": "#ffffff",
+  "companyId": 1
+}
+[TASK REPO] Creating task with data: {
+  "contactId": null,
+  "title": "ed23d23",
+  "description": "23d23d32",
+  "priority": "medium",
+  "status": "not_started",
+  "dueDate": "2026-01-19",
+  "assignedTo": null,
+  "category": null,
+  "tags": null,
+  "checklist": null,
+  "backgroundColor": "#ffffff",
+  "companyId": 1
+}
+[TASK REPO] Error creating task: TypeError: 
+value.toISOString is not a function
+    at PgTimestamp.mapToDriverValue (C:\Users\ianam\.gemin
+i\antigravity\scratch\ianampudia11\node_modules\src\pg-cor
+e\columns\timestamp.ts:66:16)
+    at <anonymous> (C:\Users\ianam\.gemini\antigravity\scr
+atch\ianampudia11\node_modules\src\sql\sql.ts:223:69)
+    at Array.map (<anonymous>)
+    at SQL.buildQueryFromSourceParams (C:\Users\ianam\.gem
+ini\antigravity\scratch\ianampudia11\node_modules\src\sql\
+sql.ts:148:30)
+    at <anonymous> (C:\Users\ianam\.gemini\antigravity\scr
+atch\ianampudia11\node_modules\src\sql\sql.ts:170:17)
+    at Array.map (<anonymous>)
+    at SQL.buildQueryFromSourceParams (C:\Users\ianam\.gem
+ini\antigravity\scratch\ianampudia11\node_modules\src\sql\
+sql.ts:148:30)
+    at <anonymous> (C:\Users\ianam\.gemini\antigravity\scr
+atch\ianampudia11\node_modules\src\sql\sql.ts:174:17)
+    at Array.map (<anonymous>)
+    at SQL.buildQueryFromSourceParams (C:\Users\ianam\.gem
+ini\antigravity\scratch\ianampudia11\node_modules\src\sql\
+sql.ts:148:30)
+    at <anonymous> (C:\Users\ianam\.gemini\antigravity\scr
+atch\ianampudia11\node_modules\src\sql\sql.ts:124:23)
+    at Object.startActiveSpan (C:\Users\ianam\.gemini\anti
+gravity\scratch\ianampudia11\node_modules\src\tracing.ts:2
+7:11)
+    at SQL.toQuery (C:\Users\ianam\.gemini\antigravity\scr
+atch\ianampudia11\node_modules\src\sql\sql.ts:123:17)
+    at PgDialect.sqlToQuery (C:\Users\ianam\.gemini\antigr
+avity\scratch\ianampudia11\node_modules\src\pg-core\dialec
+t.ts:591:14)
+    at <anonymous> (C:\Users\ianam\.gemini\antigravity\scr
+atch\ianampudia11\node_modules\src\pg-core\query-builders\
+insert.ts:405:19)
+    at Object.startActiveSpan (C:\Users\ianam\.gemini\anti
+gravity\scratch\ianampudia11\node_modules\src\tracing.ts:2
+7:11)
+[TASK REPO] Error message: value.toISOString is not a 
+function
+[TASK REPO] Error detail: undefined
+[TASK REPO] Error code: undefined
+[TASK REPO] Full error: {
+  "stack": "TypeError: value.toISOString is not a 
+function\n    at PgTimestamp.mapToDriverValue (C:\\Users\\
+ianam\\.gemini\\antigravity\\scratch\\ianampudia11\\node_m
+odules\\src\\pg-core\\columns\\timestamp.ts:66:16)\n    
+at <anonymous> (C:\\Users\\ianam\\.gemini\\antigravity\\sc
+ratch\\ianampudia11\\node_modules\\src\\sql\\sql.ts:223:69
+)\n    at Array.map (<anonymous>)\n    at 
+SQL.buildQueryFromSourceParams (C:\\Users\\ianam\\.gemini\
+\antigravity\\scratch\\ianampudia11\\node_modules\\src\\sq
+l\\sql.ts:148:30)\n    at <anonymous> (C:\\Users\\ianam\\.
+gemini\\antigravity\\scratch\\ianampudia11\\node_modules\\
+src\\sql\\sql.ts:170:17)\n    at Array.map 
+(<anonymous>)\n    at SQL.buildQueryFromSourceParams (C:\\
+Users\\ianam\\.gemini\\antigravity\\scratch\\ianampudia11\
+\node_modules\\src\\sql\\sql.ts:148:30)\n    at 
+<anonymous> (C:\\Users\\ianam\\.gemini\\antigravity\\scrat
+ch\\ianampudia11\\node_modules\\src\\sql\\sql.ts:174:17)\n
+    at Array.map (<anonymous>)\n    at 
+SQL.buildQueryFromSourceParams (C:\\Users\\ianam\\.gemini\
+\antigravity\\scratch\\ianampudia11\\node_modules\\src\\sq
+l\\sql.ts:148:30)\n    at <anonymous> (C:\\Users\\ianam\\.
+gemini\\antigravity\\scratch\\ianampudia11\\node_modules\\
+src\\sql\\sql.ts:124:23)\n    at Object.startActiveSpan (C
+:\\Users\\ianam\\.gemini\\antigravity\\scratch\\ianampudia
+11\\node_modules\\src\\tracing.ts:27:11)\n    at 
+SQL.toQuery (C:\\Users\\ianam\\.gemini\\antigravity\\scrat
+ch\\ianampudia11\\node_modules\\src\\sql\\sql.ts:123:17)\n
+    at PgDialect.sqlToQuery (C:\\Users\\ianam\\.gemini\\an
+tigravity\\scratch\\ianampudia11\\node_modules\\src\\pg-co
+re\\dialect.ts:591:14)\n    at <anonymous> (C:\\Users\\ian
+am\\.gemini\\antigravity\\scratch\\ianampudia11\\node_modu
+les\\src\\pg-core\\query-builders\\insert.ts:405:19)\n    
+at Object.startActiveSpan (C:\\Users\\ianam\\.gemini\\anti
+gravity\\scratch\\ianampudia11\\node_modules\\src\\tracing
+.ts:27:11)",
+  "message": "value.toISOString is not a function"
+}
+[CREATE TASK] Error creating task: TypeError: 
+value.toISOString is not a function
+    at PgTimestamp.mapToDriverValue (C:\Users\ianam\.gemin
+i\antigravity\scratch\ianampudia11\node_modules\src\pg-cor
+e\columns\timestamp.ts:66:16)
+    at <anonymous> (C:\Users\ianam\.gemini\antigravity\scr
+atch\ianampudia11\node_modules\src\sql\sql.ts:223:69)
+    at Array.map (<anonymous>)
+    at SQL.buildQueryFromSourceParams (C:\Users\ianam\.gem
+ini\antigravity\scratch\ianampudia11\node_modules\src\sql\
+sql.ts:148:30)
+    at <anonymous> (C:\Users\ianam\.gemini\antigravity\scr
+atch\ianampudia11\node_modules\src\sql\sql.ts:170:17)
+    at Array.map (<anonymous>)
+    at SQL.buildQueryFromSourceParams (C:\Users\ianam\.gem
+ini\antigravity\scratch\ianampudia11\node_modules\src\sql\
+sql.ts:148:30)
+    at <anonymous> (C:\Users\ianam\.gemini\antigravity\scr
+atch\ianampudia11\node_modules\src\sql\sql.ts:174:17)
+    at Array.map (<anonymous>)
+    at SQL.buildQueryFromSourceParams (C:\Users\ianam\.gem
+ini\antigravity\scratch\ianampudia11\node_modules\src\sql\
+sql.ts:148:30)
+    at <anonymous> (C:\Users\ianam\.gemini\antigravity\scr
+atch\ianampudia11\node_modules\src\sql\sql.ts:124:23)
+    at Object.startActiveSpan (C:\Users\ianam\.gemini\anti
+gravity\scratch\ianampudia11\node_modules\src\tracing.ts:2
+7:11)
+    at SQL.toQuery (C:\Users\ianam\.gemini\antigravity\scr
+atch\ianampudia11\node_modules\src\sql\sql.ts:123:17)
+    at PgDialect.sqlToQuery (C:\Users\ianam\.gemini\antigr
+avity\scratch\ianampudia11\node_modules\src\pg-core\dialec
+t.ts:591:14)
+    at <anonymous> (C:\Users\ianam\.gemini\antigravity\scr
+atch\ianampudia11\node_modules\src\pg-core\query-builders\
+insert.ts:405:19)
+    at Object.startActiveSpan (C:\Users\ianam\.gemini\anti
+gravity\scratch\ianampudia11\node_modules\src\tracing.ts:2
+7:11)
+[CREATE TASK] Error stack: TypeError: value.toISOString 
+is not a function
+    at PgTimestamp.mapToDriverValue (C:\Users\ianam\.gemin
+i\antigravity\scratch\ianampudia11\node_modules\src\pg-cor
+e\columns\timestamp.ts:66:16)
+    at <anonymous> (C:\Users\ianam\.gemini\antigravity\scr
+atch\ianampudia11\node_modules\src\sql\sql.ts:223:69)
+    at Array.map (<anonymous>)
+    at SQL.buildQueryFromSourceParams (C:\Users\ianam\.gem
+ini\antigravity\scratch\ianampudia11\node_modules\src\sql\
+sql.ts:148:30)
+    at <anonymous> (C:\Users\ianam\.gemini\antigravity\scr
+atch\ianampudia11\node_modules\src\sql\sql.ts:170:17)
+    at Array.map (<anonymous>)
+    at SQL.buildQueryFromSourceParams (C:\Users\ianam\.gem
+ini\antigravity\scratch\ianampudia11\node_modules\src\sql\
+sql.ts:148:30)
+    at <anonymous> (C:\Users\ianam\.gemini\antigravity\scr
+atch\ianampudia11\node_modules\src\sql\sql.ts:174:17)
+    at Array.map (<anonymous>)
+    at SQL.buildQueryFromSourceParams (C:\Users\ianam\.gem
+ini\antigravity\scratch\ianampudia11\node_modules\src\sql\
+sql.ts:148:30)
+    at <anonymous> (C:\Users\ianam\.gemini\antigravity\scr
+atch\ianampudia11\node_modules\src\sql\sql.ts:124:23)
+    at Object.startActiveSpan (C:\Users\ianam\.gemini\anti
+gravity\scratch\ianampudia11\node_modules\src\tracing.ts:2
+7:11)
+    at SQL.toQuery (C:\Users\ianam\.gemini\antigravity\scr
+atch\ianampudia11\node_modules\src\sql\sql.ts:123:17)
+    at PgDialect.sqlToQuery (C:\Users\ianam\.gemini\antigr
+avity\scratch\ianampudia11\node_modules\src\pg-core\dialec
+t.ts:591:14)
+    at <anonymous> (C:\Users\ianam\.gemini\antigravity\scr
+atch\ianampudia11\node_modules\src\pg-core\query-builders\
+insert.ts:405:19)
+    at Object.startActiveSpan (C:\Users\ianam\.gemini\anti
+gravity\scratch\ianampudia11\node_modules\src\tracing.ts:2
+7:11)
+No Google tokens found for user 3 in company 1
+No Google tokens found for user 3 in company 1
+No Google tokens found for user 3 in company 1

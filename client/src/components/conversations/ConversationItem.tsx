@@ -11,15 +11,17 @@ import { stripAgentSignature } from '@/utils/messageUtils';
 import { stripFormatting } from '@/utils/textFormatter';
 import BotIcon from '@/components/ui/bot-icon';
 import useSocket from '@/hooks/useSocket';
+import { ColoredTag } from '@/components/ui/colored-tag';
 
 interface ConversationItemProps {
   conversation: any;
   isActive: boolean;
   onClick: () => void;
   searchQuery?: string;
+  tagColorsMap?: Map<string, string | null>;
 }
 
-export default function ConversationItem({ conversation, isActive, onClick, searchQuery }: ConversationItemProps) {
+export default function ConversationItem({ conversation, isActive, onClick, searchQuery, tagColorsMap }: ConversationItemProps) {
   const { contact } = conversation;
   const lastMessageTime = new Date(conversation.lastMessageAt);
   const [assignedUserId, setAssignedUserId] = useState(conversation.assignedToUserId);
@@ -48,7 +50,7 @@ export default function ConversationItem({ conversation, isActive, onClick, sear
   });
 
   const getChannelInfo = (channelType: string) => {
-    switch(channelType) {
+    switch (channelType) {
       case 'whatsapp':
       case 'whatsapp_unofficial':
         return { icon: 'ri-whatsapp-line', color: '#25D366', name: t('conversations.item.channel.whatsapp', 'WhatsApp') };
@@ -167,19 +169,17 @@ export default function ConversationItem({ conversation, isActive, onClick, sear
 
   return (
     <div
-      className={`border-l-4 min-h-[88px] sm:min-h-[80px] ${
-        isActive
-          ? 'border-primary-500 bg-primary-50 hover:bg-primary-100'
-          : 'border-transparent hover:bg-gray-50'
-      } cursor-pointer transition-colors duration-150`}
+      className={`border-l-4 min-h-[88px] sm:min-h-[80px] ${isActive
+        ? 'border-primary-500 bg-primary-50 hover:bg-primary-100'
+        : 'border-transparent hover:bg-gray-50'
+        } cursor-pointer transition-colors duration-150`}
       onClick={handleClick}
       role="button"
       tabIndex={0}
-      aria-label={`${t('conversations.item.conversation_with', 'Conversation with')} ${
-        conversation.isGroup
-          ? (conversation.groupName || t('groups.unnamed_group', 'Unnamed Group'))
-          : contact?.name
-      }${unreadCount > 0 ? `, ${unreadCount} ${t('conversations.item.unread_messages', 'unread messages')}` : ''}`}
+      aria-label={`${t('conversations.item.conversation_with', 'Conversation with')} ${conversation.isGroup
+        ? (conversation.groupName || t('groups.unnamed_group', 'Unnamed Group'))
+        : contact?.name
+        }${unreadCount > 0 ? `, ${unreadCount} ${t('conversations.item.unread_messages', 'unread messages')}` : ''}`}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
@@ -265,25 +265,14 @@ export default function ConversationItem({ conversation, isActive, onClick, sear
 
         {contact?.tags && contact.tags.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1">
-            {contact.tags.slice(0, 5).map((tag: string, idx: number) => {
-              const isHighlighted = searchQuery &&
-                searchQuery.trim().length > 0 &&
-                tag.toLowerCase().includes(searchQuery.toLowerCase().trim());
-
-              return (
-                <span
-                  key={idx}
-                  className={`px-2 py-1 text-xs rounded-full truncate max-w-[80px] ${
-                    isHighlighted
-                      ? 'bg-yellow-200 text-yellow-900 ring-2 ring-yellow-400'
-                      : 'bg-blue-100 text-blue-800'
-                  }`}
-                >
-                  {tag}
-                </span>
-              );
-            })}
-
+            {contact.tags.slice(0, 5).map((tag: string, idx: number) => (
+              <ColoredTag
+                key={idx}
+                name={tag}
+                color={tagColorsMap?.get(tag) || undefined}
+                size="sm"
+              />
+            ))}
           </div>
         )}
 

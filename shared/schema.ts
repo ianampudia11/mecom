@@ -51,41 +51,7 @@ export const companies = pgTable("companies", {
   updatedAt: timestamp("updated_at").defaultNow()
 });
 
-export const insertCompanySchema = createInsertSchema(companies).pick({
-  name: true,
-  slug: true,
-  logo: true,
-  primaryColor: true,
-  active: true,
-  plan: true,
-  planId: true,
-  subscriptionStatus: true,
-  subscriptionStartDate: true,
-  subscriptionEndDate: true,
-  trialStartDate: true,
-  trialEndDate: true,
-  isInTrial: true,
-  maxUsers: true,
-  registerNumber: true,
-  companyEmail: true,
-  contactPerson: true,
-  iban: true,
-  stripeCustomerId: true,
-  stripeSubscriptionId: true,
-  billingCycleAnchor: true,
-  gracePeriodEnd: true,
-  pauseStartDate: true,
-  pauseEndDate: true,
-  autoRenewal: true,
-  dunningAttempts: true,
-  lastDunningAttempt: true,
-  subscriptionMetadata: true,
-
-  currentStorageUsed: true,
-  currentBandwidthUsed: true,
-  filesCount: true,
-  lastUsageUpdate: true
-});
+export const insertCompanySchema = createInsertSchema(companies);
 
 // Session table for connect-pg-simple - managed via drizzle.config.ts filter
 
@@ -1261,6 +1227,7 @@ export const taskCategories = pgTable("task_categories", {
   updatedAt: timestamp("updated_at").notNull().defaultNow()
 });
 
+export const insertTaskCategorySchema = createInsertSchema(taskCategories);
 export type TaskCategory = typeof taskCategories.$inferSelect;
 export type InsertTaskCategory = typeof taskCategories.$inferInsert;
 
@@ -1859,6 +1826,8 @@ export const pipelines = pgTable("pipelines", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow()
 });
+
+export const insertPipelineSchema = createInsertSchema(pipelines);
 
 export const pipelineStages = pgTable("pipeline_stages", {
   id: serial("id").primaryKey(),
@@ -2859,6 +2828,9 @@ export const insertDealSchema = createInsertSchema(deals).pick({
   lastActivityAt: true
 });
 
+export type Deal = typeof deals.$inferSelect;
+export type InsertDeal = z.infer<typeof insertDealSchema>;
+
 export const dealActivities = pgTable("deal_activities", {
   id: serial("id").primaryKey(),
   dealId: integer("deal_id").notNull().references(() => deals.id),
@@ -2920,8 +2892,8 @@ export const insertSystemUpdateSchema = createInsertSchema(systemUpdates).pick({
 
 
 
-export type Deal = typeof deals.$inferSelect;
-export type InsertDeal = z.infer<typeof insertDealSchema>;
+
+
 export type DealActivity = typeof dealActivities.$inferSelect;
 export type InsertDealActivity = z.infer<typeof insertDealActivitySchema>;
 export type DealStatus = z.infer<typeof dealStatusTypes>;
@@ -3002,6 +2974,35 @@ export type InsertPlan = z.infer<typeof insertPlanSchema>;
 
 export type PlanAiProviderConfig = typeof planAiProviderConfigs.$inferSelect;
 export type InsertPlanAiProviderConfig = z.infer<typeof insertPlanAiProviderConfigSchema>;
+
+// Tasks Feature
+export const taskPriorityEnum = pgEnum('task_priority', ['low', 'medium', 'high', 'urgent']);
+export const taskStatusEnum = pgEnum('task_status', ['not_started', 'in_progress', 'completed', 'cancelled']);
+
+export const tasks = pgTable("tasks", {
+  id: serial("id").primaryKey(),
+  contactId: integer("contact_id"),
+  companyId: integer("company_id").notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  priority: taskPriorityEnum("priority").default('medium').notNull(),
+  status: taskStatusEnum("status").default('not_started').notNull(),
+  dueDate: timestamp("due_date"),
+  completedAt: timestamp("completed_at"),
+  assignedTo: text("assigned_to"),
+  category: text("category"),
+  tags: text("tags").array(),
+  checklist: jsonb("checklist"),
+  backgroundColor: text("background_color"),
+  createdBy: integer("created_by"),
+  updatedBy: integer("updated_by"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const insertTaskSchema = createInsertSchema(tasks);
+export type Task = typeof tasks.$inferSelect;
+export type InsertTask = typeof tasks.$inferInsert;
 
 export type PlanAiUsageTracking = typeof planAiUsageTracking.$inferSelect;
 export type InsertPlanAiUsageTracking = z.infer<typeof insertPlanAiUsageTrackingSchema>;
@@ -4382,3 +4383,14 @@ export type InsertKnowledgeBaseDocumentNode = z.infer<typeof insertKnowledgeBase
 
 export type KnowledgeBaseUsage = typeof knowledgeBaseUsage.$inferSelect;
 export type InsertKnowledgeBaseUsage = z.infer<typeof insertKnowledgeBaseUsageSchema>;
+
+
+
+
+
+
+
+
+
+
+

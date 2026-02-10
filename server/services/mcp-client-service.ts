@@ -18,7 +18,7 @@ class MCPClientService {
    */
   async getOrCreateConnection(config: MCPServerConfig): Promise<MCPServerConnection> {
     const existingConnection = this.connections.get(config.id);
-    
+
 
     if (existingConnection) {
       const timeSinceLastUse = Date.now() - existingConnection.lastUsedAt.getTime();
@@ -70,7 +70,9 @@ class MCPClientService {
           version: '1.0.0'
         }, {
           capabilities: {
-            tools: {}
+            roots: {
+              listChanged: true
+            }
           }
         });
 
@@ -90,7 +92,9 @@ class MCPClientService {
           version: '1.0.0'
         }, {
           capabilities: {
-            tools: {}
+            roots: {
+              listChanged: true
+            }
           }
         });
 
@@ -180,7 +184,7 @@ class MCPClientService {
           name: toolName,
           arguments: arguments_
         }),
-        new Promise((_, reject) => 
+        new Promise((_, reject) =>
           setTimeout(() => reject(new Error('Tool execution timeout')), timeout)
         )
       ]);

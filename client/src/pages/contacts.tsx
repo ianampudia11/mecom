@@ -10,6 +10,7 @@ import Pagination from '@/components/contacts/Pagination';
 import EditContactModal from '@/components/contacts/EditContactModal';
 import { ContactExportModal } from '@/components/contacts/ContactExportModal';
 import { CreateSegmentFromContactsModal } from '@/components/contacts/CreateSegmentFromContactsModal';
+import { QuickCampaignModal } from '@/components/campaigns/QuickCampaignModal';
 import { WhatsAppScrapingModal } from '@/components/contacts/WhatsAppScrapingModal';
 import { useToast } from "@/hooks/use-toast";
 import { formatDistanceToNow, parseISO, formatISO, addHours } from 'date-fns';
@@ -26,7 +27,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, Plus, Upload, Download, AlertCircle, CheckCircle, X, Trash2, Search, Filter, MoreHorizontal, Phone, Mail, MapPin, Calendar, FileText, Archive, Users, Eye, Edit, Clock, Flag, User, CheckSquare, Square, AlertTriangle, ChevronDown, SortAsc, SortDesc, Smartphone } from 'lucide-react';
+import { Loader2, Plus, Upload, Download, AlertCircle, CheckCircle, X, Trash2, Search, Filter, MoreHorizontal, Phone, Mail, MapPin, Calendar, FileText, Archive, Users, Eye, Edit, Clock, Flag, User, CheckSquare, Square, AlertTriangle, ChevronDown, SortAsc, SortDesc, Smartphone, Megaphone, Send } from 'lucide-react';
 import AgentDisplay from '@/components/contacts/AgentDisplay';
 import { AuditLogTimeline } from '@/components/contacts/AuditLogTimeline';
 import { useGoogleCalendarAuth } from '@/hooks/useGoogleCalendarAuth';
@@ -320,6 +321,8 @@ export default function Contacts() {
 
 
   const [isCreateSegmentModalOpen, setIsCreateSegmentModalOpen] = useState(false);
+  const [segmentCreationMode, setSegmentCreationMode] = useState<'default' | 'campaign'>('default');
+  const [isQuickCampaignModalOpen, setIsQuickCampaignModalOpen] = useState(false);
 
 
   const [isWhatsAppScrapingModalOpen, setIsWhatsAppScrapingModalOpen] = useState(false);
@@ -1766,7 +1769,7 @@ export default function Contacts() {
 
         <div className="flex-1 flex overflow-hidden">
           {/* Left Panel - Contacts List */}
-          <div className="w-96 bg-white border-r border-gray-200 flex flex-col">
+          <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
             {/* Navigation Tabs */}
             <div className="px-4 py-3 border-b border-gray-200">
               <div className="flex space-x-6">
@@ -1878,10 +1881,34 @@ export default function Contacts() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setIsCreateSegmentModalOpen(true)}
+                      onClick={() => {
+                        setSegmentCreationMode('default');
+                        setIsCreateSegmentModalOpen(true);
+                      }}
                       className="text-xs"
                     >
                       Segment
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSegmentCreationMode('campaign');
+                        setIsCreateSegmentModalOpen(true);
+                      }}
+                      className="text-xs"
+                    >
+                      <Megaphone className="h-3 w-3 mr-1" />
+                      Campaign
+                    </Button>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => setIsQuickCampaignModalOpen(true)}
+                      className="text-xs bg-green-600 hover:bg-green-700"
+                    >
+                      <Send className="h-3 w-3 mr-1" />
+                      Enviar Campaña
                     </Button>
                     {archivedFilter !== 'archived' ? (
                       <Button
@@ -2004,8 +2031,9 @@ export default function Contacts() {
                     return (
                       <div
                         key={contact.id}
-                        className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${isDetailSelected ? 'bg-blue-50 border-r-2 border-blue-500' : ''
-                          } ${isSelected ? 'bg-blue-25' : ''} ${(contact as any).isArchived ? 'opacity-60 bg-gray-50' : ''
+                        className={`p-4 hover:bg-gray-50 cursor-pointer transition-all border-l-4 ${isDetailSelected ? 'bg-blue-50 border-r-2 border-blue-500 border-l-blue-500' : 'border-l-transparent'
+                          } ${isSelected ? 'bg-blue-100 border-l-blue-600 ring-2 ring-blue-200' : ''
+                          } ${(contact as any).isArchived ? 'opacity-60 bg-gray-50' : ''
                           }`}
                         onClick={() => setSelectedContactForDetail(contact)}
                       >
@@ -3372,6 +3400,18 @@ export default function Contacts() {
         onClose={() => setIsCreateSegmentModalOpen(false)}
         selectedContactIds={Array.from(selectedContacts)}
         onSegmentCreated={handleSegmentCreated}
+        onSuccessAction={segmentCreationMode}
+      />
+
+      {/* Quick Campaign Modal */}
+      <QuickCampaignModal
+        isOpen={isQuickCampaignModalOpen}
+        onClose={() => setIsQuickCampaignModalOpen(false)}
+        selectedContactIds={Array.from(selectedContacts)}
+        onSuccess={() => {
+          setSelectedContacts(new Set());
+          setIsQuickCampaignModalOpen(false);
+        }}
       />
 
       {/* WhatsApp Scraping Modal */}

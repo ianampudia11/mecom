@@ -298,6 +298,33 @@ export function CampaignBuilder() {
   const contentTextareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const [initialSegmentId, setInitialSegmentId] = useState<number | null>(null);
+
+  useEffect(() => {
+    // Parse query params manually since wouter doesn't provide them in useLocation
+    const searchParams = new URLSearchParams(window.location.search);
+    const segId = searchParams.get('segmentId');
+    if (segId) {
+      setInitialSegmentId(parseInt(segId, 10));
+      setCurrentStep(1); // Auto-advance to Audience step
+    }
+  }, []);
+
+  useEffect(() => {
+    if (initialSegmentId && segments.length > 0 && !campaignData.segmentId) {
+      const segment = segments.find(s => s.id === initialSegmentId);
+      if (segment) {
+        setCampaignData(prev => ({
+          ...prev,
+          segmentId: segment.id
+        }));
+        toast({
+          title: t('common.success', 'Success'),
+          description: t('campaigns.builder.segment_preselected', 'Segment "{{name}}" pre-selected from contacts', { name: segment.name })
+        });
+      }
+    }
+  }, [initialSegmentId, segments, campaignData.segmentId, t, toast]);
 
   const { data: channelConnections = [], isLoading: connectionsLoading } = useChannelConnections();
 
@@ -321,7 +348,7 @@ export function CampaignBuilder() {
     if (campaignData.whatsappChannelType === WHATSAPP_CHANNEL_TYPES.OFFICIAL) {
 
       return template.whatsappChannelType === 'official' &&
-             template.whatsappTemplateStatus === 'approved';
+        template.whatsappTemplateStatus === 'approved';
     } else {
 
       return template.whatsappChannelType === 'unofficial';
@@ -772,9 +799,9 @@ export function CampaignBuilder() {
 
 
     const hasAccounts = (campaignData.whatsappAccountIds?.length || 0) > 0 ||
-                       (campaignData.channelIds?.length || 0) > 0 ||
-                       campaignData.whatsappAccountId ||
-                       campaignData.channelId;
+      (campaignData.channelIds?.length || 0) > 0 ||
+      campaignData.whatsappAccountId ||
+      campaignData.channelId;
 
     if (!hasAccounts) {
       errors.push(t('campaigns.builder.validation.connection_required', 'At least one WhatsApp connection is required'));
@@ -1168,7 +1195,7 @@ export function CampaignBuilder() {
                   <div className="border rounded-lg p-3 space-y-2 max-h-48 overflow-y-auto">
                     {whatsappConnections.map((connection: any) => {
                       const isSelected = campaignData.channelIds?.includes(connection.id) ||
-                                       (campaignData.channelId === connection.id && !campaignData.channelIds?.length);
+                        (campaignData.channelId === connection.id && !campaignData.channelIds?.length);
 
                       return (
                         <div key={connection.id} className="flex items-center space-x-3 p-2 hover:bg-muted rounded">
@@ -1505,7 +1532,7 @@ export function CampaignBuilder() {
               )}
             </div>
 
-         
+
 
             {contentValidation && (
               <Card>
@@ -1613,11 +1640,10 @@ export function CampaignBuilder() {
                 </div>
 
                 {/* Channel-specific rate limit warnings */}
-                <div className={`p-3 rounded-lg border ${
-                  campaignData.whatsappChannelType === WHATSAPP_CHANNEL_TYPES.OFFICIAL
+                <div className={`p-3 rounded-lg border ${campaignData.whatsappChannelType === WHATSAPP_CHANNEL_TYPES.OFFICIAL
                     ? 'bg-green-50 border-green-200'
                     : 'bg-orange-50 border-orange-200'
-                }`}>
+                  }`}>
                   <div className="flex items-start gap-2">
                     {campaignData.whatsappChannelType === WHATSAPP_CHANNEL_TYPES.OFFICIAL ? (
                       <CheckCircle className="w-4 h-4 text-green-600 mt-0.5" />
@@ -1625,21 +1651,19 @@ export function CampaignBuilder() {
                       <AlertTriangle className="w-4 h-4 text-orange-600 mt-0.5" />
                     )}
                     <div className="text-sm">
-                      <div className={`font-medium mb-1 ${
-                        campaignData.whatsappChannelType === WHATSAPP_CHANNEL_TYPES.OFFICIAL
+                      <div className={`font-medium mb-1 ${campaignData.whatsappChannelType === WHATSAPP_CHANNEL_TYPES.OFFICIAL
                           ? 'text-green-800'
                           : 'text-orange-800'
-                      }`}>
+                        }`}>
                         {campaignData.whatsappChannelType === WHATSAPP_CHANNEL_TYPES.OFFICIAL
                           ? t('campaigns.builder.settings.official_limits_title', 'Official API Rate Limits')
                           : t('campaigns.builder.settings.unofficial_limits_title', 'Unofficial Channel Limits')
                         }
                       </div>
-                      <div className={`space-y-1 ${
-                        campaignData.whatsappChannelType === WHATSAPP_CHANNEL_TYPES.OFFICIAL
+                      <div className={`space-y-1 ${campaignData.whatsappChannelType === WHATSAPP_CHANNEL_TYPES.OFFICIAL
                           ? 'text-green-700'
                           : 'text-orange-700'
-                      }`}>
+                        }`}>
                         {campaignData.whatsappChannelType === WHATSAPP_CHANNEL_TYPES.OFFICIAL ? (
                           <>
                             <div>• {t('campaigns.builder.settings.official_limit_1', 'Up to 1000 messages per minute')}</div>
@@ -1852,11 +1876,10 @@ export function CampaignBuilder() {
                 </div>
 
                 {/* Channel-specific anti-ban importance warning */}
-                <div className={`p-3 rounded-lg border ${
-                  campaignData.whatsappChannelType === WHATSAPP_CHANNEL_TYPES.UNOFFICIAL
+                <div className={`p-3 rounded-lg border ${campaignData.whatsappChannelType === WHATSAPP_CHANNEL_TYPES.UNOFFICIAL
                     ? 'bg-red-50 border-red-200'
                     : 'bg-gray-50 border-gray-200'
-                }`}>
+                  }`}>
                   <div className="flex items-start gap-2">
                     {campaignData.whatsappChannelType === WHATSAPP_CHANNEL_TYPES.UNOFFICIAL ? (
                       <AlertTriangle className="w-4 h-4 text-red-600 mt-0.5" />
@@ -1864,21 +1887,19 @@ export function CampaignBuilder() {
                       <BadgeInfo className="w-4 h-4 text-gray-600 mt-0.5" />
                     )}
                     <div className="text-sm">
-                      <div className={`font-medium mb-1 ${
-                        campaignData.whatsappChannelType === WHATSAPP_CHANNEL_TYPES.UNOFFICIAL
+                      <div className={`font-medium mb-1 ${campaignData.whatsappChannelType === WHATSAPP_CHANNEL_TYPES.UNOFFICIAL
                           ? 'text-red-800'
                           : 'text-gray-800'
-                      }`}>
+                        }`}>
                         {campaignData.whatsappChannelType === WHATSAPP_CHANNEL_TYPES.UNOFFICIAL
                           ? t('campaigns.builder.antiban.unofficial_critical', 'Critical: Anti-Ban Protection Required')
                           : t('campaigns.builder.antiban.official_optional', 'Anti-Ban Protection (Optional)')
                         }
                       </div>
-                      <div className={`${
-                        campaignData.whatsappChannelType === WHATSAPP_CHANNEL_TYPES.UNOFFICIAL
+                      <div className={`${campaignData.whatsappChannelType === WHATSAPP_CHANNEL_TYPES.UNOFFICIAL
                           ? 'text-red-700'
                           : 'text-gray-700'
-                      }`}>
+                        }`}>
                         {campaignData.whatsappChannelType === WHATSAPP_CHANNEL_TYPES.UNOFFICIAL ? (
                           <p>{t('campaigns.builder.antiban.unofficial_critical_desc', 'Unofficial WhatsApp channels have high ban risk. Anti-ban protection is essential to avoid account restrictions. Use conservative settings and business hours.')}</p>
                         ) : (
@@ -2462,13 +2483,12 @@ export function CampaignBuilder() {
               {CAMPAIGN_STEPS.map((_, index) => (
                 <div
                   key={index}
-                  className={`w-2 h-2 rounded-full ${
-                    index === currentStep
+                  className={`w-2 h-2 rounded-full ${index === currentStep
                       ? 'bg-brand-primary'
                       : index < currentStep
                         ? 'bg-green-500'
                         : 'bg-gray-300 dark:bg-gray-600'
-                  }`}
+                    }`}
                 />
               ))}
             </div>

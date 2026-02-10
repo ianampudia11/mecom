@@ -196,6 +196,13 @@ export function TagManagement() {
     };
 
 
+    const [searchQuery, setSearchQuery] = useState('');
+
+    // Filter tags based on search query
+    const filteredTags = tags.filter(tag =>
+        tag.tag.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     return (
         <>
             <Card>
@@ -212,15 +219,23 @@ export function TagManagement() {
                             Crear Tag
                         </Button>
                     </div>
+                    <div className="mt-4">
+                        <Input
+                            placeholder="Buscar tags..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="max-w-sm"
+                        />
+                    </div>
                 </CardHeader>
                 <CardContent>
                     {isLoading ? (
                         <div className="flex items-center justify-center p-8">
                             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                         </div>
-                    ) : tags.length === 0 ? (
+                    ) : filteredTags.length === 0 ? (
                         <div className="text-center p-8 text-muted-foreground">
-                            No hay tags creados aún
+                            {searchQuery ? 'No se encontraron tags que coincidan con tu búsqueda' : 'No hay tags creados aún'}
                         </div>
                     ) : (
                         <Table>
@@ -235,7 +250,7 @@ export function TagManagement() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {tags.map((tag) => (
+                                {filteredTags.map((tag) => (
                                     <TableRow key={tag.tag}>
                                         <TableCell>
                                             <ColoredTag name={tag.tag} color={tag.color || undefined} size="md" />
