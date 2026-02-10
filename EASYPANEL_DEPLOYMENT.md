@@ -26,7 +26,7 @@ Asegúrate de que los siguientes archivos estén en la raíz de tu repositorio:
 
 1.  En la configuración del servicio, ve a la pestaña **Source**.
 2.  Conecta tu repositorio de GitHub/GitLab.
-3.  Selecciona el repositorio `PointerSoftware/ianampudia11` (o el nombre que tenga).
+3.  Selecciona el repositorio `ianampudia11/mecom`.
 4.  Rama: `main` (o la rama que uses para producción).
 
 ## Paso 4: Configurar el Build
