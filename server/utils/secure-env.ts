@@ -135,7 +135,7 @@ class SecureEnvironment {
 
     const url = new URL(dbUrl);
 
-    const sslMode = this.get('PGSSLMODE') || (process.env.NODE_ENV === 'production' ? 'prefer' : 'disable');
+    const sslMode = this.get('PGSSLMODE') || 'disable';
     url.searchParams.set('sslmode', sslMode);
     url.searchParams.set('application_name', 'iawarrior-prod');
 
