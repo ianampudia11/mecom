@@ -355,7 +355,8 @@ class LicenseValidator {
       return { valid: true };
     }
 
-    if (process.env.SKIP_LICENSE_CHECK === 'true') {
+    const skipCheck = process.env.SKIP_LICENSE_CHECK?.toString().trim().toLowerCase();
+    if (process.env.SKIP_LICENSE_CHECK === 'true' || skipCheck === 'true' || skipCheck === '1') {
       return { valid: true };
     }
 
@@ -491,7 +492,8 @@ class LicenseValidator {
   }
 
   public getLicenseInfo(): { expiryDate?: Date; allowedIps?: string[]; daysRemaining?: number } | null {
-    if (process.env.NODE_ENV !== 'production' || process.env.SKIP_LICENSE_CHECK === 'true') {
+    const skipCheck = process.env.SKIP_LICENSE_CHECK?.toString().trim().toLowerCase();
+    if (process.env.NODE_ENV !== 'production' || skipCheck === 'true' || skipCheck === '1') {
       return null;
     }
 

@@ -80,6 +80,11 @@ La aplicación debería ejecutar las migraciones automáticamente al iniciar. Si
 1.  Ve a la consola de la aplicación en EasyPanel.
 2.  Ejecuta manualmente: `node scripts/migrate.js run` (o el comando equivalente según tus scripts).
 
-### Error 502 Bad Gateway
-- Verifica que el puerto en la pestaña **Domains** esté configurado en `9000`.
-- Asegúrate de que la aplicación esté escuchando en `0.0.0.0` y no solo en `localhost` (nuestra configuración ya maneja esto).
+### Error "CRITICAL TIMEOUT"
+Si ves `CRITICAL TIMEOUT: Server failed to start listening within 30 seconds` en los logs:
+- Significa que la aplicación se "cuelga" antes de poder abrir el puerto.
+- Revisa si hay errores de conexión a servicios externos (WhatsApp, Email) que estén bloqueando el inicio.
+- Verifica el uso de CPU/Memoria en EasyPanel.
+
+### Error de Licencia
+Si ves errores relacionados con la licencia, asegúrate de que `SKIP_LICENSE_CHECK=true` esté configurado en las variables de entorno. El sistema ahora incluye un archivo de licencia "dummy" para evitar errores de construcción, pero la variable es necesaria para omitir la validación real.
