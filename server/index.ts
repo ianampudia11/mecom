@@ -140,6 +140,7 @@ app.use((req, res, next) => {
     host: "0.0.0.0",
   }, () => {
     logger.info('server', `Server running on port ${port}`);
+    console.log(`DEBUG: Server successfully listening on port ${port}`);
 
     setTimeout(async () => {
       try {

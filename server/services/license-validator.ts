@@ -38,19 +38,19 @@ class LicenseValidator {
   private ipCacheTimeout = 10 * 60 * 1000; // 10 minutes
 
   private constructor() {
-    
+
     const possiblePaths = [
-      path.join(__dirname, 'license'), 
-      path.join(__dirname, '.license'), 
-      path.join(process.cwd(), 'dist', 'license'), 
-      path.join(process.cwd(), 'dist', '.license'), 
-      path.join(__dirname, '../../dist/license'), 
-      path.join(__dirname, '../../dist/.license'), 
-      path.join(process.cwd(), 'license'), 
-      path.join(process.cwd(), '.license'), 
+      path.join(__dirname, 'license'),
+      path.join(__dirname, '.license'),
+      path.join(process.cwd(), 'dist', 'license'),
+      path.join(process.cwd(), 'dist', '.license'),
+      path.join(__dirname, '../../dist/license'),
+      path.join(__dirname, '../../dist/.license'),
+      path.join(process.cwd(), 'license'),
+      path.join(process.cwd(), '.license'),
     ];
 
-    
+
     for (const possiblePath of possiblePaths) {
       if (fs.existsSync(possiblePath)) {
         this.licenseFilePath = possiblePath;
@@ -64,7 +64,7 @@ class LicenseValidator {
     logger.info('license', `Current working directory: ${process.cwd()}`);
     logger.info('license', `__dirname: ${__dirname}`);
     logger.info('license', `Checked paths: ${possiblePaths.join(', ')}`);
-    
+
 
     const markerPaths = [
       path.join(__dirname, '.licensed'),
@@ -72,14 +72,14 @@ class LicenseValidator {
       path.join(__dirname, '../../dist/.licensed'),
       path.join(process.cwd(), '.licensed'),
     ];
-    
+
     for (const markerPath of markerPaths) {
       if (fs.existsSync(markerPath)) {
         this.licensedMarkerPath = markerPath;
         break;
       }
     }
-    
+
     if (!this.licensedMarkerPath) {
       this.licensedMarkerPath = path.join(__dirname, '.licensed');
     }
@@ -148,14 +148,14 @@ class LicenseValidator {
 
 
         const possiblePaths = [
-          path.join(__dirname, 'license'), 
-          path.join(__dirname, '.license'), 
-          path.join(process.cwd(), 'dist', 'license'), 
-          path.join(process.cwd(), 'dist', '.license'), 
-          path.join(__dirname, '../../dist/license'), 
-          path.join(__dirname, '../../dist/.license'), 
-          path.join(process.cwd(), 'license'), 
-          path.join(process.cwd(), '.license'), 
+          path.join(__dirname, 'license'),
+          path.join(__dirname, '.license'),
+          path.join(process.cwd(), 'dist', 'license'),
+          path.join(process.cwd(), 'dist', '.license'),
+          path.join(__dirname, '../../dist/license'),
+          path.join(__dirname, '../../dist/.license'),
+          path.join(process.cwd(), 'license'),
+          path.join(process.cwd(), '.license'),
         ];
 
         let foundPath: string | null = null;
@@ -163,7 +163,7 @@ class LicenseValidator {
           if (fs.existsSync(possiblePath)) {
             foundPath = possiblePath;
             logger.info('license', `License file found at alternative location: ${foundPath}`);
-            this.licenseFilePath = foundPath; 
+            this.licenseFilePath = foundPath;
             break;
           }
         }
@@ -173,7 +173,7 @@ class LicenseValidator {
           logger.error('license', `Current working directory: ${process.cwd()}`);
           logger.error('license', `__dirname: ${__dirname}`);
           logger.error('license', `Checked paths: ${possiblePaths.join(', ')}`);
-          
+
 
           try {
             const dirFiles = fs.readdirSync(__dirname);
@@ -181,7 +181,7 @@ class LicenseValidator {
           } catch (e) {
             logger.error('license', `Could not read __dirname: ${e}`);
           }
-          
+
 
           const distPath = path.join(process.cwd(), 'dist');
           if (fs.existsSync(distPath)) {
@@ -194,7 +194,7 @@ class LicenseValidator {
           } else {
             logger.error('license', `dist/ directory does not exist at: ${distPath}`);
           }
-          
+
           return null;
         }
       }
@@ -247,23 +247,23 @@ class LicenseValidator {
       for (const address of addresses) {
         if (address.family === 'IPv4' && !address.internal) {
 
-          if (!address.address.startsWith('172.17.') && 
-              !address.address.startsWith('172.18.') &&
-              !address.address.startsWith('172.19.') &&
-              !address.address.startsWith('172.20.') &&
-              !address.address.startsWith('172.21.') &&
-              !address.address.startsWith('172.22.') &&
-              !address.address.startsWith('172.23.') &&
-              !address.address.startsWith('172.24.') &&
-              !address.address.startsWith('172.25.') &&
-              !address.address.startsWith('172.26.') &&
-              !address.address.startsWith('172.27.') &&
-              !address.address.startsWith('172.28.') &&
-              !address.address.startsWith('172.29.') &&
-              !address.address.startsWith('172.30.') &&
-              !address.address.startsWith('172.31.') &&
-              !address.address.startsWith('10.') &&
-              !address.address.startsWith('192.168.')) {
+          if (!address.address.startsWith('172.17.') &&
+            !address.address.startsWith('172.18.') &&
+            !address.address.startsWith('172.19.') &&
+            !address.address.startsWith('172.20.') &&
+            !address.address.startsWith('172.21.') &&
+            !address.address.startsWith('172.22.') &&
+            !address.address.startsWith('172.23.') &&
+            !address.address.startsWith('172.24.') &&
+            !address.address.startsWith('172.25.') &&
+            !address.address.startsWith('172.26.') &&
+            !address.address.startsWith('172.27.') &&
+            !address.address.startsWith('172.28.') &&
+            !address.address.startsWith('172.29.') &&
+            !address.address.startsWith('172.30.') &&
+            !address.address.startsWith('172.31.') &&
+            !address.address.startsWith('10.') &&
+            !address.address.startsWith('192.168.')) {
             ipAddresses.push(address.address);
             logger.debug('license', `Detected network interface IP: ${address.address}`);
           }
@@ -366,14 +366,14 @@ class LicenseValidator {
       path.join(__dirname, '../../dist/.licensed'),
       path.join(process.cwd(), '.licensed'),
     ];
-    
+
     const isLicensedBuild = markerPaths.some(p => fs.existsSync(p));
-    
+
 
     if (!isLicensedBuild) {
       return { valid: true };
     }
-    
+
 
     if (!fs.existsSync(this.licenseFilePath)) {
 
@@ -491,7 +491,7 @@ class LicenseValidator {
   }
 
   public getLicenseInfo(): { expiryDate?: Date; allowedIps?: string[]; daysRemaining?: number } | null {
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.NODE_ENV !== 'production' || process.env.SKIP_LICENSE_CHECK === 'true') {
       return null;
     }
 
