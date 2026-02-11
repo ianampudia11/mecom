@@ -56,6 +56,9 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/migrations ./migrations
 COPY --from=builder /app/scripts ./scripts
 
+# Copiar archivo de licencia si existe
+COPY --from=builder /app/license ./license
+
 # Crear directorios necesarios para persistencia
 RUN mkdir -p /app/uploads /app/whatsapp-sessions /app/backups
 

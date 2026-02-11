@@ -13592,7 +13592,8 @@ DO $$ BEGIN
 END $$;
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'deal_properties' AND column_name = 'id') THEN
-    ALTER TABLE "deal_properties" ADD COLUMN "id" integer;
+    CREATE SEQUENCE IF NOT EXISTS deal_properties_id_seq;
+    ALTER TABLE "deal_properties" ADD COLUMN "id" integer NOT NULL DEFAULT nextval('deal_properties_id_seq'::regclass);
   END IF;
 END $$;
 DO $$ BEGIN
