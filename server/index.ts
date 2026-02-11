@@ -135,10 +135,27 @@ app.use((req, res, next) => {
 
 
   console.log('DEBUG: ATTEMPTING LISTENER on port ' + port);
+
+  // Add error listener to server
+  server.on('error', (e: any) => {
+    console.error('DEBUG: Server encountered an error:', e);
+    if (e.code === 'EADDRINUSE') {
+      console.error('DEBUG: Port is already in use!');
+    }
+    process.exit(1);
+  });
+
+  // Setup a timeout to kill the process if it hangs during startup
+  const startupTimeout = setTimeout(() => {
+    console.error('DEBUG: CRITICAL TIMEOUT: Server failed to start listening within 30 seconds.');
+    process.exit(1);
+  }, 30000);
+
   server.listen({
     port,
     host: "0.0.0.0",
   }, () => {
+    clearTimeout(startupTimeout); // Cancel timeout on success
     logger.info('server', `Server running on port ${port}`);
     console.log(`DEBUG: Server successfully listening on port ${port}`);
 
