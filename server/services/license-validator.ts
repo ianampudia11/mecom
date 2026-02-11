@@ -142,6 +142,12 @@ class LicenseValidator {
   }
 
   private readLicenseFile(): LicenseData | null {
+    // Check if license check should be skipped BEFORE attempting to read
+    const skipCheck = process.env.SKIP_LICENSE_CHECK?.toString().trim().toLowerCase();
+    if (skipCheck === 'true' || skipCheck === '1') {
+      return null;
+    }
+
     try {
 
       if (!fs.existsSync(this.licenseFilePath)) {
